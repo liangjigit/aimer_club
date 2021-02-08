@@ -1,0 +1,282 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "AIMER CLUB",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/integral/index",
+			"name":"integral",
+			"style": {
+				"navigationBarTitleText": "如何赚取积分"
+			}
+		},
+		{
+			"path": "pages/cup/detail",
+			"style": {
+				"navigationBarTitleText": "CUP 有料详情"
+			}
+		},
+		{
+			"path": "pages/coupon/index",
+			"style": {
+				"navigationBarTitleText": "优惠券",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/coupon/detail",
+			"style": {
+				"navigationBarTitleText": "优惠券"
+			}
+		},
+		{
+			"path": "pages/join/index",
+			"style": {
+				"navigationBarTitleText": "加入AIMER CLUB",
+				"navigationStyle":"custom"
+			}
+		},
+		{
+			"path": "pages/brarts/index",
+			"style": {
+				"navigationBarTitleText": "BRARTS",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/brarts/detail", 
+			"style": {
+				"navigationBarTitleText": "AIMER CLUB"
+			}
+		},
+		{
+			"path": "pages/activity/index",
+			"style": {
+				"navigationBarTitleText": "社区活动",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/activity/city", 
+			"style": {
+				"navigationBarTitleText": "切换城市"
+			}
+		},
+		{
+			"path": "pages/poster/index", 
+			"style": {
+				"navigationBarTitleText": "分享"
+			}
+		},
+		{
+			"path": "pages/activity/detail", 
+			"style": {
+				"navigationBarTitleText": "AIMER CLUB"
+			}
+		},
+		{
+			"path": "pages/training/index",
+			"style": {
+				"navigationBarTitleText": "体态训练营",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/training/detail/index",
+			"style": {
+				"navigationBarTitleText": "体态训练营"
+			}
+		},
+		{
+			"path": "pages/training/detail/punch",
+			"style": {
+				"navigationBarTitleText": "AIMER CLUB"
+			}
+		},
+		// {
+		// 	"path":"pages/training/evaluation/index",
+		// 	"style": {
+		// 		"navigationBarTitleText": "测量"
+		// 	}
+		// },
+		// {
+		// 	"path":"pages/training/evaluation/record",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的数据"
+		// 	}
+		// },
+		// {
+		// 	"path":"pages/training/evaluation/edit",
+		// 	"style": {
+		// 		"navigationBarTitleText": "体态测量"
+		// 	}
+		// },
+		{
+			"path": "pages/account/index",
+			"style": {
+				"navigationBarTitleText": "我的 CLUB"
+			}
+		},
+		{
+			"path": "pages/account/baseInfo/index",
+			"style": {
+				"navigationBarTitleText": "个人资料"
+			}
+		},
+		// {
+		// 	"path": "pages/account/shoppingGuide/index",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的专属导购"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/account/shoppingGuide/detail",
+		// 	"style": {
+		// 		"navigationBarTitleText": "我的专属导购"
+		// 	}
+		// },
+		// {
+		// 	"path": "pages/account/shoppingGuide/city",
+		// 	"style": {
+		// 		"navigationBarTitleText": "选择城市"
+		// 	}
+		// },
+		{
+			"path": "pages/account/benefit",
+			"style": {
+				"navigationBarTitleText": "我的权益"
+			}
+		},
+		{
+			"path": "pages/account/collect",
+			"style": {
+				"navigationBarTitleText": "我的收藏",
+				"enablePullDownRefresh":true
+			}
+		},
+		{
+			"path": "pages/account/carmi",
+			"style": {
+				"navigationBarTitleText": "电子券卡密"
+			}
+		},
+		{
+			"path": "pages/account/storeNav/index",
+			"style": {
+				"navigationBarTitleText": "门店导航"
+			}
+		},
+		{
+			"path": "pages/account/storeNav/detail",
+			"style": {
+				"navigationBarTitleText": "门店详情"
+			}
+		},
+		{
+			"path": "pages/webview/index",
+			"style": {
+				"navigationBarTitleText": "webview"
+			}
+		}
+	],
+	
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#FFFFFF"
+	},
+	"tabBar": {
+		"color":"#999999",
+		"selectedColor": "#EC2C5A",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [
+			{
+				"pagePath": "pages/index/index",
+				"text": "首页",
+				"iconPath": "static/tabbar/home.png",
+				"selectedIconPath":"static/tabbar/home-selected.png"
+			},
+			{
+				"pagePath": "pages/brarts/index",
+				"text": "BRARTS",
+				"iconPath": "static/tabbar/brarts.png",
+				"selectedIconPath":"static/tabbar/brarts-selected.png"
+			},
+			{
+				"pagePath": "pages/activity/index",
+				"text": "社区活动",
+				"iconPath": "static/tabbar/activity.png",
+				"selectedIconPath":"static/tabbar/activity-selected.png"
+			},
+			{
+				"pagePath": "pages/training/index",
+				"text": "体态训练营",
+				"iconPath": "static/tabbar/training.png",
+				"selectedIconPath":"static/tabbar/training-selected.png"
+			},
+			{
+				"pagePath": "pages/account/index",
+				"text": "我的CLUB",
+				"iconPath": "static/tabbar/my.png",
+				"selectedIconPath":"static/tabbar/my-selected.png"
+			}
+		]
+	},
+	"subPackages":[
+		{
+			"root":"pages/account/shoppingGuide",
+			"pages":[{
+				"path": "index",
+				"style": {
+					"navigationBarTitleText": "我的专属导购"
+				}
+			},
+			{
+				"path": "detail",
+				"style": {
+					"navigationBarTitleText": "我的专属导购"
+				}
+			},
+			{
+				"path": "city",
+				"style": {
+					"navigationBarTitleText": "选择城市"
+				}
+			}]
+		},
+		{
+			"root":"pages/training/evaluation",
+			"pages":[{
+					"path":"index",
+					"style": {
+						"navigationBarTitleText": "体态测评"
+					}
+				},
+				{
+					"path":"record",
+					"style": {
+						"navigationBarTitleText": "我的数据"
+					}
+				},
+				{
+					"path":"edit",
+					"style": {
+						"navigationBarTitleText": "体态测量"
+					}
+				},
+				{
+					"path":"report",
+					"style": {
+						"navigationBarTitleText": "分析报告"
+					}
+				}]
+		}
+	]
+	
+}

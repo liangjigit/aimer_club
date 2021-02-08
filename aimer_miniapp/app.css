@@ -1,0 +1,57 @@
+/* @font-face {
+	font-family: 'PingFang SC';
+	src: url('//at.alicdn.com/t/font_1114123_r6yq558axt.ttf') format('truetype');
+} */
+body{
+	font-family: PingFang SC, Helvetica Neue, Helvetica, sans-serif;
+}
+page{
+	background-color: #FFFFFF;
+}
+scroll-view,
+cover-view{
+	box-sizing: border-box;
+}
+.cu-dialog{
+	border-radius: 20upx;
+	width:620upx;
+}
+.text-gray{
+	color: #CCCCCC;
+}
+.cu-modal{
+	background: rgba(0,0,0,0.4);
+}
+.bg-red{
+	background-color: #EC2C5A;
+}
+.text-red, .line-red, .lines-red{
+	color: #EC2C5A;
+}
+.text-cut-line2{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	/*! autoprefixer: off */
+	-webkit-box-orient: vertical;
+}
+/* modal  */
+.cu-modal{
+	-ms-transform: scale(1);
+		transform: scale(1);
+		background: rgba(0, 0, 0, 0.4);
+}
+.inline-flex{
+	display: inline-flex;
+}
+.padding-lr-0{
+	padding-right: 0;
+	padding-left: 0;
+}
+.cu-card{
+	overflow: initial !important;
+}
+.cu-modal.show{
+	-webkit-overflow-scrolling: touch
+}
