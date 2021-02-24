@@ -181,6 +181,12 @@
 			"style": {
 				"navigationBarTitleText": "webview"
 			}
+		},
+		{
+			"path": "pages/activity/invite",
+			"style": {
+				"navigationBarTitleText": "邀请好友"
+			}
 		}
 	],
 	

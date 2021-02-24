@@ -149,6 +149,7 @@
 			}
 		},
 		onLoad(options) {
+			console.log(options)
 			// options={
 			// 	// 如果从小程序卡片进入（导购二维码、关注公众号）、扫门店二维码
 			// 	guidecode: '',
@@ -174,6 +175,7 @@
 			let _this = this
 			uni.getSetting({
 				success: async function(t) {
+					console.log(t)
 					if(t.authSetting["scope.userInfo"]){
 						await _this.onGetUserInfo()
 						if(_this.isLogin&&(_this.inviteUserId||_this.guidecode)){

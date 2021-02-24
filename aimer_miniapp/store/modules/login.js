@@ -41,12 +41,12 @@ const actions = {
 	// 保存用户信息
 	async login({commit,dispatch,state},payload){
 		const {guidecode,source,aimerid,erpcode,appid,inviteUserId} = state // 导购信息
-		console.log('login 邀请人id:' + inviteUserId)
-		console.log('login guidecode:' + guidecode)
-		console.log('login erpcode:' + erpcode)
-		console.log('login source:' + source)
-		console.log('login aimerid:' + aimerid)
-		console.log('login appid:' + appid)
+		// console.log('login 邀请人id:' + inviteUserId)
+		// console.log('login guidecode:' + guidecode)
+		// console.log('login erpcode:' + erpcode)
+		// console.log('login source:' + source)
+		// console.log('login aimerid:' + aimerid)
+		// console.log('login appid:' + appid)
 		let response = (await request({
 			url:'/user/miniapp/wx/login',
 			method:'POST',
@@ -88,14 +88,14 @@ const actions = {
 			 	provider: 'weixin',
 			 	success(res) {
 			 		const { code, errMsg } = res;
-					console.log(code)
+					// console.log(code)
 			 		if(errMsg == "login:ok"){
 			 			// 获取用户信息
 						uni.getUserInfo({
 						  withCredentials: false,
 						  provider: 'weixin',
 						  async success(infoRes) {
-							 // console.log(infoRes)
+							 console.log(infoRes)
 							 let { userInfo } = infoRes;
 							 let response = await dispatch('login',{jscode:code,userInfo:JSON.stringify(userInfo)});
 							 resolve(response)
