@@ -8,37 +8,72 @@
 				</view>
 			</view>
 		</header>
+		<main>
+			<view>
+				<button class="cu-btn round bg-white" role="button" aria-disabled="false" @click="inviteF">邀请好友</button>
+			</view>
+			<view>
+				<button class="cu-btn round bg-white" role="button" aria-disabled="false" @click="sendF">发朋友圈</button>
+			</view>
+			<view>
+				<text>距离失效：20:20:20</text>
+			</view>
+		</main>
+		<footer>
+			<view class="top">
+				<view class="header">邀新奖励</view>
+				<view class="title">您已邀请3/0人，邀请好友越多，奖励越多</view>
+			</view>
+			<view class="footer">
+				<get-reward></get-reward>
+			</view>
+		</footer>
 	</view>
 </template>
 
 <script>
+	import getReward from '../components/get-reward/GetReward.vue'
 	export default {
 		name: 'invite',
+		components:{getReward},
+		data() {
+			return {
+				isAndroid: false
+			}
+		},
 		methods: {
 			/**
 			 * 获取活动规则
 			 */
-			getRole(){
+			getRole() {
 				console.log(1111111111)
 			},
-			test() {
+			/**
+			 * 邀请好友
+			 */
+			inviteF() {
 				console.log(111111111111)
-				uni.getProvider({
-					service: 'share',
-					success(a, b, c) {
-						console.log(a)
-						console.log(b)
-						console.log(c)
-					}
-				})
+			},
+			/**
+			 * 发朋友圈
+			 */
+			sendF() {
+				console.log(111111111)
 			}
 		},
-		onShareAppMessage() {
-			console.log(11111)
+		onLoad() {
+			const _this = this
+			uni.getSystemInfo({
+				success(info) {
+					let {
+						platform
+					} = info
+					if (platform == 'android') _this.isAndroid = true
+				}
+			})
 		},
-		onShareTimeline() {
-
-		}
+		onShareAppMessage() {},
+		onShareTimeline() {}
 	}
 </script>
 
@@ -57,6 +92,7 @@
 			position: fixed;
 			top: 30rpx;
 			right: 0;
+
 			.rule {
 				display: flex;
 				justify-content: flex-end;
@@ -68,6 +104,60 @@
 					border-bottom-right-radius: 0;
 					text-indent: 0;
 				}
+			}
+		}
+
+		main {
+			position: absolute;
+			top: 40%;
+			// border: 1px solid black;
+			width: 100%;
+			height: 15%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+
+			.cu-btn {
+				padding: 0 50rpx;
+				height: 50rpx;
+				color: #EE194C;
+			}
+		}
+
+		footer {
+			position: fixed;
+			bottom: 8%;
+			width: 100%;
+			height: 32%;
+			border: 1px solid black;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+
+			.top {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+
+				.header {
+					font-size: 40rpx;
+					color: #ffffff;
+					font-weight: bolder;
+				}
+
+				.title {
+					margin-top: 6rpx;
+				}
+			}
+
+			.footer {
+				// position: absolute;
+				width: 90%;
+				height: 70%;
+				border: 1px solid black;
+				border-radius: 30rpx;
 			}
 		}
 	}
