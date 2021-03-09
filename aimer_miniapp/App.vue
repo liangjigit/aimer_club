@@ -55,7 +55,9 @@
 			console.log('App Hide')
 		},
 		globalData:{
-			level:false
+			level:false,
+			fromJoin:false,
+			fromActive:false,
 		}
 	}
 </script>

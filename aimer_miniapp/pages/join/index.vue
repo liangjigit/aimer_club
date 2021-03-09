@@ -109,11 +109,11 @@
 						navigatorToPage(url,type,null,null,true)
 						this.GETREDIRECTURL({redirectUrl:null})
 					}else{
+						getApp().globalData.fromJoin = true
 						uni.switchTab({
 							url:"/pages/index/index"
 						})
 					}
-					
 				}
 				return this.isSaveInfo&&this.isSavePhone
 			}

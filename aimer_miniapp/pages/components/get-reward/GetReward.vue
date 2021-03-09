@@ -19,7 +19,7 @@
 				</view>
 				<view class="button_see">可领取</view>
 			</li>
-			<li>
+			<!-- <li>
 				<view class="reward">
 					<view class="image">
 					<image src="../../../static/activity/jiang1.png" mode="widthFix"></image>
@@ -27,7 +27,7 @@
 					<text>邀请5人</text>
 				</view>
 				<view class="button_see">待领取</view>
-			</li>
+			</li> -->
 		</ul>
 	</view>
 </template>
@@ -42,6 +42,7 @@
 	.get_reward{
 		width: 100%;
 		height: 100%;
+		padding-top: 25rpx;
 		ul{
 			width: 100%;
 			height: 100%;

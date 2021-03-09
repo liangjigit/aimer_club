@@ -38,6 +38,39 @@ const actions = {
 		}
 		return response;
 	},
+	// 通过微信 uni.login 获取用户信息 (微信小程序)
+	async onGetUserInfo({dispatch,commit,state}) {
+		 let that = this;
+		 let promise = new Promise((resolve,reject)=>{
+			 uni.login({
+			 	provider: 'weixin',
+			 	success(res) {
+			 		const { code, errMsg } = res;
+					// console.log(code)
+			 		if(errMsg == "login:ok"){
+			 			// 获取用户信息
+						uni.getUserInfo({
+						  withCredentials: false,
+						  provider: 'weixin',
+						  async success(infoRes) {
+							 console.log(infoRes)
+							 let { userInfo } = infoRes;
+							 let response = await dispatch('login',{jscode:code,userInfo:JSON.stringify(userInfo)});
+							 resolve(response)
+						   },
+						   fail(error){
+							   let { errMsg } = error;
+							   reject({errMsg:'获取用户信息失败 uni.getUserInfo, login/onGetUserInfo：' + errMsg})
+							}
+						});
+			 		}else{
+						reject({errMsg:'微信登录失败 uni.login, login/onGetUserInfo：' + errMsg})
+					}
+			 	}
+			 })
+		 })
+		 return promise
+	},
 	// 保存用户信息
 	async login({commit,dispatch,state},payload){
 		const {guidecode,source,aimerid,erpcode,appid,inviteUserId} = state // 导购信息
@@ -79,39 +112,6 @@ const actions = {
 			await dispatch('getMyInfo', {userInfo: JSON.parse(payload.userInfo)})
 		}
 		return response;
-	},
-	// 通过微信 uni.login 获取用户信息 (微信小程序)
-	async onGetUserInfo({dispatch,commit,state}) {
-		 let that = this;
-		 let promise = new Promise((resolve,reject)=>{
-			 uni.login({
-			 	provider: 'weixin',
-			 	success(res) {
-			 		const { code, errMsg } = res;
-					// console.log(code)
-			 		if(errMsg == "login:ok"){
-			 			// 获取用户信息
-						uni.getUserInfo({
-						  withCredentials: false,
-						  provider: 'weixin',
-						  async success(infoRes) {
-							 console.log(infoRes)
-							 let { userInfo } = infoRes;
-							 let response = await dispatch('login',{jscode:code,userInfo:JSON.stringify(userInfo)});
-							 resolve(response)
-						   },
-						   fail(error){
-							   let { errMsg } = error;
-							   reject({errMsg:'获取用户信息失败 uni.getUserInfo, login/onGetUserInfo：' + errMsg})
-							}
-						});
-			 		}else{
-						reject({errMsg:'微信登录失败 uni.login, login/onGetUserInfo：' + errMsg})
-					}
-			 	}
-			 })
-		 })
-		 return promise
 	},
 	// 获取个人资料
 	async getMyInfo({state,commit},payload){
