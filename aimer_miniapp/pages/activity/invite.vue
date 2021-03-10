@@ -25,6 +25,7 @@
 			</view>
 			<view class="footer">
 				<get-reward></get-reward>
+				<count-down :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0"></count-down>
 			</view>
 		</footer>
 		<!-- 新人注册成功页
@@ -79,6 +80,7 @@
 				</view>
 			</view>
 		</view> -->
+		<!-- 邀新奖励
 		<view class="background-img">
 			<view class="background-award">
 				<view class="background-text">
@@ -100,23 +102,45 @@
 					</li>
 				</ul>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
 <script>
 	import getReward from '../components/get-reward/GetReward.vue'
+	import countDown from '../components/get-reward/CountDown.vue'
+	import {mapActions} from 'vuex'
 	export default {
 		name: 'invite',
 		components: {
-			getReward
+			getReward,
+			countDown
 		},
 		data() {
 			return {
-
+				indexData:{},
+				endTime:0,
+				startTime:0,
 			}
 		},
+		created() {
+			//获取页面数据
+			this.getIndexData()
+		},
 		methods: {
+			...mapActions('invite',['getActiveIndex','getActiveAward','getOldInvite','getNewInvite','sendMiniMessage']),
+			/**
+			 * 获取页面数据
+			 */
+			async getIndexData(){
+				const res = await this.getActiveIndex()
+				if(res.code == 200){
+					this.indexData = res.data
+					this.endTime = res.data.userBindConfigDO.endTime
+					this.startTime = res.data.userBindConfigDO.startTime
+					console.log(res.data)
+				}
+			},
 			/**
 			 * 获取活动规则
 			 */

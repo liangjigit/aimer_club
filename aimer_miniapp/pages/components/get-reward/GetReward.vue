@@ -2,7 +2,7 @@
 	<view class="get_reward">
 		<ul>
 			<li>
-				<view class="reward">
+				<view class="reward see-get-bg">
 					<view class="image">
 					<image src="../../../static/activity/jiang1.png" mode="widthFix"></image>
 					</view>
@@ -11,23 +11,23 @@
 				<view class="button_see">查看奖励</view>
 			</li>
 			<li>
-				<view class="reward">
+				<view class="reward see-get-bg">
 					<view class="image">
 					<image src="../../../static/activity/jiang2.png" mode="widthFix"></image>
 					</view>
 					<text>邀请3人</text>
 				</view>
-				<view class="button_see">可领取</view>
+				<view class="button_get">可领取</view>
 			</li>
-			<!-- <li>
-				<view class="reward">
+			<li>
+				<view class="reward wait-bg">
 					<view class="image">
 					<image src="../../../static/activity/jiang1.png" mode="widthFix"></image>
 					</view>
 					<text>邀请5人</text>
 				</view>
-				<view class="button_see">待领取</view>
-			</li> -->
+				<view class="button_wait">待领取</view>
+			</li>
 		</ul>
 	</view>
 </template>
@@ -60,7 +60,6 @@
 					padding-bottom: 25rpx;
 					width: 90%;
 					height: 70%;
-					background: green;
 					display: flex;
 					flex-direction: column;
 					justify-content: space-around;
@@ -73,15 +72,47 @@
 						}
 					}
 				}
+				.see-get-bg{
+					background-color: #ffdde2;
+				}
+				.wait-bg{
+					background-color: #e5e5e5;
+				}
 				.button_see{
 					transform: translateY(-50%);
 					width: 150rpx;
-					height: 50rpx;
-					border:2px solid red;
+					height: 55rpx;
+					border:2px solid #ee194c;
+					color: #ee194c;
 					border-radius: 25rpx;
 					display: flex;
 					justify-content: center;
 					align-items: center;
+					background: #ffffff;
+				}
+				.button_get{
+					transform: translateY(-50%);
+					width: 150rpx;
+					height: 55rpx;
+					border:2px solid #ee194c;
+					color: #ffffff;
+					border-radius: 25rpx;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					background: #ee194c;
+				}
+				.button_wait{
+					transform: translateY(-50%);
+					width: 150rpx;
+					height: 55rpx;
+					border:2px solid #a0a0a0;
+					color: #ffffff;
+					border-radius: 25rpx;
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					background: #a0a0a0;
 				}
 			}
 		}
