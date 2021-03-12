@@ -1,6 +1,6 @@
 <template>
 	<div class="count-down">
-		<span>{{ surplus | filterTime }}</span>
+		<span>距离失效：{{ surplus | filterTime }}</span>
 	</div>
 </template>
 <script>

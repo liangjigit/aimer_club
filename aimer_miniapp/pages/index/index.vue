@@ -190,7 +190,6 @@
 			if(getApp().globalData.fromJoin){
 				console.log('我是从注册页面过来的，我是新用户')
 				getApp().globalData.fromJoin = false
-				
 			} 
 			const {
 				guidecode,
@@ -200,8 +199,6 @@
 				appid,
 				inviteUserId,
 				scene,
-				activeId,
-				invitePhone,
 			} = options
 			const userId = inviteUserId || scene
 			if (guidecode || source || aimerid || erpcode || appid || userId) {
@@ -215,11 +212,6 @@
 				this.GETINVITEUSERID({
 					inviteUserId: userId
 				})
-			}
-			if(activeId && invitePhone){
-				getApp().globalData.fromActive = true
-			}else{
-				getApp().globalData.fromActive = false
 			}
 			// 微信小程序登录 确保进入首页的参数可以传到登录接口
 			let _this = this

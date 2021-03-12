@@ -1,5 +1,6 @@
 <template>
 	<view id="invite">
+		<login-pupop ref="login" @reGetInfo="getOldPrize" @getNewPrize="showNewPrize = true" @seePrize="isShowPrize = true"></login-pupop>
 		<image class="background" src="/static/activity/back.png" mode="scaleToFill"></image>
 		<header>
 			<view class="rule">
@@ -15,21 +16,20 @@
 					open-type="share">邀请好友</button>
 			</view>
 			<view>
-				<text>距离失效：20:20:20</text>
+				<count-down :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0"></count-down>
 			</view>
 		</main>
 		<footer>
 			<view class="top">
 				<view class="header">邀新奖励</view>
-				<view class="title">您已邀请3/0人，邀请好友越多，奖励越多</view>
+				<view class="title">您已邀请{{rewardObj.total == undefined ? 0 : rewardObj.total}}人，邀请好友越多，奖励越多</view>
 			</view>
 			<view class="footer">
-				<get-reward></get-reward>
-				<count-down :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0"></count-down>
+				<get-reward v-if="rewardObj != null" :rewardObj="rewardObj"></get-reward>
 			</view>
 		</footer>
-		<!-- 新人注册成功页
-		<view class="background-img">
+		<!-- 新人注册成功页 -->
+		<view class="background-img" v-if="fromJoin">
 			<view class="background-award">
 				<view class="background-text">
 					<view class="top-text">注册成功</view>
@@ -51,9 +51,9 @@
 					</li>
 				</ul>
 			</view>
-		</view> -->
-		<!-- 老人邀请成功页
-		<view class="background-img">
+		</view>
+		<!-- 老人邀请成功页 -->
+		<view class="background-img" v-if="showOldprize">
 			<view class="background-award">
 				<view class="background-text" style="height: 50%;">
 					<view class="top-text" style="color:#f0375f ;font-size: 40rpx;">您已注册过AIMER CLUB</view>
@@ -62,14 +62,14 @@
 				<image src="/static/index/oldJoin.png" mode="widthFix" style="height: 100%;"></image>
 				<view class="old-footer-button">
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="padding: 0 50rpx;background-color: #ffc1c9;color: #f0375f;">逛逛CLUB</button>
+						style="padding: 0 50rpx;background-color: #ffc1c9;color: #f0375f;" @click="toClubIndex">逛逛CLUB</button>
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="background-color: #ffffff;color: #f0375f;">立即邀请好友</button>
+						style="background-color: #ffffff;color: #f0375f;" open-type="share" @click="showOldprize=false;getIndexData()">立即邀请好友</button>
 				</view>
 			</view>
-		</view> -->
-		<!-- 新人未注册前的奖励
-		<view class="background-img">
+		</view>
+		<!-- 新人未注册前的奖励 -->
+		<view class="background-img" v-if="showNewPrize">
 			<view class="background-award">
 				<image src="/static/index/newback.png" mode="widthFix" style="height: 100%;"></image>
 				<image src="/static/index/newborder.png" mode="widthFix" style="width: 70%;position: absolute;top: 10%;left: 50%;transform: translate(-50%);"></image>
@@ -79,9 +79,9 @@
 						style="background-color: #ffffff;color: #f0375f;padding: 0 60rpx;">立即领取</button>
 				</view>
 			</view>
-		</view> -->
-		<!-- 邀新奖励
-		<view class="background-img">
+		</view>
+		<!-- 邀新奖励 -->
+		<view class="background-img" v-if="isShowPrize">
 			<view class="background-award">
 				<view class="background-text">
 					<view class="top-text">恭喜您获得邀新奖励</view>
@@ -102,14 +102,16 @@
 					</li>
 				</ul>
 			</view>
-		</view> -->
+		</view>
 	</view>
 </template>
 
 <script>
 	import getReward from '../components/get-reward/GetReward.vue'
 	import countDown from '../components/get-reward/CountDown.vue'
-	import {mapActions} from 'vuex'
+	import {
+		mapActions
+	} from 'vuex'
 	export default {
 		name: 'invite',
 		components: {
@@ -118,56 +120,99 @@
 		},
 		data() {
 			return {
-				indexData:{},
-				endTime:0,
-				startTime:0,
+				indexData: {},
+				endTime: 0,
+				startTime: 0,
+				rewardObj: null,
+				//是从注册页来的新用户
+				fromJoin:false,
+				fromActive:false,
+				showNewPrize:false,
+				showOldprize:false,
+				isShowPrize:false,
 			}
 		},
-		created() {
-			//获取页面数据
-			this.getIndexData()
+		onLoad(options) {
+			uni.showLoading({
+			    title: '加载中',
+					mask:true,
+			})
+			const _this = this
+			const {
+				fission
+			} = options
+			// if (fission) {
+			// 	this.fromActive = getApp().globalData.fromActive = true
+			// } else {
+			// 	this.fromActive = getApp().globalData.fromActive = false
+			// }
+			this.fromActive = getApp().globalData.fromActive = true
+			if (getApp().globalData.fromJoin) {
+				getApp().globalData.fromJoin = false
+				this.fromJoin = true
+				// this.binding('')
+				console.log('我是从注册页面过来的，我是新用户')
+			}
+			uni.getSetting({
+				withSubscriptions:true,
+				success: async function(t) {
+					// console.log(t)
+					if (t.authSetting["scope.userInfo"]) {
+						await _this.onGetUserInfo()
+						_this.getIndexData()
+					}else{
+						_this.$refs.login.checkLogin()
+					}
+				}
+			})
 		},
 		methods: {
-			...mapActions('invite',['getActiveIndex','getActiveAward','getOldInvite','getNewInvite','sendMiniMessage']),
+			...mapActions('invite', ['getActiveIndex', 'getOldInvite', 'getNewInvite', 'sendMiniMessage']),
+			...mapActions('login', ['onGetUserInfo']),
 			/**
 			 * 获取页面数据
 			 */
-			async getIndexData(){
+			async getIndexData() {
 				const res = await this.getActiveIndex()
-				if(res.code == 200){
+				if (res.code == 200) {
 					this.indexData = res.data
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
+					this.rewardObj = {
+						reward: res.data.rewardList,
+						receive: res.data.receiveList,
+						total: res.data.totalCount
+					}
+					uni.hideLoading()
 					console.log(res.data)
 				}
+			},
+			getOldPrize(){
+				console.log(11111)
+				this.showOldprize = true
+			},
+			toClubIndex(){
+				uni.switchTab({
+					url: "/pages/index/index"
+				})
+			},
+			binding(type){
+				if(type == 'new'){}else{}
 			},
 			/**
 			 * 获取活动规则
 			 */
 			getRole() {
-				console.log(1111111111)
+				console.log(this.indexData.userBindConfigDO.content)
 			},
-		},
-		onLoad() {
-			const _this = this
-			uni.getSetting({
-				success: async function(t) {
-					console.log(t)
-					if (t.authSetting["scope.userInfo"]) {
-						// await _this.onGetUserInfo()
-						//已登录
-					}
-				}
-			})
 		},
 		onShareAppMessage(res) {
 			return {
-				title: '好友裂变活动',
+				title: this.indexData.userBindConfigDO.friendsTitle,
 				imageUrl: '../../static/account/location.png',
-				path: `/pages/index/index?activeId=fission&invitePhone=15011019986`
+				path: `/pages/activity/invite?fission=invite`
 			}
 		},
-		onShareTimeline() {}
 	}
 </script>
 

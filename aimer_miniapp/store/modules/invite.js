@@ -20,26 +20,25 @@ const actions = {
 	// 获取活动首页数据
 	async getActiveIndex({commit},payload){
 		let response = (await request({
-			url:'/user/user/bind/getUserBindData?activeId=12',
+			url:'/user/user/bind/getUserBindData?activeType=FL&isShow=1',
 			method:'POST',
 			// data:payload,
 		})).data;
 		if(response.code == 200){
-			// let { list, pageNum, pageSize, totalSize } = response.data
-			// commit('GETACTIVITYLIST', { list, pageNum, pageSize, totalSize })
+			// let {  } = response.data
+			// commit('', { })
 		}
 		return response;
 	},
 	// 领取活动奖励
 	async getActiveAward({commit},payload){
 		let response = (await request({
-			url:'/user/bind/saveReward',
+			url:`/user/user/bind/saveReward`,
 			method:'POST',
-			data:payload,
+			params:payload,
 		})).data;
 		if(response.code == 200){
-			// let activityCities = [...response.data]
-			// commit('GETACTIVITYCITIES', { activityCities })
+			// commit('', { })
 		}
 		return response;
 	},
