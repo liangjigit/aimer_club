@@ -1,6 +1,7 @@
 <template>
 	<view id="invite">
-		<login-pupop ref="login" @reGetInfo="getOldPrize" @getNewPrize="showNewPrize = true" @seePrize="isShowPrize = true"></login-pupop>
+		<login-pupop ref="login" @reGetInfo="getOldPrize" @getNewPrize="showNewPrize = true"
+			@seePrize="isShowPrize = true"></login-pupop>
 		<image class="background" src="/static/activity/back.png" mode="scaleToFill"></image>
 		<header>
 			<view class="rule">
@@ -25,9 +26,55 @@
 				<view class="title">您已邀请{{rewardObj.total == undefined ? 0 : rewardObj.total}}人，邀请好友越多，奖励越多</view>
 			</view>
 			<view class="footer">
-				<get-reward v-if="rewardObj != null" :rewardObj="rewardObj"></get-reward>
+				<get-reward v-if="rewardObj != null" :rewardObj="rewardObj" @getFinish="getFinish">
+				</get-reward>
 			</view>
 		</footer>
+		<!-- 邀新奖励 -->
+		<view class="background-img" v-if="isShowPrize" @click="isShowPrize = false">
+			<view class="background-award">
+				<view class="background-text" style="top: 70rpx;">
+					<view class="top-text">恭喜您获得邀新奖励</view>
+				</view>
+				<image src="/static/index/redback.png" mode="widthFix" style="height: 100%;"></image>
+				<image src="/static/index/close.png"
+					style="position: absolute;right: 15rpx;top: 15rpx;height: 50rpx;width: 50rpx;"
+					@click="isShowPrize = false"></image>
+				<ul style="height: 55%;">
+					<li  v-if="getPrizeInfo.couponList.length > 2">
+						<image src="/static/index/jf_back.png" mode="heightFix" style="height: 140rpx;"></image>
+						<view class="award-left">
+							<text style="font-size: 90rpx;font-weight: bolder;color: #ffffff;">{{integral}}</text>
+							<view
+								style="display: flex;flex-direction: column;justify-content: flex-end;font-size: 20rpx;color: #ffffff;font-weight: bolder;margin-top: 10rpx;">
+								<text>积</text><text>分</text></view>
+						</view>
+						<view class="award-right">
+							<view class="award-right-top">{{integral}}积分</view>
+							<view class="award-right-bottom">
+								有效期：2021年2月23日至3月8日
+							</view>
+						</view>
+					</li>
+					<!-- 奖励为积分时 -->
+					<li v-else>
+						<image src="/static/index/jf_back.png" mode="heightFix" style="height: 140rpx;"></image>
+						<view class="award-left">
+							<text style="font-size: 90rpx;font-weight: bolder;color: #ffffff;">{{getPrizeInfo.integral}}</text>
+							<view
+								style="display: flex;flex-direction: column;justify-content: flex-end;font-size: 20rpx;color: #ffffff;font-weight: bolder;margin-top: 10rpx;">
+								<text>积</text><text>分</text></view>
+						</view>
+						<view class="award-right">
+							<view class="award-right-top">{{getPrizeInfo.integral}}积分</view>
+							<view class="award-right-bottom">
+								有效期：2021年2月23日至3月8日
+							</view>
+						</view>
+					</li>
+				</ul>
+			</view>
+		</view>
 		<!-- 新人注册成功页 -->
 		<view class="background-img" v-if="fromJoin">
 			<view class="background-award">
@@ -57,14 +104,17 @@
 			<view class="background-award">
 				<view class="background-text" style="height: 50%;">
 					<view class="top-text" style="color:#f0375f ;font-size: 40rpx;">您已注册过AIMER CLUB</view>
-					<view class="bottom-text" style="color: #000000;text-align: center;font-weight: 600;">您可以发起新的[邀请好友]活动获得奖励，邀请越多奖励越多哦！</view>
+					<view class="bottom-text" style="color: #000000;text-align: center;font-weight: 600;">
+						您可以发起新的[邀请好友]活动获得奖励，邀请越多奖励越多哦！</view>
 				</view>
 				<image src="/static/index/oldJoin.png" mode="widthFix" style="height: 100%;"></image>
 				<view class="old-footer-button">
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="padding: 0 50rpx;background-color: #ffc1c9;color: #f0375f;" @click="toClubIndex">逛逛CLUB</button>
+						style="padding: 0 50rpx;background-color: #ffc1c9;color: #f0375f;"
+						@click="toClubIndex">逛逛CLUB</button>
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="background-color: #ffffff;color: #f0375f;" open-type="share" @click="showOldprize=false;getIndexData()">立即邀请好友</button>
+						style="background-color: #ffffff;color: #f0375f;" open-type="share"
+						@click="showOldprize=false;getIndexData()">立即邀请好友</button>
 				</view>
 			</view>
 		</view>
@@ -72,43 +122,23 @@
 		<view class="background-img" v-if="showNewPrize">
 			<view class="background-award">
 				<image src="/static/index/newback.png" mode="widthFix" style="height: 100%;"></image>
-				<image src="/static/index/newborder.png" mode="widthFix" style="width: 70%;position: absolute;top: 10%;left: 50%;transform: translate(-50%);"></image>
-				<image src="/static/index/newtext.png" mode="widthFix" style="width: 50%;position: absolute;top: 25%;left: 50%;transform: translate(-50%);"></image>
+				<image src="/static/index/newborder.png" mode="widthFix"
+					style="width: 70%;position: absolute;top: 10%;left: 50%;transform: translate(-50%);"></image>
+				<image src="/static/index/newtext.png" mode="widthFix"
+					style="width: 50%;position: absolute;top: 25%;left: 50%;transform: translate(-50%);"></image>
 				<view class="old-footer-button" style="justify-content: center;">
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
 						style="background-color: #ffffff;color: #f0375f;padding: 0 60rpx;">立即领取</button>
 				</view>
 			</view>
 		</view>
-		<!-- 邀新奖励 -->
-		<view class="background-img" v-if="isShowPrize">
-			<view class="background-award">
-				<view class="background-text">
-					<view class="top-text">恭喜您获得邀新奖励</view>
-				</view>
-				<image src="/static/index/redback.png" mode="widthFix" style="height: 100%;"></image>
-				<ul style="height: 55%;">
-					<li>
-						<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
-						<view class="award-left">
-							50积分
-						</view>
-						<view class="award-right">
-							<view class="award-right-top">爱慕优惠券</view>
-							<view class="award-right-bottom">
-								有效期：2021年2月23日至3月8日
-							</view>
-						</view>
-					</li>
-				</ul>
-			</view>
-		</view>
+
 	</view>
 </template>
 
 <script>
-	import getReward from '../components/get-reward/GetReward.vue'
-	import countDown from '../components/get-reward/CountDown.vue'
+	import getReward from '../../components/get-reward/GetReward.vue'
+	import countDown from '../../components/get-reward/CountDown.vue'
 	import {
 		mapActions
 	} from 'vuex'
@@ -125,17 +155,19 @@
 				startTime: 0,
 				rewardObj: null,
 				//是从注册页来的新用户
-				fromJoin:false,
-				fromActive:false,
-				showNewPrize:false,
-				showOldprize:false,
-				isShowPrize:false,
+				fromJoin: false,
+				fromActive: false,
+				showNewPrize: false,
+				showOldprize: false,
+				isShowPrize: false,
+				getPrizeInfo: {},
+				getPrizeDetail: [],
 			}
 		},
 		onLoad(options) {
 			uni.showLoading({
-			    title: '加载中',
-					mask:true,
+				title: '加载中',
+				mask: true,
 			})
 			const _this = this
 			const {
@@ -154,13 +186,13 @@
 				console.log('我是从注册页面过来的，我是新用户')
 			}
 			uni.getSetting({
-				withSubscriptions:true,
+				withSubscriptions: true,
 				success: async function(t) {
 					// console.log(t)
 					if (t.authSetting["scope.userInfo"]) {
 						await _this.onGetUserInfo()
 						_this.getIndexData()
-					}else{
+					} else {
 						_this.$refs.login.checkLogin()
 					}
 				}
@@ -187,17 +219,25 @@
 					console.log(res.data)
 				}
 			},
-			getOldPrize(){
+			getOldPrize() {
 				console.log(11111)
 				this.showOldprize = true
 			},
-			toClubIndex(){
+			toClubIndex() {
 				uni.switchTab({
 					url: "/pages/index/index"
 				})
 			},
-			binding(type){
-				if(type == 'new'){}else{}
+			binding(type) {
+				if (type == 'new') {} else {}
+			},
+			/**
+			 * 获取奖品
+			 */
+			getFinish(data) {
+				this.getPrizeInfo = data
+				if(!data.couponList.length>0) return
+				this.getPrizeDetail = JSON.parse(data.couponList)
 			},
 			/**
 			 * 获取活动规则
@@ -209,7 +249,7 @@
 		onShareAppMessage(res) {
 			return {
 				title: this.indexData.userBindConfigDO.friendsTitle,
-				imageUrl: '../../static/account/location.png',
+				imageUrl: '../../../static/activity/invite.png',
 				path: `/pages/activity/invite?fission=invite`
 			}
 		},
@@ -358,7 +398,8 @@
 							top: 0;
 							left: 0;
 							display: flex;
-							justify-content: center;
+							justify-content: space-evenly;
+							padding: 0 10rpx;
 							align-items: center;
 						}
 
@@ -375,10 +416,10 @@
 								height: 60%;
 								// background: rgba(0,0,0,.6);
 								color: #F52F48;
-								font-size: 33rpx;
+								font-size: 40rpx;
 								font-weight: bolder;
 								display: flex;
-								align-items: center;
+								align-items: flex-end;
 							}
 
 							.award-right-bottom {

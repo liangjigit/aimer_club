@@ -3,8 +3,14 @@
 		<ul>
 			<li v-for="(item,index) in reward" :key="item.id">
 				<view class="reward" :class="totalInvite < item.inviteCount ? 'wait-bg' : 'see-get-bg'">
-					<view class="image">
+					<view class="image" v-if="reward[index].couponList.length > 2">
 						<image src="../../../static/activity/jiang1.png" mode="widthFix"></image>
+					</view>
+					<view class="image" style="display: flex;justify-content: center;align-items: center;" v-else>
+						<image src="../../../static/index/jf.png" mode="widthFix" style="width: 90rpx;"></image>
+						<view style="position: absolute ;display:flex;flex-direction: column;justify-content: center;align-items: center;color: #ffffff;">
+							<text style="font-size: 30rpx;">{{reward[index].integral}}</text>
+							<text style="font-size: 20rpx;">积分</text></view>
 					</view>
 					<text>邀请{{item.inviteCount}}人</text>
 				</view>
@@ -20,7 +26,9 @@
 </template>
 
 <script>
-	import {mapActions} from 'vuex'
+	import {
+		mapActions
+	} from 'vuex'
 	export default {
 		name: 'GetReward',
 		props: {
@@ -36,7 +44,7 @@
 				reward: [],
 				initCount: {},
 				getCount: {},
-				lastGetCount:[],
+				lastGetCount: [],
 			}
 		},
 		created() {
@@ -45,26 +53,24 @@
 			})
 			this.initGetPrizeCount()
 			this.disposeGet()
+			console.log(this.reward[1].couponList.length)
 			// console.log(this.receiveList)
 			// console.log(this.conpareCount)
 		},
 		methods: {
-			...mapActions('invite',['getActiveAward','getOldInvite','getNewInvite','sendMiniMessage']),
+			...mapActions('invite', ['getActiveAward', 'getOldInvite', 'getNewInvite', 'sendMiniMessage']),
 			//获取奖励
-			async getPrize(index,rewardId,activeId){
+			async getPrize(index, rewardId, activeId) {
 				// console.log(id,activeId)
 				const res = await this.getActiveAward({
 					rewardId,
 					activeId
 				})
-				console.log(res)
-				if(res.code == 200){
+				// console.log(res)
+				if (res.code == 200) {
 					this.conpareCount[index].b++
-					console.log(this.conpareCount)
-					uni.showToast({
-					    title: '领取奖励成功！',
-					    duration: 2000
-					})
+					// console.log(this.conpareCount)
+					this.$emit('getFinish', this.reward[index])
 				}
 			},
 			//默认需要领取奖品的次数
@@ -94,7 +100,7 @@
 				let {
 					receive
 				} = this.rewardObj
-				if(receive == null) receive = []
+				if (receive == null) receive = []
 				receive.forEach(item => {
 					switch (item.rewardId) {
 						case rewardId.fId:
@@ -128,19 +134,19 @@
 					tg
 				} = this.getCount
 				const f = {
-					a:fi,
-					b:fg
+					a: fi,
+					b: fg
 				}
 				const s = {
-					a:si,
-					b:sg
+					a: si,
+					b: sg
 				}
 				const t = {
-					a:ti,
-					b:tg
+					a: ti,
+					b: tg
 				}
 				this.lastGetCount = [f, s, t]
-				return this.lastGetCount 
+				return this.lastGetCount
 			}
 		}
 	}
