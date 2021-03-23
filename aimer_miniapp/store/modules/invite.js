@@ -45,7 +45,7 @@ const actions = {
 	// 老会员 关系记录
 	async getOldInvite({commit},payload){
 		let response = (await request({
-			url:'/user/bind/invitationActivities',
+			url:'/user/user/bind/invitationActivities',
 			method:'POST',
 			data:payload,
 		})).data;
@@ -54,7 +54,7 @@ const actions = {
 	// 新会员 关系记录
 	async getNewInvite({commit},payload){
 		let response = (await request({
-			url:'/user/bind/newInvitationActivities',
+			url:'/user/user/bind/newInvitationActivities',
 			method:'POST',
 			data:payload
 		})).data;
@@ -63,9 +63,18 @@ const actions = {
 	// 发送小程序消息
 	async sendMiniMessage({commit},payload){
 		let response = (await request({
-			url:'/user/bind/sendMessage',
+			url:'/user/user/bind/sendMessage',
 			method:'POST',
 			data:payload
+		})).data
+		return response;
+	},
+	//获取新会员奖励列表
+	async getNewMemberPrizeList({commit},payload){
+		let response = (await request({
+			url:`/user/user/bind/getComponConfig`,
+			method:'POST',
+			params:payload
 		})).data
 		return response;
 	},

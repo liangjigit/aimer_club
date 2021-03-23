@@ -76,14 +76,16 @@ request.interceptors.response.use(
   response => {
     //拦截响应，做统一处理
 	if(response.data.code != 200){
-		uni.hideLoading()
-		uni.showToast({
-			title: response.data.msg,
-			icon:"none",
-			duration: 2000
-		})
-		if(process.env.NODE_ENV === 'development'){
-			console.error(response.data.msg)
+		if(response.data.code == 2014){}else{
+			uni.hideLoading()
+			uni.showToast({
+				title: response.data.msg,
+				icon:"none",
+				duration: 2000
+			})
+			if(process.env.NODE_ENV === 'development'){
+				console.error(response.data.msg)
+			}
 		}
 	}
 	uni.hideNavigationBarLoading()

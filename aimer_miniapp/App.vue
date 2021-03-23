@@ -58,6 +58,7 @@
 			level:false,
 			fromJoin:false,
 			fromActive:false,
+			invitePhone:'',
 		}
 	}
 </script>

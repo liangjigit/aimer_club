@@ -148,7 +148,7 @@
 						getApp().globalData.fromJoin = true
 						if (getApp().globalData.fromActive == true) {
 							uni.reLaunch({
-								url: '/pages/activity/invite'
+								url: '/pages/activity/invite/index'
 							})
 						} else {
 							uni.switchTab({

@@ -101,6 +101,11 @@
 				const token = uni.getStorageSync('token');
 				const getPhone = uni.getStorageSync('getPhone');
 				if (token && getPhone) {
+					if (getApp().globalData.fromActive) {
+						//被邀请进入的老会员
+						this.$emit('getNewPrize')
+						return false
+					}
 					uni.redirectTo({
 						url: '/pages/join/index'
 					})
@@ -123,41 +128,39 @@
 					let that = this;
 					this.onGetUserInfo().then((response) => {
 						if (response.code == 200) {
-							//未注册
-							if (response.data.getPhone) {
-								that.$emit('getNewPrize')
-							} else {
-								this.showPopup = false
-								if (this.redirectUrl) { // 判断需要重定向的页面是否是当前页
-									const pages = getCurrentPages();
-									const page = pages[pages.length - 1];
-									let {
-										url,
-										type
-									} = this.redirectUrl
-									const isCurrentPage = url.includes(page.route)
-									if (!isCurrentPage) {
-										navigatorToPage(url, type, null, null, true)
-									}
-								} else if (id) {
-									const {
-										linkType,
-										linkUrl,
-										miniappId,
-										displayPage
-									} = this.pupop
-									navigatorToPage(linkUrl, linkType, miniappId, displayPage)
+							this.showPopup = false
+							if (this.redirectUrl) { // 判断需要重定向的页面是否是当前页
+								const pages = getCurrentPages();
+								const page = pages[pages.length - 1];
+								let {
+									url,
+									type
+								} = this.redirectUrl
+								const isCurrentPage = url.includes(page.route)
+								if (!isCurrentPage) {
+									navigatorToPage(url, type, null, null, true)
 								}
-								const getPhone = uni.getStorageSync('getPhone');
-								if (!getPhone) {
-									this.GETREDIRECTURL({
-										redirectUrl: null
-									})
-									uni.showToast({
-										title: "欢迎回来！",
-										icon: "none"
-									})
-									if (getApp().globalData.fromActive) this.$emit('reGetInfo')
+							} else if (id) {
+								const {
+									linkType,
+									linkUrl,
+									miniappId,
+									displayPage
+								} = this.pupop
+								navigatorToPage(linkUrl, linkType, miniappId, displayPage)
+							}
+							const getPhone = uni.getStorageSync('getPhone');
+							if (!getPhone) {
+								this.GETREDIRECTURL({
+									redirectUrl: null
+								})
+								uni.showToast({
+									title: "欢迎回来！",
+									icon: "none"
+								})
+								if (getApp().globalData.fromActive) {
+									//被邀请进入的老会员
+									this.$emit('reGetInfo')
 								}
 							}
 						}

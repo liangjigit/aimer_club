@@ -3,14 +3,24 @@
 		<ul>
 			<li v-for="(item,index) in reward" :key="item.id">
 				<view class="reward" :class="totalInvite < item.inviteCount ? 'wait-bg' : 'see-get-bg'">
-					<view class="image" v-if="reward[index].couponList.length > 2">
-						<image src="../../../static/activity/jiang1.png" mode="widthFix"></image>
-					</view>
-					<view class="image" style="display: flex;justify-content: center;align-items: center;" v-else>
+					<!-- 奖励1：积分 -->
+					<view class="image" v-if="item.rewardType == 2">
 						<image src="../../../static/index/jf.png" mode="widthFix" style="width: 90rpx;"></image>
-						<view style="position: absolute ;display:flex;flex-direction: column;justify-content: center;align-items: center;color: #ffffff;">
-							<text style="font-size: 30rpx;">{{reward[index].integral}}</text>
-							<text style="font-size: 20rpx;">积分</text></view>
+						<view class="award-text">
+							<text style="font-size: 30rpx;">{{item.integral}}</text>
+							<text style="font-size: 20rpx;">积分</text>
+						</view>
+					</view>
+					<!-- 奖励2：优惠券 -->
+					<view class="image" v-if="item.rewardType == 1">
+						<image src="../../../static/activity/award_back.png" mode="widthFix"></image>
+						<view  class="award-text">
+							<text style="font-size: 30rpx;">{{item.couponList[0].couponAmount}}元</text>
+						</view>
+					</view>
+					<!-- 奖励3：礼品卡 -->
+					<view class="image" v-if="item.rewardType == 3">
+						<image :src="item.prizeImg" mode="widthFix" style="width: 60%;"></image>
 					</view>
 					<text>邀请{{item.inviteCount}}人</text>
 				</view>
@@ -48,12 +58,10 @@
 			}
 		},
 		created() {
-			this.reward = this.rewardObj.reward.sort((a, b) => {
-				return a.inviteCount - b.inviteCount
-			})
+			this.initAwardList()
 			this.initGetPrizeCount()
 			this.disposeGet()
-			console.log(this.reward[1].couponList.length)
+			// console.log(this.reward[1].couponList.length)
 			// console.log(this.receiveList)
 			// console.log(this.conpareCount)
 		},
@@ -72,6 +80,18 @@
 					// console.log(this.conpareCount)
 					this.$emit('getFinish', this.reward[index])
 				}
+			},
+			//初始化奖励数组
+			initAwardList(){
+				const reward = this.rewardObj.reward.sort((a, b) => {
+					return a.inviteCount - b.inviteCount
+				})
+				//转换奖励数组
+				reward.forEach(item => {
+					item.couponList.length > 2 ? item.couponList = JSON.parse(item.couponList) : item.couponList
+				})
+				this.reward = reward
+				console.log(this.reward)
 			},
 			//默认需要领取奖品的次数
 			initGetPrizeCount() {
@@ -185,9 +205,19 @@
 
 					.image {
 						width: 90%;
-
+						display: flex;
+						justify-content: center;
+						align-items: center;
 						image {
 							width: 100%;
+						}
+						.award-text{
+							position: absolute ;
+							display:flex;
+							flex-direction: column;
+							justify-content: center;
+							align-items: center;
+							color: #ffffff;
 						}
 					}
 				}
