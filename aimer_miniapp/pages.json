@@ -247,6 +247,11 @@
 				"style": {
 					"navigationBarTitleText": "邀请好友"
 				}
+			}, {
+				"path": "rule",
+				"style": {
+					"navigationBarTitleText": "活动规则"
+				}
 			}]
 		}
 	]

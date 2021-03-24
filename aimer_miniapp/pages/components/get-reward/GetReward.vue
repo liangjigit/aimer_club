@@ -102,7 +102,7 @@
 					si: floor + (remainder >= this.reward[1].inviteCount ? 1 : 0),
 					ti: floor,
 				}
-				// console.log(initCount)
+				console.log(initCount)
 				this.initCount = initCount
 			},
 			//已经领取的数组处理

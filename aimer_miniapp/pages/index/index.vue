@@ -17,6 +17,7 @@
 				</button>
 			</view>
 		</view>
+		<button @click="toActivity">活动测试入口</button>
 		<view class="flex justify-center" v-if="banners.length>0">
 			<swiper class="banner card-swiper" next-margin="100rpx" :circular="true" :interval="5000" :duration="500"
 				:autoplay="true" easing-function="linear" @change="bannerSwiper">
@@ -304,6 +305,11 @@
 			...mapMutations('index', ['SETSELECTOR']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
+			toActivity(){
+				uni.navigateTo({
+					url:'/pages/activity/invite/index?clubIn=true'
+				})
+			},
 			getData(isRefresh) {
 				this.getBanners({
 					pageId: 1

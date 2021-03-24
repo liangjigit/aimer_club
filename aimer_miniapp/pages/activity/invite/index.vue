@@ -8,7 +8,7 @@
 		<header>
 			<view class="rule">
 				<view class="cu-capsule round">
-					<view class="cu-tag bg-blue" @click="getRole">活动规则 <text class="lg text-gray cuIcon-right"></text>
+					<view class="cu-tag bg-blue" @click="getRule">活动规则 <text class="lg text-gray cuIcon-right"></text>
 					</view>
 				</view>
 			</view>
@@ -57,7 +57,7 @@
 						<view class="award-right">
 							<view class="award-right-top">{{getPrizeInfo.integral}}积分</view>
 							<view class="award-right-bottom">
-								有效期：2021年2月23日至3月8日
+								有效期:{{nowTime}}至{{twoYearLater}}
 							</view>
 						</view>
 					</li>
@@ -79,7 +79,7 @@
 								{{getPrizeInfo.couponList[0].subheading}}
 							</view>
 							<view class="award-right-bottom">
-								有效期：2021年2月23日至3月8日
+								有效期:{{getPrizeInfo.couponList[0].startDate | transformDate}}至{{getPrizeInfo.couponList[0].endDate | transformDate}}
 							</view>
 						</view>
 					</li>
@@ -94,7 +94,7 @@
 								{{getPrizeInfo.couponList[0].couponName}}
 							</view>
 							<view class="award-right-bottom">
-								有效期：2021年2月23日至3月8日
+								有效期:{{getPrizeInfo.couponList[0].startDate | transformDate}}至{{getPrizeInfo.couponList[0].endDate | transformDate}}
 							</view>
 						</view>
 					</li>
@@ -148,17 +148,60 @@
 				</view>
 				<image src="/static/index/newJoin.png" mode="widthFix" style="height: 100%;"></image>
 				<ul>
+					<!-- DJQ:满减券 LPQ:礼品券 -->
 					<li v-for="(item,index) in newMemberPrizeList">
-						<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
-						<view class="award-left">
-							50积分
-						</view>
-						<view class="award-right">
-							<view class="award-right-top">爱慕优惠券</view>
-							<view class="award-right-bottom">
-								有效期：2021年2月23日至3月8日
+						<template v-if="item.type == 'DJQ'">
+							<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
+							<view class="award-left">
+								<text
+									style="font-size: 30rpx;font-weight: bolder;color: #F52F48;margin-bottom: 20rpx;">￥</text>
+								<text
+									style="font-size: 45rpx;font-weight: bolder;color: #F52F48;">{{item.couponAmount}}</text>
 							</view>
-						</view>
+							<view class="award-right">
+								<view
+									style="font-size: 30rpx;height: fit-content;width: 100%;font-weight: bolder;color: #F52F48;margin-top: 20rpx;">
+									{{item.couponName}}
+								</view>
+								<view style="font-size: 20rpx;height: fit-content;width: 100%;color: #F52F48;">
+									{{item.subheading}}
+								</view>
+								<view class="award-right-bottom">
+									有效期:{{item.startDate | transformDate}}至{{item.endDate | transformDate}}
+								</view>
+							</view>
+						</template>
+						<template v-else-if="item.type == 'LPQ'">
+							<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
+							<view class="award-left">
+								<image :src="item.prizeImg ? item.prizeImg : '/static/activity/jiang2.png'"
+									mode="heightFix" style="height: 70%;"></image>
+							</view>
+							<view class="award-right">
+								<view class="award-right-top" style="font-size: 30rpx;">
+									{{item.couponName}}
+								</view>
+								<view class="award-right-bottom">
+									有效期:{{item.startDate | transformDate}}至{{item.endDate | transformDate}}
+								</view>
+							</view>
+						</template>
+						<template v-else>
+							<image src="/static/index/jf_back.png" mode="heightFix" style="height: 140rpx;"></image>
+							<view class="award-left">
+								<text
+									style="font-size: 45rpx;font-weight: bolder;color: #ffffff;">{{item.integral}}</text>
+								<view class="left-style">
+									<text>积</text><text>分</text>
+								</view>
+							</view>
+							<view class="award-right">
+								<view class="award-right-top">{{item.integral}}积分</view>
+								<view class="award-right-bottom">
+									有效期:{{item.startDate | transformDate}}至{{item.endDate | transformDate}}
+								</view>
+							</view>
+						</template>
 					</li>
 				</ul>
 			</view>
@@ -200,6 +243,8 @@
 				newMemberPrizeList: [],
 				invitePhone: '',
 				showModal: false,
+				nowTime:'',
+				twoYearLater:'',
 			}
 		},
 		onLoad(options) {
@@ -208,6 +253,7 @@
 				mask: true,
 			})
 			const _this = this
+			_this.getNowAndTwoYear()
 			const {
 				fission,
 				clubIn,
@@ -233,7 +279,7 @@
 					if (t.authSetting["scope.userInfo"]) {
 						await _this.onGetUserInfo()
 						await _this.getIndexData()
-						// _this.getNewMemberPrize()
+						// console.log(_this.userInfo)
 					} else {
 						_this.$refs.login.checkLogin()
 					}
@@ -360,6 +406,7 @@
 			//获取当前领取奖品
 			async getFinish(data) {
 				this.getPrizeInfo = data
+				console.log(data)
 				this.isShowPrize = true
 				const res = await this.getActiveIndex()
 				if (res.code == 200) {
@@ -383,28 +430,73 @@
 			//获取拉起服务通知权限
 			getServicePermission() {
 				const _this = this
+				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
 				uni.requestSubscribeMessage({
-					tmplIds: ['KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'],
+					tmplIds: [TMPLID],
 					async success(res) {
-						console.log(res)
-						const response = await _this.sendMiniMessage({
-							activityId: this.indexData.userBindConfigDO.id,
-							invitationPhone: getApp().globalData.invitePhone,
-							type: null,
-							userPhone: null
-						})
-						_this.showModal = false
+						// console.log(res)
+						if (res.errMsg == 'requestSubscribeMessage:ok' && res[TMPLID] == 'accept') {
+							const response = await _this.sendMiniMessage({
+								activityId: _this.indexData.userBindConfigDO.id,
+								// invitationPhone: getApp().globalData.invitePhone,
+								invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
+								type: null,
+								userPhone: null
+							})
+							// console.log(response)
+							if (response.code == 200) {
+								_this.showModal = false
+							} else {
+								uni.showToast({
+									title: response.data,
+									duration: 2000,
+									icon: 'none'
+								});
+							}
+						} else {
+							uni.showToast({
+								title: '请您对服务通知进行授权',
+								duration: 2000,
+								icon: 'none'
+							});
+						}
 					},
 					fail(err) {
 						console.log(err)
-						console.log('必须授权')
+						uni.showToast({
+							title: err.errCode,
+							duration: 2000,
+							icon: 'none'
+						});
 					}
 				})
 			},
-			//获取活动规则
-			getRole() {
-				console.log(this.indexData.userBindConfigDO.content)
+			//获取当前以及两年后时间
+			getNowAndTwoYear(){
+				const time = new Date()
+				const year = time.getFullYear()
+				const yearTwo = parseInt(year) + 2
+				const month = time.getMonth() + 1
+				const date = time.getDate()
+				this.nowTime = `${year}年${month}月${date}日`
+				this.twoYearLater = `${yearTwo}年${month}月${date}日`
+				// console.log(this.nowTime,this.twoYearLater)
 			},
+			//获取活动规则
+			getRule() {
+				uni.navigateTo({
+					url: `/pages/activity/invite/rule?content=${this.indexData.userBindConfigDO.content}`
+				})
+			},
+		},
+		filters: {
+			transformDate(time) {
+				// console.log(time)
+				const year = time.substr(0, 4) + '年'
+				const month = time.substr(5, 2) + '月'
+				const day = time.substr(8, 2) + '日'
+				return (year + month + day)
+			}
 		},
 		onShareAppMessage(res) {
 			return {
@@ -631,7 +723,7 @@
 								height: fit-content;
 								position: absolute;
 								bottom: 10rpx;
-								font-size: 19rpx;
+								font-size: 15rpx;
 								display: flex;
 								align-items: center;
 								color: #707070;
