@@ -53,7 +53,7 @@ const actions = {
 						  withCredentials: false,
 						  provider: 'weixin',
 						  async success(infoRes) {
-							 console.log(infoRes)
+							 // console.log(infoRes)
 							 let { userInfo } = infoRes;
 							 let response = await dispatch('login',{jscode:code,userInfo:JSON.stringify(userInfo)});
 							 resolve(response)
@@ -101,9 +101,9 @@ const actions = {
 			uni.setStorageSync('sessionKey',sessionKey)
 			commit('CHANGELOGINSTATE',{loginState:true})// 登录状态
 			if(!getPhone){
-				console.log("用户已注册")
+				// console.log("用户已注册")
 				let res = uni.getSystemInfoSync()
-				console.log("当前运行环境："+res.environment)// 如果是在微信中运行 则为 undefined
+				// console.log("当前运行环境："+res.environment)// 如果是在微信中运行 则为 undefined
 				if(res.environment === "wxwork"){ 
 					dispatch('wxworkLogin',{}) // 在企业微信中需要进行企业微信登录，获取员工的信息
 				}

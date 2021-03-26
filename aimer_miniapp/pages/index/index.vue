@@ -306,8 +306,9 @@
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
 			toActivity(){
+				uni.setStorageSync('clubIn',true)
 				uni.navigateTo({
-					url:'/pages/activity/invite/index?clubIn=true'
+					url:'/pages/activity/invite/index'
 				})
 			},
 			getData(isRefresh) {

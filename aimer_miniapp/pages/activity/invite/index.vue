@@ -14,9 +14,12 @@
 			</view>
 		</header>
 		<main>
-			<view>
+			<view v-if="!noActivity">
 				<button class="cu-btn round bg-white" role="button" aria-disabled="false" open-type="share"
 					@click="showModal = true">邀请好友</button>
+			</view>
+			<view v-else>
+				<text style="color: #ffffff;font-weight: bolder;">当前没有活动正在进行中</text>
 			</view>
 			<view>
 				<count-down :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0"></count-down>
@@ -140,7 +143,7 @@
 			</view>
 		</view>
 		<!-- 新人注册成功页 -->
-		<view class="background-img" v-if="fromJoin" @click="fromJoin = false">
+		<view class="background-img" @click="fromJoin = false">
 			<view class="background-award">
 				<view class="background-text">
 					<view class="top-text">注册成功</view>
@@ -150,28 +153,29 @@
 				<ul>
 					<!-- DJQ:满减券 LPQ:礼品券 -->
 					<li v-for="(item,index) in newMemberPrizeList">
-						<template v-if="item.type == 'DJQ'">
+						<template v-if="item.type == 'DJQ' || item.rewardType == 1">
 							<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
 							<view class="award-left">
 								<text
 									style="font-size: 30rpx;font-weight: bolder;color: #F52F48;margin-bottom: 20rpx;">￥</text>
 								<text
-									style="font-size: 45rpx;font-weight: bolder;color: #F52F48;">{{item.couponAmount}}</text>
+									style="font-size: 45rpx;font-weight: bolder;color: #F52F48;">{{item.couponAmount ? item.couponAmount : item.couponList[0].couponAmount}}</text>
 							</view>
 							<view class="award-right">
 								<view
 									style="font-size: 30rpx;height: fit-content;width: 100%;font-weight: bolder;color: #F52F48;margin-top: 20rpx;">
-									{{item.couponName}}
+									{{item.couponName ? item.couponName : item.couponList[0].couponName}}
 								</view>
 								<view style="font-size: 20rpx;height: fit-content;width: 100%;color: #F52F48;">
-									{{item.subheading}}
+									{{item.subheading ? item.subheading : item.couponList[0].subheading}}
 								</view>
 								<view class="award-right-bottom">
-									有效期:{{item.startDate | transformDate}}至{{item.endDate | transformDate}}
+									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}
+									至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
 								</view>
 							</view>
 						</template>
-						<template v-else-if="item.type == 'LPQ'">
+						<template v-else-if="item.type == 'LPQ' || item.rewardType == 3">
 							<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
 							<view class="award-left">
 								<image :src="item.prizeImg ? item.prizeImg : '/static/activity/jiang2.png'"
@@ -179,10 +183,11 @@
 							</view>
 							<view class="award-right">
 								<view class="award-right-top" style="font-size: 30rpx;">
-									{{item.couponName}}
+									{{item.couponName ? item.couponName : item.couponList[0].couponName}}
 								</view>
 								<view class="award-right-bottom">
-									有效期:{{item.startDate | transformDate}}至{{item.endDate | transformDate}}
+									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}
+									至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
 								</view>
 							</view>
 						</template>
@@ -198,7 +203,7 @@
 							<view class="award-right">
 								<view class="award-right-top">{{item.integral}}积分</view>
 								<view class="award-right-bottom">
-									有效期:{{item.startDate | transformDate}}至{{item.endDate | transformDate}}
+									有效期:{{nowTime}}至{{twoYearLater}}
 								</view>
 							</view>
 						</template>
@@ -239,55 +244,69 @@
 				isShowPrize: false,
 				getPrizeInfo: {},
 				getPrizeDetail: [],
-				clubIn: false,
 				newMemberPrizeList: [],
-				invitePhone: '',
 				showModal: false,
-				nowTime:'',
-				twoYearLater:'',
+				nowTime: '',
+				twoYearLater: '',
+				noActivity:false,
 			}
 		},
+		// onHide() {
+		// 	console.log(222222)
+		// },
 		onLoad(options) {
 			uni.showLoading({
 				title: '加载中',
 				mask: true,
 			})
-			const _this = this
-			_this.getNowAndTwoYear()
 			const {
+				//是否从邀请过来
 				fission,
-				clubIn,
+				//邀请人手机号
 				invitePhone
 			} = options
-			console.log(options)
-			console.log(getApp().globalData.fromJoin)
-			console.log(getApp().globalData.fromActive)
+			console.log(fission)
+			let a = unescape(fission)
+			console.log(a)
+// let a = "bEGA5WKzyjPg0D0QbiTkqw=="
+// a= escape(a)
+// console.log(a)
+
 			if (invitePhone != undefined) getApp().globalData.invitePhone = invitePhone
-			this.invitePhone = invitePhone
-			//1.从club进入clubIn为true，否则为false
-			this.clubIn = clubIn
+			
 			//2.fission存在时表示被邀请进入，区分新老会员
 			if (fission) {
 				this.fromActive = getApp().globalData.fromActive = true
-			} else {
+			} else { 
 				this.fromActive = getApp().globalData.fromActive = false
 			}
-			uni.getSetting({
-				withSubscriptions: true,
-				success: async function(t) {
-					// console.log(t)
-					if (t.authSetting["scope.userInfo"]) {
-						await _this.onGetUserInfo()
-						await _this.getIndexData()
-						// console.log(_this.userInfo)
-					} else {
-						_this.$refs.login.checkLogin()
+		},
+		onShow() {
+			const _this = this
+			_this.getNowAndTwoYear()
+			//从club进活动页直接请求首页数据
+			if (!uni.getStorageSync('clubIn')) {
+				uni.getSetting({
+					withSubscriptions: true,
+					success: async function(t) {
+						if (t.authSetting["scope.userInfo"]) {
+							if(!_this.loginState){
+								await _this.onGetUserInfo()
+							}
+							console.log(_this.userInfo)
+							_this.getNewMemberPrize()
+							await _this.getIndexData()
+						} else {
+							_this.$refs.login.checkLogin()
+						}
 					}
-				}
-			})
+				})
+			} else {
+				_this.getIndexData()
+			}
 		},
 		computed: {
-			...mapState('login', ['userInfo']),
+			...mapState('login', ['userInfo','loginState']),
 		},
 		methods: {
 			...mapActions('invite', ['getActiveIndex', 'getOldInvite', 'getNewInvite', 'sendMiniMessage',
@@ -308,20 +327,27 @@
 						total: res.data.totalCount
 					}
 					//从club进入且是导购
-					if (this.clubIn) {
+					if (uni.getStorageSync('clubIn')) {
 						if (this.userInfo.isGuide == 1) {
 							this.bindingOld(this.userInfo)
 							return false
 						}
 					}
-					//3.如果是新会员，fromjoin为true
-					if (getApp().globalData.fromJoin) {
-						console.log('我是从注册页面过来的，我是新用户')
+					//邀请老会员进入
+					if (!uni.getStorageSync('fromJoin') && getApp().globalData.fromActive){
+						await this.bindingOld(this.userInfo)
+						this.showOldprize = true
+						return false
+					}
+					//如果是新会员，fromjoin为true
+					if (uni.getStorageSync('fromJoin')  && !getApp().globalData.fromActive) {
 						getApp().globalData.fromJoin = false
 						this.bindingNew(this.userInfo)
 						return false
 					}
 					uni.hideLoading()
+				}else if(res.code == 500){
+					this.noActivity = true
 				}
 			},
 			//绑定老会员
@@ -330,58 +356,16 @@
 					phone,
 					isGuide
 				} = userInfo
-				console.log(userInfo)
+				// console.log(userInfo)
 				const response = await this.getOldInvite({
 					activityId: this.indexData.userBindConfigDO.id,
-					invitationPhone: getApp().globalData.fromActive == true ? this.invitePhone : null,
+					invitationPhone: getApp().globalData.fromActive == true ? getApp().globalData.invitePhone :
+						null,
 					type: null,
 					userPhone: phone
 				})
 				uni.hideLoading()
 				console.log(response)
-			},
-			//绑定新会员
-			async bindingNew(userInfo) {
-				const {
-					phone,
-					isGuide
-				} = userInfo
-				console.log(userInfo)
-				const response = await this.getNewInvite({
-					activityId: this.indexData.userBindConfigDO.id,
-					invitationPhone: getApp().globalData.invitePhone,
-					type: null,
-					userPhone: phone
-				})
-				console.log(response)
-				this.getNewMemberPrize()
-			},
-			//获取新会员奖励列表
-			async getNewMemberPrize() {
-				const res = await this.getNewMemberPrizeList({
-					activeId: this.indexData.userBindConfigDO.id
-				})
-				console.log(res)
-				if (res.code == 200) {
-					let reward = JSON.parse(res.data.reward)
-					let user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
-					this.newMemberPrizeList = [...user_rge, ...reward]
-					console.log(this.newMemberPrizeList)
-				}
-				uni.hideLoading()
-				this.fromJoin = true
-			},
-			//去首页
-			toClubIndex() {
-				uni.switchTab({
-					url: "/pages/index/index"
-				})
-			},
-			//去注册页
-			toJoin() {
-				uni.redirectTo({
-					url: '/pages/join/index'
-				})
 			},
 			//老会员被邀重新登陆进入后
 			async inviteOld() {
@@ -396,13 +380,71 @@
 						receive: res.data.receiveList,
 						total: res.data.totalCount
 					}
-					//从club进入且是导购
-					if (this.fromActive) {
-						await this.bindingOld(this.userInfo)
-						this.showOldprize = true
-					}
+					await this.bindingOld(this.userInfo)
+					this.showOldprize = true
 				}
 			},
+			//绑定新会员
+			async bindingNew(userInfo) {
+				const {
+					phone,
+					isGuide
+				} = userInfo
+				// console.log(userInfo)
+				const response = await this.getNewInvite({
+					activityId: this.indexData.userBindConfigDO.id,
+					invitationPhone: getApp().globalData.invitePhone,
+					type: null,
+					userPhone: phone
+				})
+				console.log(response)
+				if (response.code == 200) {
+					this.sendNewMemberMessage()
+					this.getNewMemberPrize()
+				}
+			},
+			//新会员绑定后发送消息
+			async sendNewMemberMessage() {
+				const response = await this.sendMiniMessage({
+					activityId: this.indexData.userBindConfigDO.id,
+					//邀请人的手机
+					invitationPhone: getApp().globalData.invitePhone,
+					// invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
+					type: null,
+					userPhone: null
+				})
+				console.log(response)
+			},
+			//获取新会员奖励列表
+			async getNewMemberPrize() {
+				const res = await this.getNewMemberPrizeList({
+					activeId: this.indexData.userBindConfigDO.id
+				})
+				if (res.code == 200) {
+					let reward = JSON.parse(res.data.reward)
+					let user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
+					this.newMemberPrizeList = [...user_rge, ...reward]
+					this.newMemberPrizeList.forEach(item => {
+						if (item.couponList) item.couponList = JSON.parse(item.couponList)
+					})
+					console.log(this.newMemberPrizeList)
+					uni.hideLoading()
+					this.fromJoin = true
+				}
+			},
+			//去首页
+			toClubIndex() {
+				uni.switchTab({
+					url: "/pages/index/index"
+				})
+			},
+			//去注册页
+			toJoin() {
+				uni.redirectTo({
+					url: '/pages/join/index'
+				})
+			},
+
 			//获取当前领取奖品
 			async getFinish(data) {
 				this.getPrizeInfo = data
@@ -433,26 +475,10 @@
 				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
 				uni.requestSubscribeMessage({
 					tmplIds: [TMPLID],
-					async success(res) {
+					success(res) {
 						// console.log(res)
 						if (res.errMsg == 'requestSubscribeMessage:ok' && res[TMPLID] == 'accept') {
-							const response = await _this.sendMiniMessage({
-								activityId: _this.indexData.userBindConfigDO.id,
-								// invitationPhone: getApp().globalData.invitePhone,
-								invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
-								type: null,
-								userPhone: null
-							})
-							// console.log(response)
-							if (response.code == 200) {
-								_this.showModal = false
-							} else {
-								uni.showToast({
-									title: response.data,
-									duration: 2000,
-									icon: 'none'
-								});
-							}
+							_this.showModal = false
 						} else {
 							uni.showToast({
 								title: '请您对服务通知进行授权',
@@ -462,7 +488,7 @@
 						}
 					},
 					fail(err) {
-						console.log(err)
+						// console.log(err)
 						uni.showToast({
 							title: err.errCode,
 							duration: 2000,
@@ -472,7 +498,7 @@
 				})
 			},
 			//获取当前以及两年后时间
-			getNowAndTwoYear(){
+			getNowAndTwoYear() {
 				const time = new Date()
 				const year = time.getFullYear()
 				const yearTwo = parseInt(year) + 2
@@ -484,8 +510,10 @@
 			},
 			//获取活动规则
 			getRule() {
+				// console.log(this.indexData.userBindConfigDO.content)
+				uni.setStorageSync('content',this.indexData.userBindConfigDO.content)
 				uni.navigateTo({
-					url: `/pages/activity/invite/rule?content=${this.indexData.userBindConfigDO.content}`
+					url: `/pages/activity/invite/rule`
 				})
 			},
 		},

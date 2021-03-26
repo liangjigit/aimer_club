@@ -145,7 +145,7 @@
 							redirectUrl: null
 						})
 					} else {
-						getApp().globalData.fromJoin = true
+						uni.setStorageSync('fromJoin',true)
 						if (getApp().globalData.fromActive == true) {
 							uni.reLaunch({
 								url: '/pages/activity/invite/index'

@@ -13,9 +13,11 @@
 <script>
 	export default {
 		name:'rule',
-		onLoad(options) {
-			const {content} = options
+		onLoad() {
+			const content  = uni.getStorageSync('content')
+			// console.log(content)
 			this.content = content
+			uni.removeStorageSync('content')
 		},
 		data(){
 			return{

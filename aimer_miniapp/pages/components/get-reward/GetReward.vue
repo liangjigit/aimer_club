@@ -61,9 +61,6 @@
 			this.initAwardList()
 			this.initGetPrizeCount()
 			this.disposeGet()
-			// console.log(this.reward[1].couponList.length)
-			// console.log(this.receiveList)
-			// console.log(this.conpareCount)
 		},
 		methods: {
 			...mapActions('invite', ['getActiveAward', 'getOldInvite', 'getNewInvite', 'sendMiniMessage']),
