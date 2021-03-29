@@ -19,7 +19,7 @@
 					<button open-type="getUserInfo" @getuserinfo="login" withCredentials="false"
 						class="cu-btn line-red text-red">登录</button>
 				</view>
-				<view @click="hide" class="cancel-btn" v-if="!isFromActive">
+				<view @click="hide" class="cancel-btn">
 					<image src="/static/close-icon.png" mode="aspectFit"></image>
 				</view>
 			</view>
@@ -53,9 +53,7 @@
 			}
 		},
 		data() {
-			return {
-				isFromActive: false
-			}
+			return {}
 		},
 		computed: {
 			...mapState('login', ['userInfo', 'isShowLogin', 'pupop', 'redirectUrl']),
@@ -86,7 +84,6 @@
 									//将isShowLogin更改为true，显示login弹框
 									_this.GETLOGINPOPUP()
 									uni.hideLoading()
-									_this.isFromActive = getApp().globalData.fromActive
 								}
 							}
 						}
@@ -101,14 +98,14 @@
 				const token = uni.getStorageSync('token');
 				const getPhone = uni.getStorageSync('getPhone');
 				if (token && getPhone) {
-					if (getApp().globalData.fromActive) {
-						//被邀请进入的老会员
+					if (uni.getStorageSync('invitePhone')) {
+						//被邀请进入的新会员
 						this.$emit('getNewPrize')
-						return false
+					} else {
+						uni.redirectTo({
+							url: '/pages/join/index'
+						})
 					}
-					uni.redirectTo({
-						url: '/pages/join/index'
-					})
 				}
 			},
 			login(e) {
@@ -158,7 +155,7 @@
 									title: "欢迎回来！",
 									icon: "none"
 								})
-								if (getApp().globalData.fromActive) {
+								if (uni.getStorageSync('invitePhone')) {
 									//被邀请进入的老会员
 									this.$emit('reGetInfo')
 								}

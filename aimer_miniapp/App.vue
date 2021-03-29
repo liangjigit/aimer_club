@@ -52,12 +52,10 @@
 			// console.log('App Show')
 		},
 		onHide: function() {
-			console.log('App Hide')
+			// console.log('App Hide')
 		},
 		globalData:{
 			level:false,
-			fromActive:false,
-			invitePhone:'',
 		}
 	}
 </script>

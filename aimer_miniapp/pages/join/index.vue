@@ -146,7 +146,7 @@
 						})
 					} else {
 						uni.setStorageSync('fromJoin',true)
-						if (getApp().globalData.fromActive == true) {
+						if (uni.getStorageSync('invitePhone')) {
 							uni.reLaunch({
 								url: '/pages/activity/invite/index'
 							})

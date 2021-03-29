@@ -76,7 +76,7 @@ request.interceptors.response.use(
   response => {
     //拦截响应，做统一处理
 	if(response.data.code != 200){
-		if(response.data.code == 2014){}else{
+		if(response.data.code == 2014 || response.data.code == 901){}else{
 			uni.hideLoading()
 			uni.showToast({
 				title: response.data.msg,

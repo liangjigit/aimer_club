@@ -137,13 +137,13 @@
 				<image src="/static/index/newtext.png" mode="widthFix"
 					style="width: 50%;position: absolute;top: 25%;left: 50%;transform: translate(-50%);"></image>
 				<view class="old-footer-button" style="justify-content: center;">
-					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="background-color: #ffffff;color: #f0375f;padding: 0 60rpx;" @click="toJoin">立即领取</button>
+					<button class="cu-btn round bg-white" role="button" aria-disabled="false" @click="toJoin"
+						style="background-color: #ffffff;color: #f0375f;padding: 0 60rpx;">立即领取</button>
 				</view>
 			</view>
 		</view>
 		<!-- 新人注册成功页 -->
-		<view class="background-img" @click="fromJoin = false">
+		<view class="background-img" v-if="fromJoin" @click="fromJoin = false">
 			<view class="background-award">
 				<view class="background-text">
 					<view class="top-text">注册成功</view>
@@ -238,7 +238,6 @@
 				rewardObj: null,
 				//是从注册页来的新用户
 				fromJoin: false,
-				fromActive: false,
 				showNewPrize: false,
 				showOldprize: false,
 				isShowPrize: false,
@@ -248,40 +247,30 @@
 				showModal: false,
 				nowTime: '',
 				twoYearLater: '',
-				noActivity:false,
+				noActivity: false,
 			}
 		},
 		// onHide() {
 		// 	console.log(222222)
 		// },
 		onLoad(options) {
+			let {
+				//邀请人手机号
+				invitePhone
+			} = options
+			if (invitePhone != undefined) {
+				invitePhone = decodeURIComponent(invitePhone)
+				uni.setStorageSync('invitePhone', invitePhone)
+			}
+		},
+		onShow() {
+			console.log(uni.getStorageSync('invitePhone'))
+			console.log(uni.getStorageSync('clubIn'))
+			console.log(uni.getStorageSync('fromJoin'))
 			uni.showLoading({
 				title: '加载中',
 				mask: true,
 			})
-			const {
-				//是否从邀请过来
-				fission,
-				//邀请人手机号
-				invitePhone
-			} = options
-			console.log(fission)
-			let a = unescape(fission)
-			console.log(a)
-// let a = "bEGA5WKzyjPg0D0QbiTkqw=="
-// a= escape(a)
-// console.log(a)
-
-			if (invitePhone != undefined) getApp().globalData.invitePhone = invitePhone
-			
-			//2.fission存在时表示被邀请进入，区分新老会员
-			if (fission) {
-				this.fromActive = getApp().globalData.fromActive = true
-			} else { 
-				this.fromActive = getApp().globalData.fromActive = false
-			}
-		},
-		onShow() {
 			const _this = this
 			_this.getNowAndTwoYear()
 			//从club进活动页直接请求首页数据
@@ -290,13 +279,16 @@
 					withSubscriptions: true,
 					success: async function(t) {
 						if (t.authSetting["scope.userInfo"]) {
-							if(!_this.loginState){
+							console.log(111)
+							if (!_this.loginState) {
+								console.log(333)
 								await _this.onGetUserInfo()
 							}
-							console.log(_this.userInfo)
-							_this.getNewMemberPrize()
+							// console.log(_this.userInfo)
+							// _this.getNewMemberPrize()
 							await _this.getIndexData()
 						} else {
+							console.log(222)
 							_this.$refs.login.checkLogin()
 						}
 					}
@@ -306,7 +298,7 @@
 			}
 		},
 		computed: {
-			...mapState('login', ['userInfo','loginState']),
+			...mapState('login', ['userInfo', 'loginState']),
 		},
 		methods: {
 			...mapActions('invite', ['getActiveIndex', 'getOldInvite', 'getNewInvite', 'sendMiniMessage',
@@ -330,23 +322,24 @@
 					if (uni.getStorageSync('clubIn')) {
 						if (this.userInfo.isGuide == 1) {
 							this.bindingOld(this.userInfo)
-							return false
 						}
+						uni.removeStorageSync('clubIn')
+						uni.hideLoading()
+						return false
 					}
 					//邀请老会员进入
-					if (!uni.getStorageSync('fromJoin') && getApp().globalData.fromActive){
+					if (!uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone')) {
 						await this.bindingOld(this.userInfo)
-						this.showOldprize = true
 						return false
 					}
 					//如果是新会员，fromjoin为true
-					if (uni.getStorageSync('fromJoin')  && !getApp().globalData.fromActive) {
-						getApp().globalData.fromJoin = false
+					if (uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone')) {
+						uni.removeStorageSync('fromJoin')
 						this.bindingNew(this.userInfo)
 						return false
 					}
 					uni.hideLoading()
-				}else if(res.code == 500){
+				} else if (res.code == 500) {
 					this.noActivity = true
 				}
 			},
@@ -359,13 +352,30 @@
 				// console.log(userInfo)
 				const response = await this.getOldInvite({
 					activityId: this.indexData.userBindConfigDO.id,
-					invitationPhone: getApp().globalData.fromActive == true ? getApp().globalData.invitePhone :
+					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
 						null,
 					type: null,
 					userPhone: phone
 				})
 				uni.hideLoading()
 				console.log(response)
+			},
+			//绑定新会员
+			async bindingNew(userInfo) {
+				const {
+					phone,
+					isGuide
+				} = userInfo
+				// console.log(userInfo)
+				const response = await this.getNewInvite({
+					activityId: this.indexData.userBindConfigDO.id,
+					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
+						null,
+					type: null,
+					userPhone: phone
+				})
+				console.log(response)
+				if (response.code == 200) this.sendNewMemberMessage()
 			},
 			//老会员被邀重新登陆进入后
 			async inviteOld() {
@@ -384,36 +394,19 @@
 					this.showOldprize = true
 				}
 			},
-			//绑定新会员
-			async bindingNew(userInfo) {
-				const {
-					phone,
-					isGuide
-				} = userInfo
-				// console.log(userInfo)
-				const response = await this.getNewInvite({
-					activityId: this.indexData.userBindConfigDO.id,
-					invitationPhone: getApp().globalData.invitePhone,
-					type: null,
-					userPhone: phone
-				})
-				console.log(response)
-				if (response.code == 200) {
-					this.sendNewMemberMessage()
-					this.getNewMemberPrize()
-				}
-			},
 			//新会员绑定后发送消息
 			async sendNewMemberMessage() {
 				const response = await this.sendMiniMessage({
 					activityId: this.indexData.userBindConfigDO.id,
 					//邀请人的手机
-					invitationPhone: getApp().globalData.invitePhone,
+					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
+						null,
 					// invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
 					type: null,
 					userPhone: null
 				})
 				console.log(response)
+				if (response.code == 200) this.getNewMemberPrize()
 			},
 			//获取新会员奖励列表
 			async getNewMemberPrize() {
@@ -438,9 +431,9 @@
 					url: "/pages/index/index"
 				})
 			},
-			//去注册页
+			//去登录
 			toJoin() {
-				uni.redirectTo({
+				uni.navigateTo({
 					url: '/pages/join/index'
 				})
 			},
@@ -473,27 +466,55 @@
 			getServicePermission() {
 				const _this = this
 				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
-				uni.requestSubscribeMessage({
-					tmplIds: [TMPLID],
-					success(res) {
-						// console.log(res)
-						if (res.errMsg == 'requestSubscribeMessage:ok' && res[TMPLID] == 'accept') {
-							_this.showModal = false
+				uni.getSetting({
+					withSubscriptions: true, //  这里设置为true,下面才会返回mainSwitch
+					success: function(res) {
+						// 调起授权界面弹窗
+						if (res.subscriptionsSetting.mainSwitch) { // 用户打开了订阅消息总开关
+							if (res.subscriptionsSetting.itemSettings !=
+								null) { // 用户同意总是保持是否推送消息的选择, 这里表示以后不会再拉起推送消息的授权
+								// let moIdState = res.subscriptionsSetting.itemSettings[tmplIds]; // 用户同意的消息模板id
+								// if (moIdState === 'accept') {
+								// 	console.log('接受了消息推送');
+								// } else if (moIdState === 'reject') {
+								// 	console.log("拒绝消息推送");
+								// } else if (moIdState === 'ban') {
+								// 	console.log("已被后台封禁");
+								// }
+								_this.showModal = false
+							} else {
+								// 当用户没有点击 ’总是保持以上选择，不再询问‘  按钮。那每次执到这都会拉起授权弹窗
+								uni.requestSubscribeMessage({
+									tmplIds: [TMPLID],
+									success(res) {
+										console.log(res)
+										if (res.errMsg == 'requestSubscribeMessage:ok' && res[
+											TMPLID] == 'accept') {
+											_this.showModal = false
+										} else {
+											uni.showToast({
+												title: '请您对服务通知进行授权',
+												duration: 2000,
+												icon: 'none'
+											});
+										}
+									},
+									fail(err) {
+										console.log(err)
+										uni.showToast({
+											title: err.errCode,
+											duration: 2000,
+											icon: 'none'
+										});
+									}
+								})
+							}
 						} else {
-							uni.showToast({
-								title: '请您对服务通知进行授权',
-								duration: 2000,
-								icon: 'none'
-							});
+							console.log('订阅消息未开启')
 						}
 					},
-					fail(err) {
-						// console.log(err)
-						uni.showToast({
-							title: err.errCode,
-							duration: 2000,
-							icon: 'none'
-						});
+					fail: function(error) {
+						console.log(error);
 					}
 				})
 			},
@@ -511,7 +532,7 @@
 			//获取活动规则
 			getRule() {
 				// console.log(this.indexData.userBindConfigDO.content)
-				uni.setStorageSync('content',this.indexData.userBindConfigDO.content)
+				uni.setStorageSync('content', this.indexData.userBindConfigDO.content)
 				uni.navigateTo({
 					url: `/pages/activity/invite/rule`
 				})
@@ -527,12 +548,14 @@
 			}
 		},
 		onShareAppMessage(res) {
+			let currentUserPhone = this.userInfo.phone
+			currentUserPhone = encodeURIComponent(currentUserPhone)
 			return {
 				title: this.indexData.userBindConfigDO.friendsTitle == null ? '邀请好友活动' : this.indexData.userBindConfigDO
 					.friendsTitle,
 				imageUrl: this.indexData.userBindConfigDO.friendsBg == null ? '../../../static/activity/invite.png' : this
 					.indexData.userBindConfigDO.friendsBg,
-				path: `/pages/activity/invite/index?fission=invite&invitePhone=${this.userInfo.phone}`
+				path: `/pages/activity/invite/index?invitePhone=${currentUserPhone}`
 			}
 		},
 	}
