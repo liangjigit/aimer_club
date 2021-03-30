@@ -8,15 +8,18 @@
 		<header>
 			<view class="rule">
 				<view class="cu-capsule round">
-					<view class="cu-tag bg-blue" @click="getRule">活动规则 <text class="lg text-gray cuIcon-right"></text>
+					<view class="cu-tag bg-blue" @click="getRule">
+						<!-- 活动规则 <text class="lg text-gray cuIcon-right"></text> -->
+						<image src="/static/activity/rules.png" mode="heightFix" style="width: 109rpx;height: 21rpx;">
+						</image>
 					</view>
 				</view>
 			</view>
 		</header>
 		<main>
 			<view v-if="!noActivity">
-				<button class="cu-btn round bg-white" role="button" aria-disabled="false" open-type="share"
-					@click="showModal = true">邀请好友</button>
+				<button class="cu-btn round bg-white" role="button" style="width: 240rpx;height: 60rpx;"
+					aria-disabled="false" open-type="share" @click="showModalYn">邀请好友</button>
 			</view>
 			<view v-else>
 				<text style="color: #ffffff;font-weight: bolder;">当前没有活动正在进行中</text>
@@ -28,7 +31,9 @@
 		<footer>
 			<view class="top">
 				<view class="header">邀新奖励</view>
-				<view class="title">您已邀请{{rewardObj.total == undefined ? 0 : rewardObj.total}}人，邀请好友越多，奖励越多</view>
+				<view class="title">您已邀请<text
+						style="color: #ffffff;">{{rewardObj.total == undefined ? 0 : rewardObj.total}}</text>人，邀请好友越多，奖励越多
+				</view>
 			</view>
 			<view class="footer">
 				<get-reward v-if="rewardObj != null" :rewardObj="rewardObj" @getFinish="getFinish"
@@ -38,6 +43,7 @@
 		</footer>
 		<!-- 邀新奖励 -->
 		<view class="background-img" v-if="isShowPrize" @click="isShowPrize = false">
+			<!-- <view class="background-img" @click="isShowPrize = false"> -->
 			<view class="background-award">
 				<view class="background-text" style="top: 70rpx;">
 					<view class="top-text">恭喜您获得邀新奖励</view>
@@ -49,6 +55,7 @@
 				<ul style="height: 55%;">
 					<!-- 奖励为积分时 -->
 					<li v-if="getPrizeInfo.rewardType == 2">
+						<!-- <li> -->
 						<image src="/static/index/jf_back.png" mode="heightFix" style="height: 140rpx;"></image>
 						<view class="award-left">
 							<text
@@ -256,14 +263,18 @@
 		onLoad(options) {
 			let {
 				//邀请人手机号
-				invitePhone
+				invitePhone,
+				//从服务通知进入
+				fromService
 			} = options
 			if (invitePhone != undefined) {
 				invitePhone = decodeURIComponent(invitePhone)
 				uni.setStorageSync('invitePhone', invitePhone)
 			}
+			if (fromService) uni.setStorageSync('fromService', true)
 		},
 		onShow() {
+			console.log(encodeURIComponent('8kJ30/V3Jv++Zc4kFzYn3Q=='))
 			console.log(uni.getStorageSync('invitePhone'))
 			console.log(uni.getStorageSync('clubIn'))
 			console.log(uni.getStorageSync('fromJoin'))
@@ -273,6 +284,7 @@
 			})
 			const _this = this
 			_this.getNowAndTwoYear()
+			_this.getNewMemberPrize('INIT')
 			//从club进活动页直接请求首页数据
 			if (!uni.getStorageSync('clubIn')) {
 				uni.getSetting({
@@ -284,9 +296,8 @@
 								console.log(333)
 								await _this.onGetUserInfo()
 							}
+							_this.getIndexData()
 							// console.log(_this.userInfo)
-							// _this.getNewMemberPrize()
-							await _this.getIndexData()
 						} else {
 							console.log(222)
 							_this.$refs.login.checkLogin()
@@ -360,6 +371,27 @@
 				uni.hideLoading()
 				console.log(response)
 			},
+			//老会员被邀重新登陆进入后
+			async inviteOld() {
+				const res = await this.getActiveIndex()
+				if (res.code == 200) {
+					console.log(res.data)
+					this.indexData = res.data
+					this.endTime = res.data.userBindConfigDO.endTime
+					this.startTime = res.data.userBindConfigDO.startTime
+					this.rewardObj = {
+						reward: res.data.rewardList,
+						receive: res.data.receiveList,
+						total: res.data.totalCount
+					}
+					if (uni.getStorageSync('fromService')) {
+						uni.removeStorageSync('fromService')
+						return false
+					}
+					await this.bindingOld(this.userInfo)
+					this.showOldprize = true
+				}
+			},
 			//绑定新会员
 			async bindingNew(userInfo) {
 				const {
@@ -377,23 +409,6 @@
 				console.log(response)
 				if (response.code == 200) this.sendNewMemberMessage()
 			},
-			//老会员被邀重新登陆进入后
-			async inviteOld() {
-				const res = await this.getActiveIndex()
-				if (res.code == 200) {
-					console.log(res.data)
-					this.indexData = res.data
-					this.endTime = res.data.userBindConfigDO.endTime
-					this.startTime = res.data.userBindConfigDO.startTime
-					this.rewardObj = {
-						reward: res.data.rewardList,
-						receive: res.data.receiveList,
-						total: res.data.totalCount
-					}
-					await this.bindingOld(this.userInfo)
-					this.showOldprize = true
-				}
-			},
 			//新会员绑定后发送消息
 			async sendNewMemberMessage() {
 				const response = await this.sendMiniMessage({
@@ -402,16 +417,18 @@
 					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
 						null,
 					// invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
-					type: null,
+					type: '/pages/activity/invite/index?fromService=fromService',
 					userPhone: null
 				})
 				console.log(response)
-				if (response.code == 200) this.getNewMemberPrize()
+				if (response.code == 200) this.getNewMemberPrize('GET')
 			},
 			//获取新会员奖励列表
-			async getNewMemberPrize() {
+			async getNewMemberPrize(type) {
 				const res = await this.getNewMemberPrizeList({
-					activeId: this.indexData.userBindConfigDO.id
+					// activeId: this.indexData.userBindConfigDO.id
+					activeType: 'FL',
+					isShow: 1
 				})
 				if (res.code == 200) {
 					let reward = JSON.parse(res.data.reward)
@@ -421,8 +438,16 @@
 						if (item.couponList) item.couponList = JSON.parse(item.couponList)
 					})
 					console.log(this.newMemberPrizeList)
-					uni.hideLoading()
-					this.fromJoin = true
+					if (type == 'GET') {
+						uni.hideLoading()
+						this.fromJoin = true
+					} else if (type == 'INIT') {
+						this.rewardObj = {
+							reward: JSON.parse(res.data.rewardShow),
+							receive: [],
+							total: 0
+						}
+					}
 				}
 			},
 			//去首页
@@ -462,62 +487,6 @@
 					url: '/pages/account/benefit'
 				})
 			},
-			//获取拉起服务通知权限
-			getServicePermission() {
-				const _this = this
-				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
-				uni.getSetting({
-					withSubscriptions: true, //  这里设置为true,下面才会返回mainSwitch
-					success: function(res) {
-						// 调起授权界面弹窗
-						if (res.subscriptionsSetting.mainSwitch) { // 用户打开了订阅消息总开关
-							if (res.subscriptionsSetting.itemSettings !=
-								null) { // 用户同意总是保持是否推送消息的选择, 这里表示以后不会再拉起推送消息的授权
-								// let moIdState = res.subscriptionsSetting.itemSettings[tmplIds]; // 用户同意的消息模板id
-								// if (moIdState === 'accept') {
-								// 	console.log('接受了消息推送');
-								// } else if (moIdState === 'reject') {
-								// 	console.log("拒绝消息推送");
-								// } else if (moIdState === 'ban') {
-								// 	console.log("已被后台封禁");
-								// }
-								_this.showModal = false
-							} else {
-								// 当用户没有点击 ’总是保持以上选择，不再询问‘  按钮。那每次执到这都会拉起授权弹窗
-								uni.requestSubscribeMessage({
-									tmplIds: [TMPLID],
-									success(res) {
-										console.log(res)
-										if (res.errMsg == 'requestSubscribeMessage:ok' && res[
-											TMPLID] == 'accept') {
-											_this.showModal = false
-										} else {
-											uni.showToast({
-												title: '请您对服务通知进行授权',
-												duration: 2000,
-												icon: 'none'
-											});
-										}
-									},
-									fail(err) {
-										console.log(err)
-										uni.showToast({
-											title: err.errCode,
-											duration: 2000,
-											icon: 'none'
-										});
-									}
-								})
-							}
-						} else {
-							console.log('订阅消息未开启')
-						}
-					},
-					fail: function(error) {
-						console.log(error);
-					}
-				})
-			},
 			//获取当前以及两年后时间
 			getNowAndTwoYear() {
 				const time = new Date()
@@ -537,6 +506,59 @@
 					url: `/pages/activity/invite/rule`
 				})
 			},
+			//服务通知权限弹框
+			showModalYn() {
+				const _this = this
+				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
+				_this.showModal = true
+				if (uni.getStorageSync('subscribeMessage')) _this.showModal = false
+				uni.getSetting({
+					withSubscriptions: true, //  这里设置为true,下面才会返回mainSwitch
+					success: function(res) {
+						// console.log(res)
+						// 调起授权界面弹窗
+						if (res.subscriptionsSetting.mainSwitch) { // 用户打开了订阅消息总开关
+							if (res.subscriptionsSetting.itemSettings !=
+								null) { // 用户同意总是保持是否推送消息的选择, 这里表示以后不会再拉起推送消息的授权
+								let moIdState = res.subscriptionsSetting.itemSettings[TMPLID]; // 用户同意的消息模板id
+								// if (moIdState === 'accept') {
+								// 	console.log('接受了消息推送');
+								// } else if (moIdState === 'reject') {
+								// 	console.log("拒绝消息推送");
+								// } else if (moIdState === 'ban') {
+								// 	console.log("已被后台封禁");
+								// }
+								if (moIdState) _this.showModal = false
+							}
+						} else {
+							console.log('订阅消息未开启 withSubscriptions: true')
+						}
+					},
+					fail: function(error) {
+						console.log(error);
+					}
+				})
+			},
+			//获取拉起服务通知权限
+			getServicePermission() {
+				const _this = this
+				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
+				uni.requestSubscribeMessage({
+					tmplIds: [TMPLID],
+					success(res) {
+						console.log(res)
+						// if (res.errMsg == 'requestSubscribeMessage:ok' && res[
+						// 		TMPLID] == 'accept') {
+						// 	_this.showModal = false
+						// }
+						_this.showModal = false
+						uni.setStorageSync('subscribeMessage', true)
+					},
+					fail(err) {
+						console.log(err + 'requestSubscribeMessage失败')
+					}
+				})
+			}
 		},
 		filters: {
 			transformDate(time) {
@@ -624,7 +646,9 @@
 		}
 
 		main {
-			position: absolute;
+			position: fixed;
+			-webkit-transform: translateZ(0);
+			overflow: hidden;
 			top: 40%;
 			// border: 1px solid black;
 			width: 100%;
@@ -645,7 +669,7 @@
 			position: fixed;
 			bottom: 8%;
 			width: 100%;
-			height: 32%;
+			height: 35%;
 			// border: 1px solid black;
 			display: flex;
 			flex-direction: column;
@@ -660,18 +684,30 @@
 				.header {
 					font-size: 40rpx;
 					color: #ffffff;
-					font-weight: bolder;
+					font-weight: Regular;
+					// width: 155px;
+					// height: 39px;
+					font-family: FZLanTingHeiS-DB1-GBK;
+					line-height: 95rpx;
 				}
 
 				.title {
-					margin-top: 6rpx;
+					// margin-top: 6rpx;
+					// width: 426px;
+					// height: 22px;
+					font-size: 22rpx;
+					font-family: FZLanTingHei-R-GBK;
+					font-weight: 400;
+					color: #010101;
+					// line-height: 95rpx;
+					letter-spacing: 2rpx;
 				}
 			}
 
 			.footer {
 				// position: absolute;
 				width: 90%;
-				height: 70%;
+				height: 66%;
 				// border: 1px solid black;
 				border-radius: 30rpx;
 				background: #ffffff;

@@ -1,6 +1,6 @@
 <template>
 	<div class="count-down">
-		<span>距离失效：{{ surplus | filterTime }}</span>
+		<div class="no-activity">距离失效：<span>{{ surplus | filterTime }}</span></div>
 	</div>
 </template>
 <script>
@@ -151,5 +151,17 @@
 	}
 </script>
 
-<style>
+<style lang="scss" scoped>
+	.no-activity{
+		// width: 206px;
+		// height: 22px;
+		font-size: 22rpx;
+		font-family: FZLanTingHei-R-GBK;
+		font-weight: 400;
+		color: #010101;
+		line-height: 95rpx;
+		span{
+			color: #FFEA00;
+		}
+	}
 </style>

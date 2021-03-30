@@ -19,7 +19,7 @@
 					<button open-type="getUserInfo" @getuserinfo="login" withCredentials="false"
 						class="cu-btn line-red text-red">登录</button>
 				</view>
-				<view @click="hide" class="cancel-btn">
+				<view @click="hide" class="cancel-btn" v-if="showHide">
 					<image src="/static/close-icon.png" mode="aspectFit"></image>
 				</view>
 			</view>
@@ -53,7 +53,15 @@
 			}
 		},
 		data() {
-			return {}
+			return {
+				showHide:false
+			}
+		},
+		created() {
+			if (uni.getStorageSync('invitePhone') || uni.getStorageSync('fromService')) {
+				//被邀请进入的老会员
+				this.showHide = false
+			}
 		},
 		computed: {
 			...mapState('login', ['userInfo', 'isShowLogin', 'pupop', 'redirectUrl']),
@@ -155,7 +163,7 @@
 									title: "欢迎回来！",
 									icon: "none"
 								})
-								if (uni.getStorageSync('invitePhone')) {
+								if (uni.getStorageSync('invitePhone') || uni.getStorageSync('fromService')) {
 									//被邀请进入的老会员
 									this.$emit('reGetInfo')
 								}

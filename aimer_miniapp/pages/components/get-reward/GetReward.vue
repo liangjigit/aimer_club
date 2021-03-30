@@ -5,22 +5,23 @@
 				<view class="reward" :class="totalInvite < item.inviteCount ? 'wait-bg' : 'see-get-bg'">
 					<!-- 奖励1：积分 -->
 					<view class="image" v-if="item.rewardType == 2">
-						<image src="../../../static/index/jf.png" mode="widthFix" style="width: 90rpx;"></image>
+						<image src="../../../static/index/jf.png" mode="widthFix" style="width: 70rpx;"></image>
 						<view class="award-text">
-							<text style="font-size: 30rpx;">{{item.integral}}</text>
+							<text style="font-size: 25rpx;">{{item.integral}}</text>
 							<text style="font-size: 20rpx;">积分</text>
 						</view>
 					</view>
 					<!-- 奖励2：优惠券 -->
 					<view class="image" v-if="item.rewardType == 1">
-						<image src="../../../static/activity/award_back.png" mode="widthFix"></image>
-						<view  class="award-text">
-							<text style="font-size: 30rpx;">{{item.couponList[0].couponAmount}}元</text>
+						<image src="../../../static/activity/award_back.png" mode="widthFix"
+							style="width: 88rpx;height: 51rpx;"></image>
+						<view class="award-text">
+							<text class="youhuiquan">{{item.couponList[0].couponAmount}}元</text>
 						</view>
 					</view>
 					<!-- 奖励3：礼品卡 -->
 					<view class="image" v-if="item.rewardType == 3">
-						<image :src="item.prizeImg" mode="widthFix" style="width: 60%;"></image>
+						<image :src="item.prizeImg" mode="heightFix" style="height: 70rpx;"></image>
 					</view>
 					<text>邀请{{item.inviteCount}}人</text>
 				</view>
@@ -79,7 +80,7 @@
 				}
 			},
 			//初始化奖励数组
-			initAwardList(){
+			initAwardList() {
 				const reward = this.rewardObj.reward.sort((a, b) => {
 					return a.inviteCount - b.inviteCount
 				})
@@ -191,7 +192,7 @@
 
 				.reward {
 					padding-top: 15rpx;
-					padding-bottom: 25rpx;
+					padding-bottom: 40rpx;
 					width: 90%;
 					height: 70%;
 					display: flex;
@@ -201,20 +202,27 @@
 					border-radius: 10rpx;
 
 					.image {
-						width: 90%;
+						width: 140rpx;
+						height: 185rpx;
 						display: flex;
 						justify-content: center;
 						align-items: center;
-						image {
-							width: 100%;
-						}
-						.award-text{
-							position: absolute ;
-							display:flex;
+
+						.award-text {
+							position: absolute;
+							display: flex;
 							flex-direction: column;
 							justify-content: center;
 							align-items: center;
-							color: #ffffff;
+							font-family: FZLanTingHeiS-DB1-GBK;
+							color: #FFFFFF;
+							font-weight: Regular;
+
+							.youhuiquan {
+								font-size: 28rpx;
+								// letter-spacing: -25rpx;
+								line-height: 95rpx;
+							}
 						}
 					}
 				}
@@ -229,8 +237,8 @@
 
 				.button_see {
 					transform: translateY(-50%);
-					width: 150rpx;
-					height: 55rpx;
+					width: 160rpx;
+					height: 50rpx;
 					border: 2px solid #ee194c;
 					color: #ee194c;
 					border-radius: 25rpx;
@@ -242,8 +250,8 @@
 
 				.button_get {
 					transform: translateY(-50%);
-					width: 150rpx;
-					height: 55rpx;
+					width: 160rpx;
+					height: 50rpx;
 					border: 2px solid #ee194c;
 					color: #ffffff;
 					border-radius: 25rpx;
@@ -255,8 +263,8 @@
 
 				.button_wait {
 					transform: translateY(-50%);
-					width: 150rpx;
-					height: 55rpx;
+					width: 160rpx;
+					height: 50rpx;
 					border: 2px solid #a0a0a0;
 					color: #ffffff;
 					border-radius: 25rpx;
