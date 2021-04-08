@@ -19,8 +19,10 @@ const getters = {
 const actions = {
 	// 获取活动首页数据
 	async getActiveIndex({commit},payload){
+		const {isShowHide} = payload
+		//isShowHide为1时显示，0时隐藏
 		let response = (await request({
-			url:'/user/user/bind/getUserBindData?activeType=FL&isShow=1',
+			url:`/user/user/bind/getUserBindData?activeType=FL&isShow=${isShowHide}`,
 			method:'POST',
 			// data:payload,
 		})).data;

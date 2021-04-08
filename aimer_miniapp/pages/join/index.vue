@@ -145,6 +145,7 @@
 							redirectUrl: null
 						})
 					} else {
+						//加入fromJoin判断为从注册页面进入的新用户
 						uni.setStorageSync('fromJoin',true)
 						if (uni.getStorageSync('invitePhone')) {
 							uni.reLaunch({
@@ -157,6 +158,7 @@
 						}
 					}
 				}
+				//用户信息以及手机号保存成功为true
 				return this.isSaveInfo && this.isSavePhone
 			}
 		},
@@ -235,6 +237,7 @@
 				return true
 			},
 			submit: debounce(async function() {
+				//debunce防抖
 				if (this.isDisabledUser) {
 					abnormalprompt()
 					return
@@ -263,9 +266,9 @@
 					if (response.code == 200) {
 						await this.getMyInfo({})
 						this.isSaveInfo = true
-						console.log("用户加入成功")
+						// console.log("用户加入成功")
 						let res = uni.getSystemInfoSync()
-						console.log("当前运行环境：" + res.environment)
+						// console.log("当前运行环境：" + res.environment)
 						if (getApp().globalData.level) {
 							uni.reLaunch({
 								url: '/pages/account/benefit?level=lv'

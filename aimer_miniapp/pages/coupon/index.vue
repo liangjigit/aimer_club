@@ -12,6 +12,16 @@
 					<text class="date">有效期 {{item.startDate}} —— {{item.endDate}}</text>
 				</view>
 			</view>
+			<view class="padding-lr-lg padding-top-lg padding-bottom flex align-center" v-if="cardType[index] == 'LP'">
+				<view class="discount">
+					<text class="unit">¥</text>
+					<text class="num">{{item.faceAmount}}</text>
+				</view>
+				<view class="flex flex-direction flex-sub">
+					<text class="title text-cut-line2 margin-bottom">【{{item.couponName}}】{{item.subheading}}</text>
+					<text class="date">有效期 {{item.startDate}} —— {{item.endDate}}</text>
+				</view>
+			</view>
 			<view class="padding-lr-lg padding-top-lg padding-bottom flex align-center" v-if="cardType[index] == 'ZK'">
 				<view class="discount">
 					<text class="num">{{item.discount * 10}}</text>
@@ -89,7 +99,7 @@
 			async getData(isRefresh) {
 				this.isLoading = true
 				let pageIndex = isRefresh ? 1 : this.pageNum + 1
-				console.log(pageIndex, this.pageSize)
+				// console.log(pageIndex, this.pageSize)
 				let response = await this.getCoupons({
 					pageNum: pageIndex,
 					pageSize: this.pageSize
@@ -112,8 +122,8 @@
 					this.cardType = this.list.map(item=>{
 						return item.couponId.substr(0,2)
 					})
-					console.log(this.list)
-					console.log(this.cardType)
+					console.log('我是列表',this.list)
+					console.log('我是类型',this.cardType)
 					if (isRefresh) {
 						uni.showToast({
 							title: "已刷新",

@@ -21,13 +21,14 @@ export default {
 		}
 		if(!this.isLogin){
 			// 微信小程序登录
-			 uni.getSetting({
-				success: function(t) {
-					if(t.authSetting["scope.userInfo"]){
-						_this.onGetUserInfo()
-					}
-				}
-			})
+			//  uni.getSetting({
+			// 	success: function(t) {
+			// 		if(t.authSetting["scope.userInfo"]){
+			// 			_this.onGetUserInfo()
+			// 		}
+			// 	}
+			// })
+			_this.onGetUserInfo()
 		}
 	},
 	methods:{

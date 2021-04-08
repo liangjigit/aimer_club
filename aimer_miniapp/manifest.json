@@ -65,6 +65,7 @@
             "minified" : true
         },
         "usingComponents" : true,
+				"optimization":{"subPackages":true},
         "permission" : {
             "scope.userLocation" : {
                 "desc" : "用于获取您所在城市的社区活动、线下门店等信息"

@@ -32,7 +32,7 @@
 
 <script>
 	import {mapState,mapActions} from 'vuex'
-	import imtCalendar from '@/pages/components/imt-calendar/imt-calendar.vue'
+	import imtCalendar from '@/pages/training/evaluation/imt-calendar/imt-calendar.vue'
 	export default{
 		onShow(){
 			this.$refs.login.checkLogin()

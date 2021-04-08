@@ -4,8 +4,10 @@
 			@click="getServicePermission"></view>
 		<login-pupop ref="login" @reGetInfo="inviteOld" @getNewPrize="showNewPrize = true">
 		</login-pupop>
-		<image class="background" src="/static/activity/back.png" mode="scaleToFill"></image>
-		<header>
+		<image class="background"
+			:src="indexData.userBindConfigDO.themeBg ? indexData.userBindConfigDO.themeBg : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1614670402293.jpg'"
+			mode="scaleToFill"></image>
+		<header v-if="isShowInvite">
 			<view class="rule">
 				<view class="cu-capsule round">
 					<view class="cu-tag bg-blue" @click="getRule">
@@ -19,13 +21,14 @@
 		<main>
 			<view v-if="!noActivity">
 				<button class="cu-btn round bg-white" role="button" style="width: 240rpx;height: 60rpx;"
-					aria-disabled="false" open-type="share" @click="showModalYn">邀请好友</button>
+					aria-disabled="false" open-type="share" @click="showModalYn" v-if="isShowInvite">邀请好友</button>
 			</view>
 			<view v-else>
 				<text style="color: #ffffff;font-weight: bolder;">当前没有活动正在进行中</text>
 			</view>
 			<view>
-				<count-down :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0"></count-down>
+				<count-down ref="countDown" :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0">
+				</count-down>
 			</view>
 		</main>
 		<footer>
@@ -36,33 +39,30 @@
 				</view>
 			</view>
 			<view class="footer">
-				<get-reward v-if="rewardObj != null" :rewardObj="rewardObj" @getFinish="getFinish"
+				<get-reward v-if="rewardObj != null" :rewardStr="JSON.stringify(rewardObj)" @getFinish="getFinish"
 					@seePrize="toSeePrize">
 				</get-reward>
 			</view>
 		</footer>
 		<!-- 邀新奖励 -->
 		<view class="background-img" v-if="isShowPrize" @click="isShowPrize = false">
-			<!-- <view class="background-img" @click="isShowPrize = false"> -->
 			<view class="background-award">
-				<view class="background-text" style="top: 70rpx;">
+				<view class="background-text" style="top: 54rpx;">
 					<view class="top-text">恭喜您获得邀新奖励</view>
 				</view>
-				<image src="/static/index/redback.png" mode="widthFix" style="height: 100%;"></image>
+				<image src="/static/index/redback.png" mode="center" style="height: 300rpx;"></image>
 				<image src="/static/index/close.png"
-					style="position: absolute;right: 15rpx;top: 15rpx;height: 50rpx;width: 50rpx;"
+					style="position: absolute;right: 23rpx;top: 23rpx;height: 40rpx;width: 40rpx;"
 					@click="isShowPrize = false"></image>
-				<ul style="height: 55%;">
+				<ul style="height: fit-content;margin-top: 32rpx;">
 					<!-- 奖励为积分时 -->
 					<li v-if="getPrizeInfo.rewardType == 2">
-						<!-- <li> -->
-						<image src="/static/index/jf_back.png" mode="heightFix" style="height: 140rpx;"></image>
+						<image src="/static/index/jf_back.png" mode="heightFix" style="height: 148rpx;"></image>
 						<view class="award-left">
 							<text
-								style="font-size: 45rpx;font-weight: bolder;color: #ffffff;">{{getPrizeInfo.integral}}</text>
-							<view class="left-style">
-								<text>积</text><text>分</text>
-							</view>
+								style="font-size: 90rpx;font-family: DINCond-Black;font-weight: 400;color: #FFFFFF;line-height: 122rpx;">{{getPrizeInfo.integral}}</text>
+							<image src="/static/activity/jifen.png" mode="widthFix"
+								style="width: 25rpx;height: 46rpx;margin-top: 20rpx;"></image>
 						</view>
 						<view class="award-right">
 							<view class="award-right-top">{{getPrizeInfo.integral}}积分</view>
@@ -73,20 +73,21 @@
 					</li>
 					<!-- 奖励为优惠券的时候 -->
 					<li v-if="getPrizeInfo.rewardType == 1">
-						<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
+						<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
 						<view class="award-left">
 							<text
-								style="font-size: 30rpx;font-weight: bolder;color: #F52F48;margin-bottom: 20rpx;">￥</text>
+								style="font-size: 34rpx;font-family: DINCond-Black;font-weight: 400;color: #F52F48;line-height: 122rpx;margin-bottom: 14rpx;">￥</text>
 							<text
-								style="font-size: 45rpx;font-weight: bolder;color: #F52F48;">{{getPrizeInfo.couponList[0].couponAmount}}</text>
+								style="font-size: 60rpx;font-family: DINCond-Black;font-weight: 400;color: #F52F48;line-height: 122rpx;margin-left: -10rpx;">
+								{{getPrizeInfo.couponList[0].couponAmount}}</text>
 						</view>
 						<view class="award-right">
-							<view
-								style="font-size: 30rpx;height: fit-content;width: 100%;font-weight: bolder;color: #F52F48;margin-top: 20rpx;">
-								{{getPrizeInfo.couponList[0].couponName}}
+							<view class="right-10">
+								<text>{{getPrizeInfo.couponList[0].couponName}}
+								</text>
 							</view>
-							<view style="font-size: 20rpx;height: fit-content;width: 100%;color: #F52F48;">
-								{{getPrizeInfo.couponList[0].subheading}}
+							<view class="right-10" style="font-size: 22rpx;margin-top: 10rpx;">
+								<text>{{getPrizeInfo.couponList[0].subheading}}</text>
 							</view>
 							<view class="award-right-bottom">
 								有效期:{{getPrizeInfo.couponList[0].startDate | transformDate}}至{{getPrizeInfo.couponList[0].endDate | transformDate}}
@@ -95,13 +96,15 @@
 					</li>
 					<!-- 奖励为礼品卡的时候 -->
 					<li v-if="getPrizeInfo.rewardType == 3">
-						<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
+						<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
 						<view class="award-left">
-							<image :src="getPrizeInfo.prizeImg" mode="heightFix" style="height: 70%;"></image>
+							<image :src="getPrizeInfo.prizeImg" mode="heightFix" style="height: 100rpx;"></image>
 						</view>
 						<view class="award-right">
-							<view class="award-right-top" style="font-size: 30rpx;">
-								{{getPrizeInfo.couponList[0].couponName}}
+							<view class="award-right-top"
+								style="height: fit-content;width: 280rpx;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;margin-top: 45rpx;">
+								<text
+									style="width: 100%;text-overflow: ellipsis;overflow: hidden;">{{getPrizeInfo.couponList[0].couponName}}</text>
 							</view>
 							<view class="award-right-bottom">
 								有效期:{{getPrizeInfo.couponList[0].startDate | transformDate}}至{{getPrizeInfo.couponList[0].endDate | transformDate}}
@@ -113,99 +116,109 @@
 		</view>
 		<!-- 老人邀请成功页 -->
 		<view class="background-img" v-if="showOldprize">
-			<view class="background-award">
+			<view class="background-award" style="height: 400rpx;">
 				<view class="cancel-btn">
 					<image src="/static/close-icon.png" mode="aspectFit" @click="showOldprize=false">
 					</image>
 				</view>
 				<view class="background-text" style="height: 40%;">
-					<view class="top-text" style="color:#f0375f ;font-size: 40rpx;">您已注册过AIMER CLUB</view>
-					<view class="bottom-text"
-						style="color: #000000;text-align: center;font-weight: 600;padding-left: 25rpx;padding-right: 25rpx;">
-						您可以发起新的[邀请好友]活动获得奖励，邀请越多奖励越多哦！</view>
+					<image src="/static/activity/already-join.png" mode="aspectFit"
+						style="width: 403rpx;height: 35rpx;margin-top: 32rpx;"></image>
+					<image src="/static/activity/already-sub.png" mode="aspectFit"
+						style="width: 435rpx;height: 58rpx;margin-top: 53rpx;"></image>
 				</view>
 				<image src="/static/index/oldJoin.png" mode="widthFix" style="height: 100%;"></image>
 				<view class="old-footer-button">
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="padding: 0 50rpx;background-color: #ffc1c9;color: #f0375f;"
-						@click="toClubIndex">逛逛CLUB</button>
+						style="width: 220rpx;height: 60rpx;background-color: #ffc1c9;color: #f0375f;"
+						@click="toClubIndex">
+						<image src="/static/activity/to-club.png" mode="widthFix" style="width: 130rpx;height: 24rpx;">
+						</image>
+					</button>
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false"
-						style="background-color: #ffffff;color: #f0375f;" open-type="share"
-						@click="showOldprize=false">立即邀请好友</button>
+						style="width: 220rpx;height: 60rpx;background-color: #ffffff;color: #f0375f;" open-type="share"
+						@click="showOldprize=false">
+						<image src="/static/activity/invute-f.png" mode="widthFix" style="width: 159rpx;height: 25rpx;">
+						</image>
+					</button>
 				</view>
 			</view>
 		</view>
 		<!-- 新人未注册前的奖励 -->
 		<view class="background-img" v-if="showNewPrize">
-			<view class="background-award">
-				<image src="/static/index/newback.png" mode="widthFix" style="height: 100%;"></image>
+			<view class="background-award" style="height: 400rpx;">
+				<image src="/static/index/newback.png" mode="widthFix" style="width: 100%;"></image>
 				<image src="/static/index/newborder.png" mode="widthFix"
-					style="width: 70%;position: absolute;top: 10%;left: 50%;transform: translate(-50%);"></image>
+					style="width: 343rpx;height:199rpx; position: absolute;top: 48rpx;left: 104rpx;"></image>
 				<image src="/static/index/newtext.png" mode="widthFix"
-					style="width: 50%;position: absolute;top: 25%;left: 50%;transform: translate(-50%);"></image>
+					style="width: 221rpx;height: 81rpx;position: absolute;top: 109rpx;left: 50%;transform: translate(-50%);">
+				</image>
 				<view class="old-footer-button" style="justify-content: center;">
 					<button class="cu-btn round bg-white" role="button" aria-disabled="false" @click="toJoin"
-						style="background-color: #ffffff;color: #f0375f;padding: 0 60rpx;">立即领取</button>
+						style="background-color: #ffffff;color: #f0375f;width: 240rpx;height: 60rpx;">
+						<image src="/static/activity/like-get.png" mode="widthFix" style="width: 106rpx;height: 25rpx;">
+						</image>
+					</button>
 				</view>
 			</view>
 		</view>
 		<!-- 新人注册成功页 -->
 		<view class="background-img" v-if="fromJoin" @click="fromJoin = false">
-			<view class="background-award">
+			<view class="background-award" style="height: fit-content;">
 				<view class="background-text">
-					<view class="top-text">注册成功</view>
-					<view class="bottom-text">点击我的卡券查看优惠</view>
+					<image src="/static/activity/join-success.png" mode="widthFix" style="height: 81rpx;width: 239rpx;">
+					</image>
 				</view>
 				<image src="/static/index/newJoin.png" mode="widthFix" style="height: 100%;"></image>
 				<ul>
 					<!-- DJQ:满减券 LPQ:礼品券 -->
 					<li v-for="(item,index) in newMemberPrizeList">
 						<template v-if="item.type == 'DJQ' || item.rewardType == 1">
-							<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
+							<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
 							<view class="award-left">
 								<text
-									style="font-size: 30rpx;font-weight: bolder;color: #F52F48;margin-bottom: 20rpx;">￥</text>
+									style="font-size: 34rpx;font-family: DINCond-Black;font-weight: 400;color: #F52F48;line-height: 122rpx;margin-bottom: 14rpx;">￥</text>
 								<text
-									style="font-size: 45rpx;font-weight: bolder;color: #F52F48;">{{item.couponAmount ? item.couponAmount : item.couponList[0].couponAmount}}</text>
+									style="font-size: 60rpx;font-family: DINCond-Black;font-weight: 400;color: #F52F48;line-height: 122rpx;margin-left: -10rpx;">
+									{{item.couponAmount ? item.couponAmount : item.couponList[0].couponAmount}}</text>
 							</view>
 							<view class="award-right">
-								<view
-									style="font-size: 30rpx;height: fit-content;width: 100%;font-weight: bolder;color: #F52F48;margin-top: 20rpx;">
-									{{item.couponName ? item.couponName : item.couponList[0].couponName}}
+								<view class="right-10">
+									<text>{{item.couponName ? item.couponName : item.couponList[0].couponName}}
+									</text>
 								</view>
-								<view style="font-size: 20rpx;height: fit-content;width: 100%;color: #F52F48;">
-									{{item.subheading ? item.subheading : item.couponList[0].subheading}}
+								<view class="right-10" style="font-size: 22rpx;margin-top: 10rpx;">
+									<text>{{item.subheading ? item.subheading : item.couponList[0].subheading}}</text>
 								</view>
 								<view class="award-right-bottom">
-									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}
-									至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
+									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
 								</view>
 							</view>
 						</template>
 						<template v-else-if="item.type == 'LPQ' || item.rewardType == 3">
-							<image src="/static/index/backAward.png" mode="heightFix" style="height: 140rpx;"></image>
+							<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
 							<view class="award-left">
-								<image :src="item.prizeImg ? item.prizeImg : '/static/activity/jiang2.png'"
-									mode="heightFix" style="height: 70%;"></image>
+								<image :src="item.prizeImg ? item.prizeImg : ''" mode="heightFix"
+									style="height: 100rpx;"></image>
 							</view>
 							<view class="award-right">
-								<view class="award-right-top" style="font-size: 30rpx;">
-									{{item.couponName ? item.couponName : item.couponList[0].couponName}}
+								<view class="award-right-top"
+									style="height: fit-content;width: 280rpx;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;margin-top: 45rpx;">
+									<text
+										style="width: 100%;text-overflow: ellipsis;overflow: hidden;">{{item.couponName ? item.couponName : item.couponList[0].couponName}}</text>
 								</view>
 								<view class="award-right-bottom">
-									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}
-									至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
+									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
 								</view>
 							</view>
 						</template>
 						<template v-else>
-							<image src="/static/index/jf_back.png" mode="heightFix" style="height: 140rpx;"></image>
+							<image src="/static/index/jf_back.png" mode="heightFix" style="height: 148rpx;"></image>
 							<view class="award-left">
 								<text
-									style="font-size: 45rpx;font-weight: bolder;color: #ffffff;">{{item.integral}}</text>
-								<view class="left-style">
-									<text>积</text><text>分</text>
-								</view>
+									style="font-size: 90rpx;font-family: DINCond-Black;font-weight: 400;color: #FFFFFF;line-height: 122rpx;">{{item.integral}}</text>
+								<image src="/static/activity/jifen.png" mode="widthFix"
+									style="width: 25rpx;height: 46rpx;margin-top: 20rpx;"></image>
 							</view>
 							<view class="award-right">
 								<view class="award-right-top">{{item.integral}}积分</view>
@@ -218,18 +231,21 @@
 				</ul>
 			</view>
 			<view class="cancel-award">
-				<image src="/static/close-icon.png" mode="aspectFit" @click="fromJoin = false"></image>
+				<image src="/static/close-icon.png" mode="aspectFit" style="height: 40rpx;height: 40rpx;"
+					@click="fromJoin = false"></image>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
-	import getReward from '../../components/get-reward/GetReward.vue'
-	import countDown from '../../components/get-reward/CountDown.vue'
+	import getReward from './get-reward/GetReward.vue'
+	import countDown from './get-reward/CountDown.vue'
 	import {
 		mapActions,
-		mapState
+		mapState,
+		mapMutations,
+		mapGetters
 	} from 'vuex'
 	export default {
 		name: 'invite',
@@ -255,82 +271,107 @@
 				nowTime: '',
 				twoYearLater: '',
 				noActivity: false,
+				isShowInvite: false
 			}
 		},
-		// onHide() {
-		// 	console.log(222222)
-		// },
+		onHide() {
+			uni.hideLoading()
+			uni.removeStorageSync('clubIn')
+			console.log('我走了onHide')
+		},
+		onUnload() {
+			uni.removeStorageSync('inviteStatus')
+			console.log('我走了onUnload')
+		},
 		onLoad(options) {
 			let {
+				//奖励标识 目前FL固定
+				inviteType,
+				//活动的状态 0隐藏 1显示
+				inviteStatus,
+				//邀请人id
+				inviteUserId,
 				//邀请人手机号
 				invitePhone,
 				//从服务通知进入
-				fromService
+				fromService,
+				//是否从club进入
+				clubIn
 			} = options
+			//是否从club进入
+			if (clubIn) uni.setStorageSync('clubIn', true)
+			//保存活动的状态
+			if (inviteStatus != undefined) {
+				uni.setStorageSync('inviteStatus', inviteStatus)
+			} else {
+				if (!uni.getStorageSync('inviteStatus')) uni.setStorageSync('inviteStatus', 1)
+			}
+			//保存邀请人的id
+			if (inviteUserId) {
+				this.GETINVITEUSERID({
+					inviteUserId
+				})
+			}
+			//保存邀请人的加密手机号
 			if (invitePhone != undefined) {
 				invitePhone = decodeURIComponent(invitePhone)
 				uni.setStorageSync('invitePhone', invitePhone)
 			}
+			//从服务通知进入场景
 			if (fromService) uni.setStorageSync('fromService', true)
 		},
 		onShow() {
-			console.log(encodeURIComponent('8kJ30/V3Jv++Zc4kFzYn3Q=='))
-			console.log(uni.getStorageSync('invitePhone'))
-			console.log(uni.getStorageSync('clubIn'))
-			console.log(uni.getStorageSync('fromJoin'))
+			const _this = this
+			_this.getNowAndTwoYear()
 			uni.showLoading({
 				title: '加载中',
 				mask: true,
 			})
-			const _this = this
-			_this.getNowAndTwoYear()
-			_this.getNewMemberPrize('INIT')
-			//从club进活动页直接请求首页数据
-			if (!uni.getStorageSync('clubIn')) {
-				uni.getSetting({
-					withSubscriptions: true,
-					success: async function(t) {
-						if (t.authSetting["scope.userInfo"]) {
-							console.log(111)
-							if (!_this.loginState) {
-								console.log(333)
-								await _this.onGetUserInfo()
-							}
-							_this.getIndexData()
-							// console.log(_this.userInfo)
-						} else {
-							console.log(222)
-							_this.$refs.login.checkLogin()
-						}
-					}
-				})
-			} else {
+			//判断是否登陆
+			if (_this.isLogin) {
+				console.log(222, '我有个人资料缓存')
+				_this.isShowInvite = true
 				_this.getIndexData()
+			} else {
+				console.log(333, '我没有个人资料缓存')
+				_this.isShowInvite = false
+				_this.getNewMemberPrize('INIT')
+				_this.$refs.login.checkLogin('fromFL')
 			}
-		},
-		computed: {
-			...mapState('login', ['userInfo', 'loginState']),
 		},
 		methods: {
 			...mapActions('invite', ['getActiveIndex', 'getOldInvite', 'getNewInvite', 'sendMiniMessage',
 				'getNewMemberPrizeList'
 			]),
 			...mapActions('login', ['onGetUserInfo']),
+			...mapMutations('login', ['GETINVITEUSERID']),
 			//获取页面数据
 			async getIndexData() {
-				const res = await this.getActiveIndex()
+				//如果不是导购且进入的是隐藏活动则跳回首页
+				if (this.userInfo.isGuide != 1 && uni.getStorageSync('inviteStatus') == 0 && !uni.getStorageSync(
+						'invitePhone')) {
+					uni.switchTab({
+						url: '/pages/index/index'
+					})
+					return false
+				}
+				const res = await this.getActiveIndex({
+					isShowHide: uni.getStorageSync('inviteStatus')
+				})
 				if (res.code == 200) {
-					console.log(res.data)
+					console.log('我是奖品的数据',res.data)
 					this.indexData = res.data
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
 					this.rewardObj = {
 						reward: res.data.rewardList,
 						receive: res.data.receiveList,
-						total: res.data.totalCount
+						total: res.data.totalCount,
+						limit:res.data.userBindConfigDO.timeLimit
 					}
-					//从club进入且是导购
-					if (uni.getStorageSync('clubIn')) {
+					//从club进入且是导购 或者通过太阳码进入只存在inviteStatus
+					if (uni.getStorageSync('clubIn') || (uni.getStorageSync('inviteStatus') == 0 && !uni
+							.getStorageSync('invitePhone'))) {
 						if (this.userInfo.isGuide == 1) {
 							this.bindingOld(this.userInfo)
 						}
@@ -346,21 +387,25 @@
 					//如果是新会员，fromjoin为true
 					if (uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone')) {
 						uni.removeStorageSync('fromJoin')
+						console.log('我是新会员')
+						this.getNewMemberPrize('GET')
 						this.bindingNew(this.userInfo)
 						return false
 					}
 					uni.hideLoading()
 				} else if (res.code == 500) {
 					this.noActivity = true
+				} else if (res.code == 2009) {
+					uni.redirectTo({
+						url: '/pages/join/index'
+					})
 				}
 			},
 			//绑定老会员
 			async bindingOld(userInfo) {
 				const {
-					phone,
-					isGuide
+					phone
 				} = userInfo
-				// console.log(userInfo)
 				const response = await this.getOldInvite({
 					activityId: this.indexData.userBindConfigDO.id,
 					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
@@ -368,12 +413,38 @@
 					type: null,
 					userPhone: phone
 				})
+				//如果被邀请人是导购
+				if (response.code == 2016) {
+					const _this = this
+					uni.setStorageSync('indexDataId', this.indexData.userBindConfigDO.id)
+					this.showOldprize = false
+					setTimeout(async function() {
+						// console.log('我是id',uni.getStorageSync('indexDataId'))
+						await _this.getOldInvite({
+							activityId: uni.getStorageSync('indexDataId'),
+							invitationPhone: null,
+							type: null,
+							userPhone: phone
+						})
+						uni.removeStorageSync('indexDataId')
+					}, 5000)
+				}
 				uni.hideLoading()
-				console.log(response)
+				console.log('我是老会员绑定之后', response)
 			},
 			//老会员被邀重新登陆进入后
 			async inviteOld() {
-				const res = await this.getActiveIndex()
+				//如果不是导购且进入的是隐藏活动则跳回首页
+				if (this.userInfo.isGuide != 1 && uni.getStorageSync('inviteStatus') == 0 && !uni.getStorageSync(
+						'invitePhone')) {
+					uni.switchTab({
+						url: '/pages/index/index'
+					})
+					return false
+				}
+				const res = await this.getActiveIndex({
+					isShowHide: uni.getStorageSync('inviteStatus')
+				})
 				if (res.code == 200) {
 					console.log(res.data)
 					this.indexData = res.data
@@ -382,21 +453,23 @@
 					this.rewardObj = {
 						reward: res.data.rewardList,
 						receive: res.data.receiveList,
-						total: res.data.totalCount
+						total: res.data.totalCount,
+						limit:res.data.userBindConfigDO.timeLimit
 					}
+					//从服务通知进来的不需要再进行老会员绑定了
 					if (uni.getStorageSync('fromService')) {
 						uni.removeStorageSync('fromService')
 						return false
 					}
-					await this.bindingOld(this.userInfo)
 					this.showOldprize = true
+					this.isShowInvite = true
+					await this.bindingOld(this.userInfo)
 				}
 			},
 			//绑定新会员
 			async bindingNew(userInfo) {
 				const {
-					phone,
-					isGuide
+					phone
 				} = userInfo
 				// console.log(userInfo)
 				const response = await this.getNewInvite({
@@ -406,7 +479,7 @@
 					type: null,
 					userPhone: phone
 				})
-				console.log(response)
+				console.log('绑定新会员成功', response)
 				if (response.code == 200) this.sendNewMemberMessage()
 			},
 			//新会员绑定后发送消息
@@ -417,18 +490,17 @@
 					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
 						null,
 					// invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
-					type: '/pages/activity/invite/index?fromService=fromService',
+					type: 'pages/activity/invite/index?fromService=fromService',
 					userPhone: null
 				})
 				console.log(response)
-				if (response.code == 200) this.getNewMemberPrize('GET')
 			},
 			//获取新会员奖励列表
 			async getNewMemberPrize(type) {
 				const res = await this.getNewMemberPrizeList({
 					// activeId: this.indexData.userBindConfigDO.id
 					activeType: 'FL',
-					isShow: 1
+					isShow: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
 					let reward = JSON.parse(res.data.reward)
@@ -437,16 +509,19 @@
 					this.newMemberPrizeList.forEach(item => {
 						if (item.couponList) item.couponList = JSON.parse(item.couponList)
 					})
-					console.log(this.newMemberPrizeList)
 					if (type == 'GET') {
+						// this.newMemberPrizeList = [this.newMemberPrizeList[0],this.newMemberPrizeList[1]]
+						this.newMemberPrizeList = this.newMemberPrizeList.splice(0, 3)
 						uni.hideLoading()
 						this.fromJoin = true
 					} else if (type == 'INIT') {
 						this.rewardObj = {
 							reward: JSON.parse(res.data.rewardShow),
 							receive: [],
-							total: 0
+							total: 0,
+							limit:1
 						}
+						uni.hideLoading()
 					}
 				}
 			},
@@ -466,9 +541,11 @@
 			//获取当前领取奖品
 			async getFinish(data) {
 				this.getPrizeInfo = data
-				console.log(data)
+				// console.log(data)
 				this.isShowPrize = true
-				const res = await this.getActiveIndex()
+				const res = await this.getActiveIndex({
+					isShowHide: uni.getStorageSync('inviteStatus')
+				})
 				if (res.code == 200) {
 					console.log(res.data)
 					this.indexData = res.data
@@ -477,7 +554,8 @@
 					this.rewardObj = {
 						reward: res.data.rewardList,
 						receive: res.data.receiveList,
-						total: res.data.totalCount
+						total: res.data.totalCount,
+						limit:res.data.userBindConfigDO.timeLimit
 					}
 				}
 			},
@@ -508,36 +586,36 @@
 			},
 			//服务通知权限弹框
 			showModalYn() {
-				const _this = this
-				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
-				_this.showModal = true
-				if (uni.getStorageSync('subscribeMessage')) _this.showModal = false
-				uni.getSetting({
-					withSubscriptions: true, //  这里设置为true,下面才会返回mainSwitch
-					success: function(res) {
-						// console.log(res)
-						// 调起授权界面弹窗
-						if (res.subscriptionsSetting.mainSwitch) { // 用户打开了订阅消息总开关
-							if (res.subscriptionsSetting.itemSettings !=
-								null) { // 用户同意总是保持是否推送消息的选择, 这里表示以后不会再拉起推送消息的授权
-								let moIdState = res.subscriptionsSetting.itemSettings[TMPLID]; // 用户同意的消息模板id
-								// if (moIdState === 'accept') {
-								// 	console.log('接受了消息推送');
-								// } else if (moIdState === 'reject') {
-								// 	console.log("拒绝消息推送");
-								// } else if (moIdState === 'ban') {
-								// 	console.log("已被后台封禁");
-								// }
-								if (moIdState) _this.showModal = false
-							}
-						} else {
-							console.log('订阅消息未开启 withSubscriptions: true')
-						}
-					},
-					fail: function(error) {
-						console.log(error);
-					}
-				})
+				if (uni.getStorageSync('alreadySubscribeMessage')) return false
+				this.showModal = true
+				// const _this = this
+				// const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
+				// uni.getSetting({
+				// 	withSubscriptions: true, //  这里设置为true,下面才会返回mainSwitch
+				// 	success: function(res) {
+				// 		// console.log(res)
+				// 		// 调起授权界面弹窗
+				// 		if (res.subscriptionsSetting.mainSwitch) { // 用户打开了订阅消息总开关
+				// 			if (res.subscriptionsSetting.itemSettings !=
+				// 				null) { // 用户同意总是保持是否推送消息的选择, 这里表示以后不会再拉起推送消息的授权
+				// 				let moIdState = res.subscriptionsSetting.itemSettings[TMPLID]; // 用户同意的消息模板id
+				// 				// if (moIdState === 'accept') {
+				// 				// 	console.log('接受了消息推送');
+				// 				// } else if (moIdState === 'reject') {
+				// 				// 	console.log("拒绝消息推送");
+				// 				// } else if (moIdState === 'ban') {
+				// 				// 	console.log("已被后台封禁");
+				// 				// }
+				// 				if (moIdState) _this.showModal = false
+				// 			}
+				// 		} else {
+				// 			console.log('订阅消息未开启 withSubscriptions: true')
+				// 		}
+				// 	},
+				// 	fail: function(error) {
+				// 		console.log(error);
+				// 	}
+				// })
 			},
 			//获取拉起服务通知权限
 			getServicePermission() {
@@ -546,19 +624,26 @@
 				uni.requestSubscribeMessage({
 					tmplIds: [TMPLID],
 					success(res) {
-						console.log(res)
+						// console.log(res)
 						// if (res.errMsg == 'requestSubscribeMessage:ok' && res[
 						// 		TMPLID] == 'accept') {
 						// 	_this.showModal = false
 						// }
+						uni.setStorageSync('alreadySubscribeMessage', true)
 						_this.showModal = false
-						uni.setStorageSync('subscribeMessage', true)
 					},
 					fail(err) {
 						console.log(err + 'requestSubscribeMessage失败')
 					}
 				})
 			}
+		},
+		computed: {
+			...mapState('login', ['userInfo', 'loginState']),
+			...mapGetters('login', ['isLogin']),
+			// countDownChange(){
+			// 	return this.$refs.countDown.surplus
+			// }
 		},
 		filters: {
 			transformDate(time) {
@@ -570,14 +655,22 @@
 			}
 		},
 		onShareAppMessage(res) {
-			let currentUserPhone = this.userInfo.phone
-			currentUserPhone = encodeURIComponent(currentUserPhone)
+			let {
+				id,
+				phone
+			} = this.userInfo || {
+				id: undefined,
+				phone: undefined
+			}
+			phone = encodeURIComponent(phone)
+			const status = uni.getStorageSync('inviteStatus')
 			return {
-				title: this.indexData.userBindConfigDO.friendsTitle == null ? '邀请好友活动' : this.indexData.userBindConfigDO
+				title: this.indexData.userBindConfigDO.friendsTitle == null ? '好友分裂活动' : this.indexData.userBindConfigDO
 					.friendsTitle,
-				imageUrl: this.indexData.userBindConfigDO.friendsBg == null ? '../../../static/activity/invite.png' : this
+				imageUrl: this.indexData.userBindConfigDO.friendsBg == null ?
+					'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1616037395714.png' : this
 					.indexData.userBindConfigDO.friendsBg,
-				path: `/pages/activity/invite/index?invitePhone=${currentUserPhone}`
+				path: `/pages/activity/invite/index?invitePhone=${phone}&inviteUserId=${id}&inviteStatus=${status}`
 			}
 		},
 	}
@@ -589,7 +682,7 @@
 			position: absolute;
 			left: 50%;
 			margin-left: -33upx;
-			bottom: 10%;
+			bottom: 15%;
 			font-size: 70upx;
 			width: 66upx;
 			height: 66upx;
@@ -603,11 +696,11 @@
 
 		.cancel-btn {
 			position: absolute;
-			top: 0rpx;
-			right: 10rpx;
+			top: 0;
+			right: 23rpx;
 			font-size: 70rpx;
-			width: 50rpx;
-			height: 50rpx;
+			width: 40rpx;
+			height: 40rpx;
 			z-index: 999;
 
 			image {
@@ -727,8 +820,10 @@
 				left: 50%;
 				transform: translate(-50%, -50%);
 				z-index: 100;
-				width: 70%;
-				height: fit-content;
+				width: 550rpx;
+				height: 300rpx;
+				border-radius: 20rpx;
+				overflow: hidden;
 
 				.background-text {
 					position: absolute;
@@ -744,7 +839,11 @@
 					align-items: center;
 
 					.top-text {
-						font-size: 35rpx;
+						font-size: 36rpx;
+						font-family: FZLanTingHeiS-B-GB;
+						font-weight: 400;
+						color: #FFFFFF;
+						line-height: 48rpx;
 					}
 				}
 
@@ -794,26 +893,44 @@
 							top: 0;
 							right: 0;
 
+							.right-10 {
+								font-size: 28rpx;
+								height: fit-content;
+								width: 280rpx;
+								font-weight: 400;
+								color: #F52F48;
+								margin-top: 20rpx;
+								text-overflow: ellipsis;
+								overflow: hidden;
+								white-space: nowrap;
+							}
+
 							.award-right-top {
+								font-family: FZLanTingHeiS-B-GB;
 								width: 100%;
 								height: 60%;
 								// background: rgba(0,0,0,.6);
 								color: #F52F48;
 								font-size: 40rpx;
-								font-weight: bolder;
+								font-weight: 400;
 								display: flex;
 								align-items: flex-end;
+								padding-left: 20rpx;
 							}
 
 							.award-right-bottom {
-								width: 100%;
-								height: fit-content;
-								position: absolute;
-								bottom: 10rpx;
-								font-size: 15rpx;
-								display: flex;
-								align-items: center;
+								font-size: 14rpx;
+								font-family: FZLanTingHei-R-GBK;
+								font-weight: 400;
 								color: #707070;
+								line-height: 48rpx;
+								width: 100%;
+								height: 14rpx;
+								position: absolute;
+								bottom: 15rpx;
+								display: flex;
+								justify-content: center;
+								align-items: center;
 							}
 						}
 					}

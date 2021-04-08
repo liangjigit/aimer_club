@@ -5,7 +5,7 @@
 				<view class="reward" :class="totalInvite < item.inviteCount ? 'wait-bg' : 'see-get-bg'">
 					<!-- 奖励1：积分 -->
 					<view class="image" v-if="item.rewardType == 2">
-						<image src="../../../static/index/jf.png" mode="widthFix" style="width: 70rpx;"></image>
+						<image src="/static/index/jf.png" mode="widthFix" style="width: 70rpx;"></image>
 						<view class="award-text">
 							<text style="font-size: 25rpx;">{{item.integral}}</text>
 							<text style="font-size: 20rpx;">积分</text>
@@ -13,7 +13,7 @@
 					</view>
 					<!-- 奖励2：优惠券 -->
 					<view class="image" v-if="item.rewardType == 1">
-						<image src="../../../static/activity/award_back.png" mode="widthFix"
+						<image src="/static/activity/award_back.png" mode="widthFix"
 							style="width: 88rpx;height: 51rpx;"></image>
 						<view class="award-text">
 							<text class="youhuiquan">{{item.couponList[0].couponAmount}}元</text>
@@ -43,25 +43,38 @@
 	export default {
 		name: 'GetReward',
 		props: {
-			rewardObj: {
-				type: Object,
-				default () {
-					return {}
-				}
+			rewardStr: {
+				type: String,
+				default: ''
 			},
 		},
 		data() {
 			return {
+				rewardObj: {},
 				reward: [],
 				initCount: {},
 				getCount: {},
 				lastGetCount: [],
 			}
 		},
+		watch: {
+			rewardStr: {
+				handler(n) {
+					this.rewardObj = JSON.parse(n)
+					console.log('我是get-reward组件奖励数据',this.rewardObj)
+					this.initAwardList()
+					if (this.rewardObj.total == 0 || this.rewardObj.total == null) return false
+					this.initGetPrizeCount()
+					this.disposeGet()
+				},
+				immediate: true,
+			}
+		},
 		created() {
-			this.initAwardList()
-			this.initGetPrizeCount()
-			this.disposeGet()
+			// this.rewardObj = JSON.parse(this.rewardStr)
+			// this.initAwardList()
+			// this.initGetPrizeCount()
+			// this.disposeGet()
 		},
 		methods: {
 			...mapActions('invite', ['getActiveAward', 'getOldInvite', 'getNewInvite', 'sendMiniMessage']),
@@ -72,7 +85,6 @@
 					rewardId,
 					activeId
 				})
-				// console.log(res)
 				if (res.code == 200) {
 					this.conpareCount[index].b++
 					// console.log(this.conpareCount)
@@ -89,26 +101,43 @@
 					item.couponList.length > 2 ? item.couponList = JSON.parse(item.couponList) : item.couponList
 				})
 				this.reward = reward
-				console.log(this.reward)
+				// console.log(this.reward)
 			},
 			//默认需要领取奖品的次数
 			initGetPrizeCount() {
 				let floor = Math.floor(this.totalInvite / this.reward[this.reward.length - 1].inviteCount)
 				let remainder = this.totalInvite % this.reward[this.reward.length - 1].inviteCount
-				const initCount = {
-					fi: floor + (remainder >= this.reward[0].inviteCount ? 1 : 0),
-					si: floor + (remainder >= this.reward[1].inviteCount ? 1 : 0),
-					ti: floor,
+				let prizeMember = this.reward.length.toString()
+				let initCount = {}
+				switch (prizeMember) {
+					case '1':
+						initCount = {
+							fi: floor
+						}
+						break;
+					case '2':
+						initCount = {
+							fi: floor + (remainder >= this.reward[0].inviteCount ? 1 : 0),
+							si: floor,
+						}
+						break;
+					case '3':
+						initCount = {
+							fi: floor + (remainder >= this.reward[0].inviteCount ? 1 : 0),
+							si: floor + (remainder >= this.reward[1].inviteCount ? 1 : 0),
+							ti: floor,
+						}
+						break;
 				}
-				console.log(initCount)
+				console.log('我是应该领取次数',initCount)
 				this.initCount = initCount
 			},
 			//已经领取的数组处理
 			disposeGet() {
 				const rewardId = {
 					fId: this.reward[0].id,
-					sId: this.reward[1].id,
-					tId: this.reward[2].id,
+					sId: this.reward[1] ? this.reward[1].id : 0,
+					tId: this.reward[2] ? this.reward[2].id : 0,
 				}
 				const getCount = {
 					fg: 0,
@@ -132,7 +161,7 @@
 							break;
 					}
 				})
-				// console.log(getCount)
+				console.log('我是已经领取次数',getCount)
 				this.getCount = getCount
 			},
 		},
@@ -152,18 +181,27 @@
 					tg
 				} = this.getCount
 				const f = {
-					a: fi,
-					b: fg
+					a: fi || 0,
+					b: fg || 0
 				}
 				const s = {
-					a: si,
-					b: sg
+					a: si || 0,
+					b: sg || 0
 				}
 				const t = {
-					a: ti,
-					b: tg
+					a: ti || 0,
+					b: tg || 0
 				}
-				this.lastGetCount = [f, s, t]
+				//2是不限次
+				if(this.rewardObj.limit == 2){
+					this.lastGetCount = [f, s, t]
+				}else{
+					f.a = 1
+					s.a = 1
+					t.a = 1
+					this.lastGetCount = [f, s, t]
+				}
+				console.log('最终',this.lastGetCount)
 				return this.lastGetCount
 			}
 		}

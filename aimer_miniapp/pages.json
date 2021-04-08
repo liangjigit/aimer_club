@@ -15,6 +15,13 @@
 			}
 		},
 		{
+			"path": "pages/banner/aimerInfo",
+			"style": {
+				"navigationBarTitleText": "aimer信息",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
 			"path": "pages/integral/index",
 			"name": "integral",
 			"style": {
@@ -176,12 +183,12 @@
 				"iconPath": "static/tabbar/activity.png",
 				"selectedIconPath": "static/tabbar/activity-selected.png"
 			},
-			{
-				"pagePath": "pages/training/index",
-				"text": "体态训练营",
-				"iconPath": "static/tabbar/training.png",
-				"selectedIconPath": "static/tabbar/training-selected.png"
-			},
+			// {
+			// 	"pagePath": "pages/training/index",
+			// 	"text": "体态训练营",
+			// 	"iconPath": "static/tabbar/training.png",
+			// 	"selectedIconPath": "static/tabbar/training-selected.png"
+			// },
 			{
 				"pagePath": "pages/account/index",
 				"text": "我的CLUB",

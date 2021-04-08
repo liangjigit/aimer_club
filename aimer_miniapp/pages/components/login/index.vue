@@ -16,8 +16,9 @@
 						<text class="unit">元</text> -->
 					</text>
 					<text class="tip">{{defaultDesc}}</text>
-					<button open-type="getUserInfo" @getuserinfo="login" withCredentials="false"
-						class="cu-btn line-red text-red">登录</button>
+					<!-- <button open-type="getUserInfo" @getuserinfo="login" withCredentials="false"
+						class="cu-btn line-red text-red">登录</button> -->
+					<button @click="login" class="cu-btn line-red text-red">登录</button>
 				</view>
 				<view @click="hide" class="cancel-btn" v-if="showHide">
 					<image src="/static/close-icon.png" mode="aspectFit"></image>
@@ -54,13 +55,7 @@
 		},
 		data() {
 			return {
-				showHide:false
-			}
-		},
-		created() {
-			if (uni.getStorageSync('invitePhone') || uni.getStorageSync('fromService')) {
-				//被邀请进入的老会员
-				this.showHide = false
+				showHide: true
 			}
 		},
 		computed: {
@@ -74,28 +69,24 @@
 						this.getLoginPopup({})
 					}
 				}
+				//isLogin为false且isShowLogin为true 当前用户未登录且显示登录弹窗 
 				return !this.isLogin && this.isShowLogin
 			}
 		},
 		methods: {
 			...mapActions('login', ['onGetUserInfo', 'getLoginPopup']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETREDIRECTURL']),
-			async checkLogin() {
+			async checkLogin(fromFL) {
+				//isLogin为true代表已成功调用wx/login接口登录
 				if (!this.isLogin) {
-					//获取popup数组
+					//获取popup数组 /content/miniapp/home/popup 且popup获取到了值
 					await this.getLoginPopup({})
 					let _this = this
-					uni.getSetting({
-						success: function(t) {
-							if (!t.authSetting["scope.userInfo"]) {
-								if (!_this.isShowLogin) {
-									//将isShowLogin更改为true，显示login弹框
-									_this.GETLOGINPOPUP()
-									uni.hideLoading()
-								}
-							}
-						}
-					})
+					if (!_this.isShowLogin) {
+						if(fromFL) _this.showHide = false
+						_this.GETLOGINPOPUP()
+						uni.hideLoading()
+					}
 					return false
 				} else {
 					this.checkJoinState()
@@ -125,60 +116,54 @@
 						id
 					}) // 数据统计
 				}
-				let {
-					errMsg
-				} = e.detail
-				//获个人信息，用户给了权限 通过open-type=getUserInfo
-				if (errMsg == "getUserInfo:ok") {
-					let that = this;
-					this.onGetUserInfo().then((response) => {
-						if (response.code == 200) {
-							this.showPopup = false
-							if (this.redirectUrl) { // 判断需要重定向的页面是否是当前页
-								const pages = getCurrentPages();
-								const page = pages[pages.length - 1];
-								let {
-									url,
-									type
-								} = this.redirectUrl
-								const isCurrentPage = url.includes(page.route)
-								if (!isCurrentPage) {
-									navigatorToPage(url, type, null, null, true)
-								}
-							} else if (id) {
-								const {
-									linkType,
-									linkUrl,
-									miniappId,
-									displayPage
-								} = this.pupop
-								navigatorToPage(linkUrl, linkType, miniappId, displayPage)
+				//通过onGetUserInfo方法，获取到getPhone，如果getPhone为true，则跳转注册页面
+				this.onGetUserInfo().then((response) => {
+					if (response.code == 200) {
+						this.showPopup = false
+						if (this.redirectUrl) { // 判断需要重定向的页面是否是当前页
+							const pages = getCurrentPages();
+							const page = pages[pages.length - 1];
+							let {
+								url,
+								type
+							} = this.redirectUrl
+							const isCurrentPage = url.includes(page.route)
+							if (!isCurrentPage) {
+								navigatorToPage(url, type, null, null, true)
 							}
-							const getPhone = uni.getStorageSync('getPhone');
-							if (!getPhone) {
-								this.GETREDIRECTURL({
-									redirectUrl: null
-								})
-								uni.showToast({
-									title: "欢迎回来！",
-									icon: "none"
-								})
-								if (uni.getStorageSync('invitePhone') || uni.getStorageSync('fromService')) {
-									//被邀请进入的老会员
-									this.$emit('reGetInfo')
-								}
+						} else if (id) {
+							const {
+								linkType,
+								linkUrl,
+								miniappId,
+								displayPage
+							} = this.pupop
+							navigatorToPage(linkUrl, linkType, miniappId, displayPage)
+						}
+						//获取getPhone 为false则代表已经注册过
+						const getPhone = uni.getStorageSync('getPhone');
+						if (!getPhone) {
+							this.GETREDIRECTURL({
+								redirectUrl: null
+							})
+							uni.showToast({
+								title: "欢迎回来！",
+								icon: "none"
+							})
+							//好友分裂活动的判断
+							if (uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus')) {
+								//被邀请进入的老会员
+								this.$emit('reGetInfo')
 							}
 						}
-					}).catch((error) => {
-						this.showPopup = true
-						let {
-							errMsg
-						} = error;
-						// console.error(errMsg)
-					})
-				} else {
+					}
+				}).catch((error) => {
 					this.showPopup = true
-				}
+					let {
+						errMsg
+					} = error;
+					console.error(errMsg)
+				})
 			},
 			hide() {
 				this.GETLOGINPOPUP()

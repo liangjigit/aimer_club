@@ -188,10 +188,10 @@
 					url: '/pages/account/benefit?level=lv'
 				})
 			}
-			if(getApp().globalData.fromJoin){
+			if (getApp().globalData.fromJoin) {
 				console.log('我是从注册页面过来的，我是新用户')
 				getApp().globalData.fromJoin = false
-			} 
+			}
 			const {
 				guidecode,
 				source,
@@ -215,36 +215,24 @@
 				})
 			}
 			// 微信小程序登录 确保进入首页的参数可以传到登录接口
-			let _this = this
-			uni.getSetting({
-				success: async function(t) {
-					console.log(t)
-					if (t.authSetting["scope.userInfo"]) {
-						await _this.onGetUserInfo()
-						//已登录
-						if (_this.isLogin && (_this.inviteUserId || _this.guidecode)) {
-							console.log('bindWithGuid...')
-							_this.bindWithGuid({})
-						}
-					}
-				}
-			})
-		},
-		onShareAppMessage(res) {
-			const {
-				title,
-				image
-			} = this.miniProgramShare
-			const {
-				id
-			} = this.userInfo || {
-				id: undefined
-			}
-			return {
-				title: title,
-				imageUrl: image,
-				path: '/pages/index/index?inviteUserId=' + id
-			}
+			// let _this = this
+			// this.$refs.login.checkLogin()
+			// _this.onGetUserInfo()
+			// //已登录
+			
+			// uni.getSetting({
+			// 	success: async function(t) {
+			// 		console.log(t)
+			// 		if (t.authSetting["scope.userInfo"]) {
+			// 			await _this.onGetUserInfo()
+			// 			//已登录
+			// 			if (_this.isLogin && (_this.inviteUserId || _this.guidecode)) {
+			// 				console.log('bindWithGuid...')
+			// 				_this.bindWithGuid({})
+			// 			}
+			// 		}
+			// 	}
+			// })
 		},
 		onShow() {
 			this.$refs.login.checkLogin()
@@ -267,6 +255,22 @@
 						}
 					})
 				})
+			}
+		},
+		onShareAppMessage(res) {
+			const {
+				title,
+				image
+			} = this.miniProgramShare
+			const {
+				id
+			} = this.userInfo || {
+				id: undefined
+			}
+			return {
+				title: title,
+				imageUrl: image,
+				path: '/pages/index/index?inviteUserId=' + id
 			}
 		},
 		created() {
@@ -305,10 +309,11 @@
 			...mapMutations('index', ['SETSELECTOR']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
-			toActivity(){
-				uni.setStorageSync('clubIn',true)
+			async toActivity() {
+				const isLogin = await this.$refs.login.checkLogin()
+				if (!isLogin) return false
 				uni.navigateTo({
-					url:'/pages/activity/invite/index'
+					url: '/pages/activity/invite/index?clubIn=true'
 				})
 			},
 			getData(isRefresh) {

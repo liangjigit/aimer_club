@@ -49,6 +49,8 @@
 			})
 		},
 		onShow: function(options) {
+			//获取进入场景值
+			// console.log(options)
 			// console.log('App Show')
 		},
 		onHide: function() {

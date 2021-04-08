@@ -98,7 +98,7 @@
 					// 获取到所有分钟数 3600 / 60 = 60分钟
 					// 对60取模，超过小时数的分钟数
 					const minutes = Math.floor(newV / 60) % 60
-					this.surplus = dates + ':' + hours + ':' + minutes
+					this.surplus = dates + '天' + hours + '时' + minutes + '分'
 				} else {
 					// 当前秒数 / 60，向下取整
 					// 获取到所有分钟数 3600 / 60 = 60分钟
@@ -152,7 +152,7 @@
 </script>
 
 <style lang="scss" scoped>
-	.no-activity{
+	.no-activity {
 		// width: 206px;
 		// height: 22px;
 		font-size: 22rpx;
@@ -160,7 +160,8 @@
 		font-weight: 400;
 		color: #010101;
 		line-height: 95rpx;
-		span{
+
+		span {
 			color: #FFEA00;
 		}
 	}
