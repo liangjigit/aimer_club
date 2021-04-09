@@ -115,6 +115,11 @@
 				if (newV === 0) {
 					this.computedSurplusTime()
 				}
+			},
+			surplus(n){
+				if(n == '活动未开始' || n == '活动已结束'){
+					this.$emit('activityIsOver')
+				}
 			}
 		},
 		filters: {

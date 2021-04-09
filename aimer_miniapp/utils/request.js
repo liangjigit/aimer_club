@@ -106,28 +106,27 @@ request.interceptors.response.use(
 		} = error;
 		const token = uni.getStorageSync('token');
 		if (status == 401 && token) { // 登录过期处理
-			uni.getSetting({
-				success: async function(t) {
-					if (!t.authSetting["scope.userInfo"]) {
-						uni.clearStorageSync()
-						store.commit("login/CHANGELOGINSTATE", {
-							loginState: false
-						}, {
-							root: true
-						})
-						if (!store.state.login.isShowLogin) {
-							store.commit("login/GETLOGINPOPUP", {}, {
-								root: true
-							})
-						}
-						uni.showToast({
-							title: '登录已过期，请重新登录',
-							icon: 'none',
-							duration: 2000
-						})
-					}
+			//从分裂活动进入
+			if (uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus')) {
+				// return false
+			} else {
+				uni.clearStorageSync()
+				store.commit("login/CHANGELOGINSTATE", {
+					loginState: false
+				}, {
+					root: true
+				})
+				if (!store.state.login.isShowLogin) {
+					store.commit("login/GETLOGINPOPUP", {}, {
+						root: true
+					})
 				}
-			})
+				uni.showToast({
+					title: '登录已过期，请重新登录',
+					icon: 'none',
+					duration: 2000
+				})
+			}
 		} else {
 			uni.showToast({
 				title: `请求错误，请稍后重试`,

@@ -148,8 +148,9 @@
 						//加入fromJoin判断为从注册页面进入的新用户
 						uni.setStorageSync('fromJoin',true)
 						if (uni.getStorageSync('invitePhone')) {
+							const inviteStatus = uni.getStorageSync('inviteStatus')
 							uni.reLaunch({
-								url: '/pages/activity/invite/index'
+								url: `/pages/activity/invite/index?inviteStatus=${inviteStatus}`
 							})
 						} else {
 							uni.switchTab({

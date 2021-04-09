@@ -313,7 +313,7 @@
 				const isLogin = await this.$refs.login.checkLogin()
 				if (!isLogin) return false
 				uni.navigateTo({
-					url: '/pages/activity/invite/index?clubIn=true'
+					url: '/pages/activity/invite/index?clubIn=true&inviteStatus=1'
 				})
 			},
 			getData(isRefresh) {

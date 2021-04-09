@@ -61,7 +61,7 @@
 			rewardStr: {
 				handler(n) {
 					this.rewardObj = JSON.parse(n)
-					console.log('我是get-reward组件奖励数据',this.rewardObj)
+					console.log('我是get-reward组件奖励数据', this.rewardObj)
 					this.initAwardList()
 					if (this.rewardObj.total == 0 || this.rewardObj.total == null) return false
 					this.initGetPrizeCount()
@@ -129,7 +129,7 @@
 						}
 						break;
 				}
-				console.log('我是应该领取次数',initCount)
+				console.log('我是应该领取次数', initCount)
 				this.initCount = initCount
 			},
 			//已经领取的数组处理
@@ -161,7 +161,7 @@
 							break;
 					}
 				})
-				console.log('我是已经领取次数',getCount)
+				console.log('我是已经领取次数', getCount)
 				this.getCount = getCount
 			},
 		},
@@ -193,15 +193,15 @@
 					b: tg || 0
 				}
 				//2是不限次
-				if(this.rewardObj.limit == 2){
+				if (this.rewardObj.limit == 2) {
 					this.lastGetCount = [f, s, t]
-				}else{
+				} else {
 					f.a = 1
 					s.a = 1
 					t.a = 1
 					this.lastGetCount = [f, s, t]
 				}
-				console.log('最终',this.lastGetCount)
+				console.log('最终', this.lastGetCount)
 				return this.lastGetCount
 			}
 		}

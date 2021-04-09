@@ -27,7 +27,7 @@
 				<text style="color: #ffffff;font-weight: bolder;">当前没有活动正在进行中</text>
 			</view>
 			<view>
-				<count-down ref="countDown" :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0">
+				<count-down @activityIsOver="isShowInvite = false" :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0">
 				</count-down>
 			</view>
 		</main>
@@ -285,8 +285,6 @@
 		},
 		onLoad(options) {
 			let {
-				//奖励标识 目前FL固定
-				inviteType,
 				//活动的状态 0隐藏 1显示
 				inviteStatus,
 				//邀请人id
@@ -319,6 +317,13 @@
 			}
 			//从服务通知进入场景
 			if (fromService) uni.setStorageSync('fromService', true)
+			//通过小程序码进入 1047 1048 1049
+			const scene = wx.getLaunchOptionsSync().scene
+			if(scene == 1047 || scene == 1048 || scene == 1049){
+				//奖励标识 目前FL固定
+				const inviteType = 'FL'
+				uni.setStorageSync('inviteStatus', 0)
+			}
 		},
 		onShow() {
 			const _this = this
@@ -417,7 +422,6 @@
 				if (response.code == 2016) {
 					const _this = this
 					uni.setStorageSync('indexDataId', this.indexData.userBindConfigDO.id)
-					this.showOldprize = false
 					setTimeout(async function() {
 						// console.log('我是id',uni.getStorageSync('indexDataId'))
 						await _this.getOldInvite({
@@ -461,7 +465,8 @@
 						uni.removeStorageSync('fromService')
 						return false
 					}
-					this.showOldprize = true
+					//非导购时才显示
+					if(this.userInfo.isGuide != 1) this.showOldprize = true
 					this.isShowInvite = true
 					await this.bindingOld(this.userInfo)
 				}
@@ -641,9 +646,6 @@
 		computed: {
 			...mapState('login', ['userInfo', 'loginState']),
 			...mapGetters('login', ['isLogin']),
-			// countDownChange(){
-			// 	return this.$refs.countDown.surplus
-			// }
 		},
 		filters: {
 			transformDate(time) {
