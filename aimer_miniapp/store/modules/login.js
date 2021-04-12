@@ -36,39 +36,24 @@ const getters = {
 	}
 }
 const actions = {
-	// 保存手机号
-	async savePhoneNumber({
-		state,
-		commit,
-		dispatch
-	}, payload) {
-		let response = (await request({
-			url: '/user/miniapp/wx/save/phone',
-			method: 'POST',
-			data: payload
-		})).data;
-		if (response.code == 200) {
-			uni.setStorageSync('getPhone', false)
-		}
-		return response;
-	},
 	// 通过微信 uni.login 获取用户信息 (微信小程序)
 	async onGetUserInfo({
 		dispatch,
 		commit,
 		state
 	}) {
-		let that = this;
-		let promise = new Promise((resolve, reject) => {
+		const that = this;
+		return new Promise((resolve, reject) => {
 			//获取个人资料
 			wx.getUserProfile({
-				desc: 'club获取个人资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+				desc: '登录获取个人资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
 				success: (infoRes) => {
 					let {
 						userInfo
 					} = infoRes;
 					//微信登录
 					uni.setStorageSync('saveUserProfile', userInfo)
+					//微信登录获取code
 					uni.login({
 						provider: 'weixin',
 						async success(res) {
@@ -83,33 +68,6 @@ const actions = {
 									userInfo: JSON.stringify(userInfo)
 								})
 								resolve(response)
-								// uni.getUserInfo({
-								// 	withCredentials: false,
-								// 	provider: 'weixin',
-								// 	async success(infoRes) {
-								// 		// console.log(infoRes)
-								// 		let {
-								// 			userInfo
-								// 		} = infoRes;
-								// 		let response = await dispatch(
-								// 			'login', {
-								// 				jscode: code,
-								// 				userInfo: JSON
-								// 					.stringify(
-								// 						userInfo)
-								// 			});
-								// 		resolve(response)
-								// 	},
-								// 	fail(error) {
-								// 		let {
-								// 			errMsg
-								// 		} = error;
-								// 		reject({
-								// 			errMsg: '获取用户信息失败 uni.getUserInfo, login/onGetUserInfo：' +
-								// 				errMsg
-								// 		})
-								// 	}
-								// });
 							} else {
 								reject({
 									errMsg: '微信登录失败 uni.login, login/onGetUserInfo：' +
@@ -124,7 +82,6 @@ const actions = {
 				}
 			})
 		})
-		return promise
 	},
 	// 保存用户信息
 	async login({
@@ -140,12 +97,7 @@ const actions = {
 			appid,
 			inviteUserId
 		} = state // 导购信息
-		// console.log('login 邀请人id:' + inviteUserId)
-		// console.log('login guidecode:' + guidecode)
-		// console.log('login erpcode:' + erpcode)
-		// console.log('login source:' + source)
-		// console.log('login aimerid:' + aimerid)
-		// console.log('login appid:' + appid)
+		//后台登录并保存用户数据
 		let response = (await request({
 			url: '/user/miniapp/wx/login',
 			method: 'POST',
@@ -174,14 +126,13 @@ const actions = {
 			})
 			//绑定导购
 			if (inviteUserId || guidecode) {
-				console.log('bindWithGuid...')
+				console.log('产生绑定关系:bindWithGuid...')
 				dispatch('bindWithGuid', {})
 			}
 			// 登录状态
 			if (!getPhone) {
-				// console.log("用户已注册")
+				// 用户已注册 res.environment 如果是在微信中运行 则为 undefined
 				let res = uni.getSystemInfoSync()
-				// console.log("当前运行环境："+res.environment)// 如果是在微信中运行 则为 undefined
 				if (res.environment === "wxwork") {
 					dispatch('wxworkLogin', {}) // 在企业微信中需要进行企业微信登录，获取员工的信息
 				}
@@ -215,6 +166,7 @@ const actions = {
 				phone,
 				isDisabledUser
 			} = response.data
+			//payload.userInfo不存在时
 			if (!payload.userInfo) payload.userInfo = state.userInfo
 			commit('GETUSERINFO', {
 				userInfo: {
@@ -261,12 +213,11 @@ const actions = {
 	wxworkLogin({
 		commit
 	}, payload) {
-		console.log("开始企业微信登录")
-		let that = this;
+		const that = this;
 		wx.qy.login({
 			success: async function(res) {
 				if (res.code) {
-					console.log(res.code)
+					console.log('企业微信登录:' + res.code)
 					let response = (await request({
 						url: '/user/miniapp/qywx/login',
 						method: 'POST',
@@ -284,6 +235,22 @@ const actions = {
 			}
 		});
 	},
+	// 保存手机号
+	async savePhoneNumber({
+		state,
+		commit,
+		dispatch
+	}, payload) {
+		let response = (await request({
+			url: '/user/miniapp/wx/save/phone',
+			method: 'POST',
+			data: payload
+		})).data;
+		if (response.code == 200) {
+			uni.setStorageSync('getPhone', false)
+		}
+		return response;
+	},
 	// 导购关系绑定
 	async bindWithGuid({
 		commit,
@@ -298,8 +265,8 @@ const actions = {
 			url: '/user/miniapp/userGuide/auth/binding',
 			method: 'POST',
 			data: {
-				guidecode: guidecode, // 导购 code
-				inviteUserId: inviteUserId // 邀请人id
+				guidecode, // 导购 code
+				inviteUserId // 邀请人id
 			}
 		})).data;
 		if (response.code == 200) {

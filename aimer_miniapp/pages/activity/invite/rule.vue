@@ -57,6 +57,7 @@
 			background: #FFFFFF;
 			border-radius: 30rpx;
 			padding: 50rpx;
+			overflow: scroll;
 		}
 	}
 </style>

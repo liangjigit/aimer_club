@@ -7,7 +7,8 @@
 		<image class="background"
 			:src="indexData.userBindConfigDO.themeBg ? indexData.userBindConfigDO.themeBg : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1614670402293.jpg'"
 			mode="scaleToFill"></image>
-		<header v-if="isShowInvite">
+		<image :src="'/static/activity/envelope.png'" mode="widthFix" style="width: 100%;margin-top: 200rpx;"></image>
+		<header v-if="isShowInvite || !noActivity">
 			<view class="rule">
 				<view class="cu-capsule round">
 					<view class="cu-tag bg-blue" @click="getRule">
@@ -27,7 +28,8 @@
 				<text style="color: #ffffff;font-weight: bolder;">当前没有活动正在进行中</text>
 			</view>
 			<view>
-				<count-down @activityIsOver="isShowInvite = false" :startTimes="startTime" :endTimes="endTime" v-if="endTime != 0">
+				<count-down @activityIsOver="isShowInvite = false" :startTimes="startTime" :endTimes="endTime"
+					v-if="endTime != 0">
 				</count-down>
 			</view>
 		</main>
@@ -296,14 +298,17 @@
 				//是否从club进入
 				clubIn
 			} = options
-			//是否从club进入
-			if (clubIn) uni.setStorageSync('clubIn', true)
-			//保存活动的状态
-			if (inviteStatus != undefined) {
-				uni.setStorageSync('inviteStatus', inviteStatus)
-			} else {
-				if (!uni.getStorageSync('inviteStatus')) uni.setStorageSync('inviteStatus', 1)
+			//是否从club进入 要清除其他所有状态
+			if (clubIn) {
+				uni.setStorageSync('clubIn', true)
+				this.GETINVITEUSERID({
+					inviteUserId:null
+				})
+				uni.removeStorageSync('invitePhone')
+				uni.removeStorageSync('fromService')
 			}
+			//保存活动的状态
+			uni.setStorageSync('inviteStatus', inviteStatus)
 			//保存邀请人的id
 			if (inviteUserId) {
 				this.GETINVITEUSERID({
@@ -311,21 +316,28 @@
 				})
 			}
 			//保存邀请人的加密手机号
-			if (invitePhone != undefined) {
+			if (invitePhone) {
 				invitePhone = decodeURIComponent(invitePhone)
 				uni.setStorageSync('invitePhone', invitePhone)
 			}
 			//从服务通知进入场景
 			if (fromService) uni.setStorageSync('fromService', true)
-			//通过小程序码进入 1047 1048 1049
-			const scene = wx.getLaunchOptionsSync().scene
-			if(scene == 1047 || scene == 1048 || scene == 1049){
-				//奖励标识 目前FL固定
-				const inviteType = 'FL'
-				uni.setStorageSync('inviteStatus', 0)
-			}
+			console.log(1111)
 		},
 		onShow() {
+			//通过小程序码进入 1047 1048 1049
+			const scene = wx.getLaunchOptionsSync().scene
+			if (scene == 1047 || scene == 1048 || scene == 1049) {
+				//奖励标识 目前FL固定
+				// const inviteType = 'FL'
+				uni.setStorageSync('inviteStatus', 0)
+				this.GETINVITEUSERID({
+					inviteUserId:null
+				})
+				uni.removeStorageSync('invitePhone')
+				uni.removeStorageSync('fromService')
+				uni.removeStorageSync('clubIn')
+			}
 			const _this = this
 			_this.getNowAndTwoYear()
 			uni.showLoading({
@@ -364,7 +376,7 @@
 					isShowHide: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
-					console.log('我是奖品的数据',res.data)
+					console.log('我是首页的数据', res.data)
 					this.indexData = res.data
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
@@ -372,12 +384,13 @@
 						reward: res.data.rewardList,
 						receive: res.data.receiveList,
 						total: res.data.totalCount,
-						limit:res.data.userBindConfigDO.timeLimit
+						limit: res.data.userBindConfigDO.timeLimit
 					}
 					//从club进入且是导购 或者通过太阳码进入只存在inviteStatus
 					if (uni.getStorageSync('clubIn') || (uni.getStorageSync('inviteStatus') == 0 && !uni
 							.getStorageSync('invitePhone'))) {
 						if (this.userInfo.isGuide == 1) {
+							console.log('我是导购，我进入自我绑定')
 							this.bindingOld(this.userInfo)
 						}
 						uni.removeStorageSync('clubIn')
@@ -398,7 +411,7 @@
 						return false
 					}
 					uni.hideLoading()
-				} else if (res.code == 500) {
+				} else if (res.code == 500 || res.code == 2100) {
 					this.noActivity = true
 				} else if (res.code == 2009) {
 					uni.redirectTo({
@@ -450,7 +463,7 @@
 					isShowHide: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
-					console.log(res.data)
+					console.log('我是老会员邀请结束后请求的首页数据',res.data)
 					this.indexData = res.data
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
@@ -458,7 +471,7 @@
 						reward: res.data.rewardList,
 						receive: res.data.receiveList,
 						total: res.data.totalCount,
-						limit:res.data.userBindConfigDO.timeLimit
+						limit: res.data.userBindConfigDO.timeLimit
 					}
 					//从服务通知进来的不需要再进行老会员绑定了
 					if (uni.getStorageSync('fromService')) {
@@ -466,9 +479,17 @@
 						return false
 					}
 					//非导购时才显示
-					if(this.userInfo.isGuide != 1) this.showOldprize = true
+					if (this.userInfo.isGuide != 1){
+						this.showOldprize = true
+					} 
 					this.isShowInvite = true
 					await this.bindingOld(this.userInfo)
+				} else if (res.code == 500 || res.code == 2100) {
+					this.noActivity = true
+				} else if (res.code == 2009) {
+					uni.redirectTo({
+						url: '/pages/join/index'
+					})
 				}
 			},
 			//绑定新会员
@@ -524,7 +545,7 @@
 							reward: JSON.parse(res.data.rewardShow),
 							receive: [],
 							total: 0,
-							limit:1
+							limit: 1
 						}
 						uni.hideLoading()
 					}
@@ -560,8 +581,14 @@
 						reward: res.data.rewardList,
 						receive: res.data.receiveList,
 						total: res.data.totalCount,
-						limit:res.data.userBindConfigDO.timeLimit
+						limit: res.data.userBindConfigDO.timeLimit
 					}
+				} else if (res.code == 500 || res.code == 2100) {
+					this.noActivity = true
+				} else if (res.code == 2009) {
+					uni.redirectTo({
+						url: '/pages/join/index'
+					})
 				}
 			},
 			//去查看奖励

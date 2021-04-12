@@ -172,26 +172,19 @@
 		},
 		onLoad(options) {
 			// console.log(getApp().globalData.fromJoin)
+			// if (getApp().globalData.level) {
+			// 	uni.reLaunch({
+			// 		url: '/pages/account/benefit?level=lv'
+			// 	})
+			// }
 			// console.log(options)
-			// options={
-			// 	// 如果从小程序卡片进入（导购二维码、关注公众号）、扫门店二维码
-			// 	guidecode: '',
+			// 	guidecode: '', // 如果从小程序卡片进入（导购二维码、关注公众号）、扫门店二维码
 			// 	source:'WXC实体店微信', // 来源
 			// 	aimerid:'olhZPv-4Tqthr4D104cTsvlTAWyY',
 			// 	erpcode:'LB01A004', // 门店编码
 			// 	appid:'wx326e67c0d2fd1528',
-			// 	// 邀请链接进入
-			// 	inviteUserId:'' // 邀请人Id
-			// }
-			if (getApp().globalData.level) {
-				uni.reLaunch({
-					url: '/pages/account/benefit?level=lv'
-				})
-			}
-			if (getApp().globalData.fromJoin) {
-				console.log('我是从注册页面过来的，我是新用户')
-				getApp().globalData.fromJoin = false
-			}
+			// 	inviteUserId:'' // 邀请链接进入 邀请人Id
+			//  scene:'' //场景值
 			const {
 				guidecode,
 				source,
@@ -202,6 +195,7 @@
 				scene,
 			} = options
 			const userId = inviteUserId || scene
+			//保存到全局vuex
 			if (guidecode || source || aimerid || erpcode || appid || userId) {
 				this.GETGUIDINFO({
 					guidecode,
@@ -214,25 +208,6 @@
 					inviteUserId: userId
 				})
 			}
-			// 微信小程序登录 确保进入首页的参数可以传到登录接口
-			// let _this = this
-			// this.$refs.login.checkLogin()
-			// _this.onGetUserInfo()
-			// //已登录
-			
-			// uni.getSetting({
-			// 	success: async function(t) {
-			// 		console.log(t)
-			// 		if (t.authSetting["scope.userInfo"]) {
-			// 			await _this.onGetUserInfo()
-			// 			//已登录
-			// 			if (_this.isLogin && (_this.inviteUserId || _this.guidecode)) {
-			// 				console.log('bindWithGuid...')
-			// 				_this.bindWithGuid({})
-			// 			}
-			// 		}
-			// 	}
-			// })
 		},
 		onShow() {
 			this.$refs.login.checkLogin()

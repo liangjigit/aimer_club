@@ -2,8 +2,8 @@
 	<view class="wrapper" v-show="isShow&&pupop" @touchmove.stop.prevent="moveHandle">
 		<view class="bg-mask flex align-center justify-center">
 			<view class="card flex flex-direction align-center">
-				<button open-type="getUserInfo" v-if="pupop.image&&!isDefault" @getuserinfo="login"
-					withCredentials="false" class="btn">
+				<!-- popup数据存在image -->
+				<button v-if="pupop.image&&!isDefault" @click="login" class="btn">
 					<image :src="pupop.image" mode="aspectFill"></image>
 				</button>
 				<view class="bg-white flex flex-direction align-center" v-else>
@@ -16,8 +16,6 @@
 						<text class="unit">元</text> -->
 					</text>
 					<text class="tip">{{defaultDesc}}</text>
-					<!-- <button open-type="getUserInfo" @getuserinfo="login" withCredentials="false"
-						class="cu-btn line-red text-red">登录</button> -->
 					<button @click="login" class="cu-btn line-red text-red">登录</button>
 				</view>
 				<view @click="hide" class="cancel-btn" v-if="showHide">
@@ -76,15 +74,17 @@
 		methods: {
 			...mapActions('login', ['onGetUserInfo', 'getLoginPopup']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETREDIRECTURL']),
+			//查看是否登录
 			async checkLogin(fromFL) {
 				//isLogin为true代表已成功调用wx/login接口登录
 				if (!this.isLogin) {
 					//获取popup数组 /content/miniapp/home/popup 且popup获取到了值
 					await this.getLoginPopup({})
-					let _this = this
-					if (!_this.isShowLogin) {
-						if(fromFL) _this.showHide = false
-						_this.GETLOGINPOPUP()
+					//如果未显示弹窗
+					if (!this.isShowLogin) {
+						if (fromFL) this.showHide = false
+						//显示弹窗
+						this.GETLOGINPOPUP()
 						uni.hideLoading()
 					}
 					return false
@@ -93,9 +93,11 @@
 				}
 				return true
 			},
+			//当前是登录状态，看是否注册club,getPhone为true则未注册
 			checkJoinState() {
 				const token = uni.getStorageSync('token');
 				const getPhone = uni.getStorageSync('getPhone');
+				//未注册
 				if (token && getPhone) {
 					if (uni.getStorageSync('invitePhone')) {
 						//被邀请进入的新会员
@@ -107,6 +109,7 @@
 					}
 				}
 			},
+			//未登陆时登录
 			login(e) {
 				const {
 					id
@@ -119,8 +122,10 @@
 				//通过onGetUserInfo方法，获取到getPhone，如果getPhone为true，则跳转注册页面
 				this.onGetUserInfo().then((response) => {
 					if (response.code == 200) {
+						//关闭弹窗
 						this.showPopup = false
-						if (this.redirectUrl) { // 判断需要重定向的页面是否是当前页
+						// 判断需要重定向的页面是否是当前页
+						if (this.redirectUrl) {
 							const pages = getCurrentPages();
 							const page = pages[pages.length - 1];
 							let {
@@ -143,6 +148,7 @@
 						//获取getPhone 为false则代表已经注册过
 						const getPhone = uni.getStorageSync('getPhone');
 						if (!getPhone) {
+							//重定向路径为空
 							this.GETREDIRECTURL({
 								redirectUrl: null
 							})
@@ -151,7 +157,8 @@
 								icon: "none"
 							})
 							//好友分裂活动的判断
-							if (uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus')) {
+							if (uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus') == 0 ||  uni.getStorageSync('inviteStatus') == 1) {
+								console.log('我进入了裂变活动登录的判断')
 								//被邀请进入的老会员
 								this.$emit('reGetInfo')
 							}
@@ -165,9 +172,11 @@
 					console.error(errMsg)
 				})
 			},
+			//关闭登录框
 			hide() {
 				this.GETLOGINPOPUP()
 			},
+			//移动屏幕
 			moveHandle() {},
 		}
 	}

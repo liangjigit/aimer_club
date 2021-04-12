@@ -55,6 +55,7 @@
 				initCount: {},
 				getCount: {},
 				lastGetCount: [],
+				flag:false
 			}
 		},
 		watch: {
@@ -81,14 +82,22 @@
 			//获取奖励
 			async getPrize(index, rewardId, activeId) {
 				// console.log(id,activeId)
+				if(this.flag) return false
+				this.flag = true
 				const res = await this.getActiveAward({
 					rewardId,
 					activeId
 				})
 				if (res.code == 200) {
+					this.flag = false
 					this.conpareCount[index].b++
 					// console.log(this.conpareCount)
 					this.$emit('getFinish', this.reward[index])
+				} else if (res.code == 500) {
+					uni.showToast({
+						title: '优惠券发放完毕，活动结束！',
+						duration: 2000
+					})
 				}
 			},
 			//初始化奖励数组
