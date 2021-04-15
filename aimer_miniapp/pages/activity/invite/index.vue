@@ -4,10 +4,13 @@
 			@click="getServicePermission"></view>
 		<login-pupop ref="login" @reGetInfo="inviteOld" @getNewPrize="showNewPrize = true">
 		</login-pupop>
-		<image class="background"
+		<image class="background" v-if="currentStatus == 1"
 			:src="indexData.userBindConfigDO.themeBg ? indexData.userBindConfigDO.themeBg : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1614670402293.jpg'"
 			mode="scaleToFill"></image>
-		<image :src="'/static/activity/envelope.png'" mode="widthFix" style="width: 100%;margin-top: 200rpx;"></image>
+		<image class="background" v-if="currentStatus == 0"
+			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1614670402293.jpg'"
+			mode="scaleToFill"></image>
+		<image class="small-background" src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392341758.png" mode="widthFix"></image>
 		<header v-if="isShowInvite || !noActivity">
 			<view class="rule">
 				<view class="cu-capsule round">
@@ -171,9 +174,10 @@
 					<image src="/static/activity/join-success.png" mode="widthFix" style="height: 81rpx;width: 239rpx;">
 					</image>
 				</view>
-				<image src="/static/index/newJoin.png" mode="widthFix" style="height: 100%;"></image>
+				<image v-if="newMemberPrizeList.length == 3" src="/static/index/newJoin.png" mode="widthFix" style="height: 100%;"></image>
+				<image v-else src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392452987.png" mode="widthFix" style="height: 100%;"></image>
 				<ul>
-					<!-- DJQ:满减券 LPQ:礼品券 -->
+					<!-- DJQ:满减券 -->
 					<li v-for="(item,index) in newMemberPrizeList">
 						<template v-if="item.type == 'DJQ' || item.rewardType == 1">
 							<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
@@ -197,23 +201,7 @@
 								</view>
 							</view>
 						</template>
-						<template v-else-if="item.type == 'LPQ' || item.rewardType == 3">
-							<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
-							<view class="award-left">
-								<image :src="item.prizeImg ? item.prizeImg : ''" mode="heightFix"
-									style="height: 100rpx;"></image>
-							</view>
-							<view class="award-right">
-								<view class="award-right-top"
-									style="height: fit-content;width: 280rpx;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;margin-top: 45rpx;">
-									<text
-										style="width: 100%;text-overflow: ellipsis;overflow: hidden;">{{item.couponName ? item.couponName : item.couponList[0].couponName}}</text>
-								</view>
-								<view class="award-right-bottom">
-									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
-								</view>
-							</view>
-						</template>
+						<!-- 积分 -->
 						<template v-else>
 							<image src="/static/index/jf_back.png" mode="heightFix" style="height: 148rpx;"></image>
 							<view class="award-left">
@@ -229,6 +217,23 @@
 								</view>
 							</view>
 						</template>
+						<!-- <template v-else-if="item.type == 'LPQ'">
+							<image src="/static/index/backAward.png" mode="heightFix" style="height: 148rpx;"></image>
+							<view class="award-left">
+								<image :src="item.prizeImg ? item.prizeImg : ''" mode="heightFix"
+									style="height: 100rpx;"></image>
+							</view>
+							<view class="award-right">
+								<view class="award-right-top"
+									style="height: fit-content;width: 280rpx;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;margin-top: 45rpx;">
+									<text
+										style="width: 100%;text-overflow: ellipsis;overflow: hidden;">{{item.couponName ? item.couponName : item.couponList[0].couponName}}</text>
+								</view>
+								<view class="award-right-bottom">
+									有效期:{{(item.startDate ? item.startDate : item.couponList[0].startDate) | transformDate}}至{{(item.endDate ? item.endDate : item.couponList[0].endDate) | transformDate}}
+								</view>
+							</view>
+						</template> -->
 					</li>
 				</ul>
 			</view>
@@ -273,7 +278,9 @@
 				nowTime: '',
 				twoYearLater: '',
 				noActivity: false,
-				isShowInvite: false
+				isShowInvite: false,
+				backgroundMr: '',
+				currentStatus: Number
 			}
 		},
 		onHide() {
@@ -283,26 +290,35 @@
 		},
 		onUnload() {
 			uni.removeStorageSync('inviteStatus')
+			this.GETINVITEUSERID({
+				inviteUserId: null
+			})
+			uni.removeStorageSync('invitePhone')
+			uni.removeStorageSync('fromService')
+			uni.removeStorageSync('globalScene')
 			console.log('我走了onUnload')
 		},
 		onLoad(options) {
 			let {
 				//活动的状态 0隐藏 1显示
-				inviteStatus,
-				//邀请人id
-				inviteUserId,
-				//邀请人手机号
-				invitePhone,
-				//从服务通知进入
-				fromService,
-				//是否从club进入
-				clubIn
+				inviteStatus = 1,
+					//邀请人id
+					inviteUserId,
+					//邀请人手机号
+					invitePhone,
+					//从服务通知进入
+					fromService,
+					//是否从club进入
+					clubIn
 			} = options
+			console.log('我走了onLoad')
 			//是否从club进入 要清除其他所有状态
+			// console.log('我是clubIn', clubIn)
+			// console.log('我是inviteStatus', inviteStatus)
 			if (clubIn) {
 				uni.setStorageSync('clubIn', true)
 				this.GETINVITEUSERID({
-					inviteUserId:null
+					inviteUserId: null
 				})
 				uni.removeStorageSync('invitePhone')
 				uni.removeStorageSync('fromService')
@@ -322,22 +338,23 @@
 			}
 			//从服务通知进入场景
 			if (fromService) uni.setStorageSync('fromService', true)
-			console.log(1111)
 		},
 		onShow() {
-			//通过小程序码进入 1047 1048 1049
-			const scene = wx.getLaunchOptionsSync().scene
+			console.log('我走了onShow')
+			//通过小程序码进入 1047 1048 1049 隐藏活动
+			let scene = uni.getStorageSync('globalScene')
 			if (scene == 1047 || scene == 1048 || scene == 1049) {
 				//奖励标识 目前FL固定
 				// const inviteType = 'FL'
 				uni.setStorageSync('inviteStatus', 0)
 				this.GETINVITEUSERID({
-					inviteUserId:null
+					inviteUserId: null
 				})
 				uni.removeStorageSync('invitePhone')
 				uni.removeStorageSync('fromService')
 				uni.removeStorageSync('clubIn')
 			}
+			this.currentStatus = uni.getStorageSync('inviteStatus')
 			const _this = this
 			_this.getNowAndTwoYear()
 			uni.showLoading({
@@ -346,14 +363,14 @@
 			})
 			//判断是否登陆
 			if (_this.isLogin) {
-				console.log(222, '我有个人资料缓存')
+				// console.log(111, '已登录')
 				_this.isShowInvite = true
 				_this.getIndexData()
 			} else {
-				console.log(333, '我没有个人资料缓存')
+				// console.log(222, '未登录')
 				_this.isShowInvite = false
 				_this.getNewMemberPrize('INIT')
-				_this.$refs.login.checkLogin('fromFL')
+				_this.$refs.login.checkLogin('FL')
 			}
 		},
 		methods: {
@@ -376,8 +393,9 @@
 					isShowHide: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
-					console.log('我是首页的数据', res.data)
+					// console.log('我是首页的数据', res.data)
 					this.indexData = res.data
+					this.backgroundMr = res.data.userBindConfigDO.themeBg
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
 					this.rewardObj = {
@@ -390,7 +408,7 @@
 					if (uni.getStorageSync('clubIn') || (uni.getStorageSync('inviteStatus') == 0 && !uni
 							.getStorageSync('invitePhone'))) {
 						if (this.userInfo.isGuide == 1) {
-							console.log('我是导购，我进入自我绑定')
+							console.log('我是导购，进入isGuide == 1')
 							this.bindingOld(this.userInfo)
 						}
 						uni.removeStorageSync('clubIn')
@@ -447,7 +465,7 @@
 					}, 5000)
 				}
 				uni.hideLoading()
-				console.log('我是老会员绑定之后', response)
+				// console.log('我是老会员绑定之后', response)
 			},
 			//老会员被邀重新登陆进入后
 			async inviteOld() {
@@ -463,7 +481,7 @@
 					isShowHide: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
-					console.log('我是老会员邀请结束后请求的首页数据',res.data)
+					console.log('我是老会员邀请结束后请求的首页数据', res.data)
 					this.indexData = res.data
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
@@ -475,13 +493,14 @@
 					}
 					//从服务通知进来的不需要再进行老会员绑定了
 					if (uni.getStorageSync('fromService')) {
+						this.isShowInvite = true
 						uni.removeStorageSync('fromService')
 						return false
 					}
 					//非导购时才显示
-					if (this.userInfo.isGuide != 1){
+					if (this.userInfo.isGuide != 1) {
 						this.showOldprize = true
-					} 
+					}
 					this.isShowInvite = true
 					await this.bindingOld(this.userInfo)
 				} else if (res.code == 500 || res.code == 2100) {
@@ -529,15 +548,41 @@
 					isShow: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
-					let reward = JSON.parse(res.data.reward)
+					this.backgroundMr = res.data.rewardImage
+					//新人礼满减券
 					let user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
-					this.newMemberPrizeList = [...user_rge, ...reward]
+					//新人礼积分
+					let user_jf = [{
+						integral: JSON.parse(res.data.user_rge).integral
+					}]
+					//邀新礼
+					let reward = JSON.parse(res.data.reward)
+					//保存新人礼的数组
+					let saveNewArr = []
+					if (user_rge.length == 0) {
+						//没有优惠券
+						if (user_jf[0].integral !== 0) {
+							saveNewArr = [...user_jf]
+						}
+					} else if (user_rge.length == 1) {
+						if (user_rge[0].couponNum == 1) {
+							saveNewArr = [...user_rge]
+							if (user_jf[0].integral !== 0) {
+								saveNewArr = [...saveNewArr,...user_jf]
+							}
+						} else {
+							saveNewArr = [...user_rge, ...user_rge]
+						}
+					} else {
+						saveNewArr = [...user_rge].splice(0,2)
+					}
+					//要渲染的数据
+					this.newMemberPrizeList = [...saveNewArr, ...reward]
 					this.newMemberPrizeList.forEach(item => {
 						if (item.couponList) item.couponList = JSON.parse(item.couponList)
 					})
 					if (type == 'GET') {
-						// this.newMemberPrizeList = [this.newMemberPrizeList[0],this.newMemberPrizeList[1]]
-						this.newMemberPrizeList = this.newMemberPrizeList.splice(0, 3)
+						console.log('我是新会员奖励展示',this.newMemberPrizeList)
 						uni.hideLoading()
 						this.fromJoin = true
 					} else if (type == 'INIT') {
@@ -611,7 +656,18 @@
 			//获取活动规则
 			getRule() {
 				// console.log(this.indexData.userBindConfigDO.content)
-				uni.setStorageSync('content', this.indexData.userBindConfigDO.content)
+				const rule =
+					`1、分享方式：在此活动页面点击【邀请好友】分享给准备邀请的好友，好友成功注册后即完成爱慕会员邀请活动。<br/>
+				2、分享者发起分享活动，在活动有效期内邀请好友注册，完成分享活动并达到邀请好友注册数量，即可领取邀请好友专属优惠券或实物兑换券（具体奖励以活动设置为准）。<br/>
+				3、被分享者通过邀请链接注册成为爱慕会员，即可获得专属导购服务及新人专属好礼。<br/>
+				4、分享活动进行中，如分享者邀请人数已达上限，则不再获得邀请人奖励，仍可邀请好友参与活动。<br/>
+				5、可在活动页“查看奖励”或在“我的账户-我的优惠券”中查看获得的邀请奖励。实物兑换券需使用其下单成功才会发货。<br/> 
+				6、同一设备id、用户id只能绑定一张券，同一IP同一收货地址同一收货人视为恶意刷单行为有权取消资格。<br/>
+				7、针对不正当手段（如作弊、扰乱系统、实施网络攻击等）参与活动的用户，爱慕有权禁止其参与活动并取消获奖资格（如已发放，有权追回）。<br/>
+				8、最终解释权归爱慕股份有限公司所有`
+				// uni.setStorageSync('content', )
+				let content = this.indexData.userBindConfigDO.content || rule
+				uni.setStorageSync('content', content)
 				uni.navigateTo({
 					url: `/pages/activity/invite/rule`
 				})
@@ -745,6 +801,13 @@
 			position: fixed;
 			top: 0;
 			background-size: 100% 100%;
+			z-index: -2;
+		}
+
+		.small-background {
+			width: 100%;
+			position: fixed;
+			top: 200rpx;
 			z-index: -1;
 		}
 

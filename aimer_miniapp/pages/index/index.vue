@@ -17,7 +17,6 @@
 				</button>
 			</view>
 		</view>
-		<button @click="toActivity">活动测试入口</button>
 		<view class="flex justify-center" v-if="banners.length>0">
 			<swiper class="banner card-swiper" next-margin="100rpx" :circular="true" :interval="5000" :duration="500"
 				:autoplay="true" easing-function="linear" @change="bannerSwiper">
@@ -210,7 +209,9 @@
 			}
 		},
 		onShow() {
-			this.$refs.login.checkLogin()
+			//删除裂变活动的缓存
+			uni.removeStorageSync('inviteStatus')
+			this.$refs.login.checkLogin('tabBar')
 			if (!this.onCreated) {
 				let isRefresh = true
 				this.getData(isRefresh)
@@ -284,13 +285,6 @@
 			...mapMutations('index', ['SETSELECTOR']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
-			async toActivity() {
-				const isLogin = await this.$refs.login.checkLogin()
-				if (!isLogin) return false
-				uni.navigateTo({
-					url: '/pages/activity/invite/index?clubIn=true&inviteStatus=1'
-				})
-			},
 			getData(isRefresh) {
 				this.getBanners({
 					pageId: 1
@@ -424,7 +418,11 @@
 			tutorSwiper(e) {
 				this.currentCur = e.detail.current
 			},
-			goCupDetail(options) {
+			async goCupDetail(options) {
+				const isLogin = await this.$refs.login.checkLogin()
+				if (!isLogin) {
+					return
+				}
 				let {
 					code
 				} = options

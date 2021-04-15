@@ -24,7 +24,7 @@
 	import login from '@/common/login.js'
 	export default{
 		onShow(){
-			this.$refs.login.checkLogin()
+			this.$refs.login.checkLogin('tabBar')
 			if(this.onCreated){
 				this.onCreated = false
 				return

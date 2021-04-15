@@ -49,7 +49,7 @@
 	import {checkForAuthorization} from '@/common/index.js'
 	export default {
 		onShow(){
-			this.$refs.login.checkLogin()
+			this.$refs.login.checkLogin('tabBar')
 		},
 		components: {
 			uniIndexedList,

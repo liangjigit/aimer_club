@@ -71,6 +71,7 @@
 				</view>
 			</view>
 		</view>
+		<login-pupop ref="login"></login-pupop>
 	</view>
 </template>
 
@@ -98,7 +99,11 @@
 			closeGoods(){
 				this.showGoods = false
 			},
-			toMiniProgram(appId,path,productNo,goodsCode){
+			async toMiniProgram(appId,path,productNo,goodsCode){
+				const isLogin = await this.$refs.login.checkLogin()
+				if(!isLogin){
+					return
+				}
 				this.$emit('clickGoods',{appId,path,productNo,goodsCode})
 			},
 			addCourse(){

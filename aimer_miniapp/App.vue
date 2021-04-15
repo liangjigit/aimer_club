@@ -49,6 +49,8 @@
 			})
 		},
 		onShow: function(options) {
+			const {scene} = options
+			uni.setStorageSync('globalScene',scene)
 			// console.log('App Show')
 		},
 		onHide: function() {

@@ -44,41 +44,28 @@ const actions = {
 	}) {
 		const that = this;
 		return new Promise((resolve, reject) => {
-			//获取个人资料
-			wx.getUserProfile({
-				desc: '登录获取个人资料', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
-				success: (infoRes) => {
-					let {
-						userInfo
-					} = infoRes;
-					//微信登录
-					uni.setStorageSync('saveUserProfile', userInfo)
-					//微信登录获取code
-					uni.login({
-						provider: 'weixin',
-						async success(res) {
-							const {
-								code,
+			//微信登录获取code
+			uni.login({
+				provider: 'weixin',
+				async success(res) {
+					const {
+						code,
+						errMsg
+					} = res;
+					if (errMsg == "login:ok") {
+						// 获取用户信息
+						let response = await dispatch('login', {
+							jscode: code,
+							userInfo: JSON.stringify(uni.getStorageSync(
+								'saveUserProfile'))
+						})
+						resolve(response)
+					} else {
+						reject({
+							errMsg: '微信登录失败 uni.login, login/onGetUserInfo：' +
 								errMsg
-							} = res;
-							if (errMsg == "login:ok") {
-								// 获取用户信息
-								let response = await dispatch('login', {
-									jscode: code,
-									userInfo: JSON.stringify(userInfo)
-								})
-								resolve(response)
-							} else {
-								reject({
-									errMsg: '微信登录失败 uni.login, login/onGetUserInfo：' +
-										errMsg
-								})
-							}
-						}
-					})
-				},
-				fail(err) {
-					reject(err)
+						})
+					}
 				}
 			})
 		})

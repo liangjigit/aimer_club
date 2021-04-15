@@ -32,7 +32,7 @@
 			}
 		},
 		onShow(){
-			this.$refs.login.checkLogin()
+			this.$refs.login.checkLogin('tabBar')
 		},
 		onLoad() {
 			let info = uni.getSystemInfoSync()

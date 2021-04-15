@@ -1,26 +1,41 @@
 <template>
-	<view class="wrapper" v-show="isShow&&pupop" @touchmove.stop.prevent="moveHandle">
-		<view class="bg-mask flex align-center justify-center">
-			<view class="card flex flex-direction align-center">
-				<!-- popup数据存在image -->
-				<button v-if="pupop.image&&!isDefault" @click="login" class="btn">
-					<image :src="pupop.image" mode="aspectFill"></image>
-				</button>
-				<view class="bg-white flex flex-direction align-center" v-else>
-					<view class="title-img">
-						<image src="/static/index/login.png" mode="aspectFill"></image>
-					</view>
-					<text class="title">{{defaultTitle}}</text>
-					<text class="money">
-						<!-- <text class="num">120</text>
+	<view>
+		<view class="wrapper" v-show="isShow&&pupop" @touchmove.stop.prevent="moveHandle">
+			<view class="bg-mask flex align-center justify-center">
+				<view class="card flex flex-direction align-center">
+					<!-- popup数据存在image -->
+					<button v-if="pupop.image&&!isDefault" @click="getSelfInfo" class="btn">
+						<image :src="pupop.image" mode="aspectFill"></image>
+					</button>
+					<view class="bg-white flex flex-direction align-center" v-else>
+						<view class="title-img">
+							<image src="/static/index/login.png" mode="aspectFill"></image>
+						</view>
+						<text class="title">{{defaultTitle}}</text>
+						<text class="money">
+							<!-- <text class="num">120</text>
 						<text class="unit">元</text> -->
-					</text>
-					<text class="tip">{{defaultDesc}}</text>
-					<button @click="login" class="cu-btn line-red text-red">登录</button>
+						</text>
+						<text class="tip">{{defaultDesc}}</text>
+						<button @click="getSelfInfo" class="cu-btn line-red text-red">登录</button>
+					</view>
+					<view @click="hide" class="cancel-btn" v-if="showHide">
+						<image src="/static/close-icon.png" mode="aspectFit"></image>
+					</view>
 				</view>
-				<view @click="hide" class="cancel-btn" v-if="showHide">
-					<image src="/static/close-icon.png" mode="aspectFit"></image>
-				</view>
+			</view>
+		</view>
+		<view v-if="showTopLogin" class="top-login">
+			<view class="avatar-top">
+				<image src="/static/index/sign_2.png" mode="widthFix" style="width: 80rpx;"></image>
+				<image src="/static/index/sign_1.png" mode="widthFix" class="sign1"></image>
+			</view>
+			<view class="login-text">
+				<image src="/static/index/sign_3.png" mode="widthFix" style="width: 312rpx;"></image>
+			</view>
+			<view class="login-sign" @click="getSelfInfo">
+				<image src="/static/index/sign_4.png" mode="widthFix" style="width: 160rpx;"></image>
+				<image src="/static/index/sign_5.png" mode="widthFix" class="sign5"></image>
 			</view>
 		</view>
 	</view>
@@ -53,7 +68,8 @@
 		},
 		data() {
 			return {
-				showHide: true
+				showHide: true,
+				showTopLogin: false
 			}
 		},
 		computed: {
@@ -75,17 +91,27 @@
 			...mapActions('login', ['onGetUserInfo', 'getLoginPopup']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETREDIRECTURL']),
 			//查看是否登录
-			async checkLogin(fromFL) {
+			async checkLogin(fromWhere) {
 				//isLogin为true代表已成功调用wx/login接口登录
 				if (!this.isLogin) {
 					//获取popup数组 /content/miniapp/home/popup 且popup获取到了值
 					await this.getLoginPopup({})
-					//如果未显示弹窗
-					if (!this.isShowLogin) {
-						if (fromFL) this.showHide = false
-						//显示弹窗
-						this.GETLOGINPOPUP()
-						uni.hideLoading()
+					if (uni.getStorageSync('saveUserProfile')) {
+						//如果存在用户数据就不显示弹窗了
+						this.login()
+					} else {
+						//参数为tabBar不需要弹窗
+						if (fromWhere == 'tabBar') {
+							this.showTopLogin = true
+						} else {
+							//如果未显示弹窗
+							if (!this.isShowLogin) {
+								if (fromWhere == 'FL') this.showHide = false
+								//显示弹窗
+								this.GETLOGINPOPUP()
+								uni.hideLoading()
+							}
+						}
 					}
 					return false
 				} else {
@@ -109,8 +135,27 @@
 					}
 				}
 			},
+			//获取个人资料
+			getSelfInfo() {
+				const _this = this
+				wx.getUserProfile({
+					desc: '用于登录当前小程序', // 声明获取用户个人信息后的用途，后续会展示在弹窗中，请谨慎填写
+					success: (infoRes) => {
+						let {
+							userInfo
+						} = infoRes;
+						//微信登录
+						uni.setStorageSync('saveUserProfile', userInfo)
+						//微信登录
+						_this.login()
+					},
+					fail(err) {
+						console.log(err)
+					}
+				})
+			},
 			//未登陆时登录
-			login(e) {
+			login() {
 				const {
 					id
 				} = this.pupop
@@ -124,6 +169,7 @@
 					if (response.code == 200) {
 						//关闭弹窗
 						this.showPopup = false
+						this.showTopLogin = false
 						// 判断需要重定向的页面是否是当前页
 						if (this.redirectUrl) {
 							const pages = getCurrentPages();
@@ -157,7 +203,7 @@
 								icon: "none"
 							})
 							//好友分裂活动的判断
-							if (uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus') == 0 ||  uni.getStorageSync('inviteStatus') == 1) {
+							if (uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus') !== '') {
 								console.log('我进入了裂变活动登录的判断')
 								//被邀请进入的老会员
 								this.$emit('reGetInfo')
@@ -183,6 +229,57 @@
 </script>
 
 <style lang="scss" scoped>
+	.top-login {
+		position: fixed;
+		z-index: 999;
+		top: 0;
+		width: 100%;
+		height: 100rpx;
+		background-color: rgba(255, 255, 255, 1);
+		display: flex;
+		box-shadow: 0 0 3rpx #bfbfbf;
+
+		.avatar-top {
+			position: relative;
+			left: 40rpx;
+			top: 10rpx;
+			width: 80rpx;
+			height: 80rpx;
+
+			.sign1 {
+				width: 39rpx;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+
+		.login-text {
+			width: 312rpx;
+			height: 29rpx;
+			position: relative;
+			top: 35rpx;
+			left: 100rpx;
+		}
+
+		.login-sign {
+			position: absolute;
+			right: 40rpx;
+			top: 25rpx;
+			width: 160rpx;
+			height: 50rpx;
+
+			.sign5 {
+				width: 124rpx;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+	}
+
 	.wrapper {
 		position: fixed;
 		top: 0;

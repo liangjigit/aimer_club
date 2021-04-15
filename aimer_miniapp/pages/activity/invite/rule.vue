@@ -1,6 +1,6 @@
 <template>
 	<view id="rule">
-		<image class="background" src="/static/activity/content.png" mode="scaleToFill"></image>
+		<image class="background" src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png" mode="scaleToFill"></image>
 		<view class="text">
 			<text>活动规则</text>
 		</view>

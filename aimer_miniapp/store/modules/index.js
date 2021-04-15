@@ -19,7 +19,7 @@ const actions = {
 			data:payload,
 			needAuth:false
 		})).data;
-		console.log(response)
+		// console.log(response)
 		if(response.code == 200){
 			commit('GETBANNERS',{banners:response.data})
 		}

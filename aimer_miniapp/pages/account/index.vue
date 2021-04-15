@@ -52,7 +52,7 @@
 			
 		</view>
 		<button open-type="share" class="cu-btn banner-center">
-			<image src="/static/account/index/invite.png" mode="aspectFill"></image>
+			<image src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392393665.png" mode="aspectFill"></image>
 		</button>
 		<view class="menu-box flex align-center justify-center">
 			<view class="grid col-3">
@@ -144,7 +144,7 @@
 	export default{
 		onShow(){ 
 			this.showGiftPopup = true
-			this.$refs.login.checkLogin()
+			// this.$refs.login.checkLogin('tabBar')
 			if(this.isLogin){
 				this.getMyInfo({})
 			}

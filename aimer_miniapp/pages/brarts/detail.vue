@@ -89,7 +89,7 @@
 			this.code = code
 		},
 		onShow() {
-			this.$refs.login.checkLogin()
+			this.$refs.login.checkLogin('tabBar')
 		},
 		onShareAppMessage(res){
 			// 统计分享数据

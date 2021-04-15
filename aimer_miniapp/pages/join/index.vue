@@ -178,6 +178,7 @@
 			...mapMutations('login', ['GETREDIRECTURL']),
 			onInput(index, e) {
 				let value = e.detail.value.replace(/\d/g, "")
+				value = value.substr(0,10)
 				this.fieldList[index].value = value
 				return value
 			},

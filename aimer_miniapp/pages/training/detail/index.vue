@@ -39,7 +39,7 @@
 	export default{
 		mixins:[share,login],
 		onShow(){
-			this.$refs.login.checkLogin() 
+			this.$refs.login.checkLogin('tabBar') 
 		},
 		components:{
 			videoH,

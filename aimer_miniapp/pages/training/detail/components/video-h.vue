@@ -39,6 +39,7 @@
 					<text>分享闺蜜</text>
 				</view>
 			</view>
+			<login-pupop ref="login"></login-pupop>
 		</view>
 	</view>
 </template>
@@ -94,7 +95,11 @@
 			pause(){
 				this.isPlay = false
 			},
-			videoPlay(){
+			async videoPlay(){
+				const isLogin = await this.$refs.login.checkLogin()
+				if(!isLogin){
+					return
+				}
 				this.videoContext.requestFullScreen({direction:90})
 				this.videoContext.play()
 				this.isPlay = true

@@ -78,7 +78,7 @@
 	export default{
 		mixins:[share,login],
 		async onShow(){
-			this.$refs.login.checkLogin()
+			this.$refs.login.checkLogin('tabBar')
 			let response = await this.getApplyTimeStatus({activityCode:this.code})
 			if(response.code == 200){
 				this.stopApply = response.data ===-2

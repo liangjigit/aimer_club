@@ -62,7 +62,7 @@
 			rewardStr: {
 				handler(n) {
 					this.rewardObj = JSON.parse(n)
-					console.log('我是get-reward组件奖励数据', this.rewardObj)
+					// console.log('我是get-reward组件奖励数据', this.rewardObj)
 					this.initAwardList()
 					if (this.rewardObj.total == 0 || this.rewardObj.total == null) return false
 					this.initGetPrizeCount()
@@ -70,12 +70,6 @@
 				},
 				immediate: true,
 			}
-		},
-		created() {
-			// this.rewardObj = JSON.parse(this.rewardStr)
-			// this.initAwardList()
-			// this.initGetPrizeCount()
-			// this.disposeGet()
 		},
 		methods: {
 			...mapActions('invite', ['getActiveAward', 'getOldInvite', 'getNewInvite', 'sendMiniMessage']),
@@ -91,7 +85,7 @@
 				if (res.code == 200) {
 					this.flag = false
 					this.conpareCount[index].b++
-					// console.log(this.conpareCount)
+					// console.log('我是领取后的数组',this.conpareCount)
 					this.$emit('getFinish', this.reward[index])
 				} else if (res.code == 500) {
 					uni.showToast({
@@ -138,7 +132,7 @@
 						}
 						break;
 				}
-				console.log('我是应该领取次数', initCount)
+				// console.log('我是应该领取次数', initCount)
 				this.initCount = initCount
 			},
 			//已经领取的数组处理
@@ -170,7 +164,7 @@
 							break;
 					}
 				})
-				console.log('我是已经领取次数', getCount)
+				// console.log('我是已经领取次数', getCount)
 				this.getCount = getCount
 			},
 		},
@@ -210,7 +204,7 @@
 					t.a = 1
 					this.lastGetCount = [f, s, t]
 				}
-				console.log('最终', this.lastGetCount)
+				// console.log('[应该领取:已领取]', this.lastGetCount)
 				return this.lastGetCount
 			}
 		}
