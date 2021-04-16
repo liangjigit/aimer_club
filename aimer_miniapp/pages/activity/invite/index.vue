@@ -4,13 +4,12 @@
 			@click="getServicePermission"></view>
 		<login-pupop ref="login" @reGetInfo="inviteOld" @getNewPrize="showNewPrize = true">
 		</login-pupop>
-		<image class="background" v-if="currentStatus == 1"
-			:src="indexData.userBindConfigDO.themeBg ? indexData.userBindConfigDO.themeBg : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1614670402293.jpg'"
+		<image class="background"
+			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png'"
 			mode="scaleToFill"></image>
-		<image class="background" v-if="currentStatus == 0"
-			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1614670402293.jpg'"
-			mode="scaleToFill"></image>
-		<image class="small-background" src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392341758.png" mode="widthFix"></image>
+		<image class="small-background"
+			src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392341758.png" mode="widthFix"
+			:style="{'top':topHeight}"></image>
 		<header v-if="isShowInvite || !noActivity">
 			<view class="rule">
 				<view class="cu-capsule round">
@@ -28,7 +27,7 @@
 					aria-disabled="false" open-type="share" @click="showModalYn" v-if="isShowInvite">邀请好友</button>
 			</view>
 			<view v-else>
-				<text style="color: #ffffff;font-weight: bolder;">当前没有活动正在进行中</text>
+				<text style="color: #ffffff;font-weight: bolder;">当前没有活动</text>
 			</view>
 			<view>
 				<count-down @activityIsOver="isShowInvite = false" :startTimes="startTime" :endTimes="endTime"
@@ -174,8 +173,9 @@
 					<image src="/static/activity/join-success.png" mode="widthFix" style="height: 81rpx;width: 239rpx;">
 					</image>
 				</view>
-				<image v-if="newMemberPrizeList.length == 3" src="/static/index/newJoin.png" mode="widthFix" style="height: 100%;"></image>
-				<image v-else src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392452987.png" mode="widthFix" style="height: 100%;"></image>
+				<image
+					:src="newMemberPrizeList.length == 3 ? 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392421168.png':'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392452987.png'"
+					mode="widthFix" style="height: 100%;"></image>
 				<ul>
 					<!-- DJQ:满减券 -->
 					<li v-for="(item,index) in newMemberPrizeList">
@@ -280,7 +280,7 @@
 				noActivity: false,
 				isShowInvite: false,
 				backgroundMr: '',
-				currentStatus: Number
+				topHeight: '200rpx'
 			}
 		},
 		onHide() {
@@ -340,8 +340,11 @@
 			if (fromService) uni.setStorageSync('fromService', true)
 		},
 		onShow() {
+			this.getPhoneScreenHeight()
+			// this.getNewMemberPrize('GET')
 			console.log('我走了onShow')
 			//通过小程序码进入 1047 1048 1049 隐藏活动
+			console.log(uni.getStorageSync('globalScene'))
 			let scene = uni.getStorageSync('globalScene')
 			if (scene == 1047 || scene == 1048 || scene == 1049) {
 				//奖励标识 目前FL固定
@@ -354,7 +357,6 @@
 				uni.removeStorageSync('fromService')
 				uni.removeStorageSync('clubIn')
 			}
-			this.currentStatus = uni.getStorageSync('inviteStatus')
 			const _this = this
 			_this.getNowAndTwoYear()
 			uni.showLoading({
@@ -394,6 +396,13 @@
 				})
 				if (res.code == 200) {
 					// console.log('我是首页的数据', res.data)
+					if (res.data == null) {
+						//data为空时活动时间结束
+						uni.switchTab({
+							url: '/pages/index/index'
+						})
+						return false
+					}
 					this.indexData = res.data
 					this.backgroundMr = res.data.userBindConfigDO.themeBg
 					this.endTime = res.data.userBindConfigDO.endTime
@@ -483,6 +492,7 @@
 				if (res.code == 200) {
 					console.log('我是老会员邀请结束后请求的首页数据', res.data)
 					this.indexData = res.data
+					this.backgroundMr = res.data.userBindConfigDO.themeBg
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
 					this.rewardObj = {
@@ -549,6 +559,7 @@
 				})
 				if (res.code == 200) {
 					this.backgroundMr = res.data.rewardImage
+					console.log(this.backgroundMr)
 					//新人礼满减券
 					let user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
 					//新人礼积分
@@ -568,13 +579,13 @@
 						if (user_rge[0].couponNum == 1) {
 							saveNewArr = [...user_rge]
 							if (user_jf[0].integral !== 0) {
-								saveNewArr = [...saveNewArr,...user_jf]
+								saveNewArr = [...saveNewArr, ...user_jf]
 							}
 						} else {
 							saveNewArr = [...user_rge, ...user_rge]
 						}
 					} else {
-						saveNewArr = [...user_rge].splice(0,2)
+						saveNewArr = [...user_rge].splice(0, 2)
 					}
 					//要渲染的数据
 					this.newMemberPrizeList = [...saveNewArr, ...reward]
@@ -582,7 +593,7 @@
 						if (item.couponList) item.couponList = JSON.parse(item.couponList)
 					})
 					if (type == 'GET') {
-						console.log('我是新会员奖励展示',this.newMemberPrizeList)
+						console.log('我是新会员奖励展示', this.newMemberPrizeList)
 						uni.hideLoading()
 						this.fromJoin = true
 					} else if (type == 'INIT') {
@@ -620,6 +631,7 @@
 				if (res.code == 200) {
 					console.log(res.data)
 					this.indexData = res.data
+					this.backgroundMr = res.data.userBindConfigDO.themeBg
 					this.endTime = res.data.userBindConfigDO.endTime
 					this.startTime = res.data.userBindConfigDO.startTime
 					this.rewardObj = {
@@ -724,6 +736,21 @@
 						console.log(err + 'requestSubscribeMessage失败')
 					}
 				})
+			},
+			//获取屏幕宽度
+			getPhoneScreenHeight() {
+				const _this = this
+				uni.getSystemInfo({
+					success: function(res) {
+						const {
+							windowHeight
+						} = res
+						console.log(windowHeight)
+						if (windowHeight < 724) {
+							_this.topHeight = '80rpx'
+						}
+					}
+				});
 			}
 		},
 		computed: {
@@ -807,7 +834,8 @@
 		.small-background {
 			width: 100%;
 			position: fixed;
-			top: 200rpx;
+			left: 50%;
+			transform: translate(-50%);
 			z-index: -1;
 		}
 
