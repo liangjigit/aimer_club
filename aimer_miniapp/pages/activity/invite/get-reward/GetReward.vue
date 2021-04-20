@@ -55,7 +55,7 @@
 				initCount: {},
 				getCount: {},
 				lastGetCount: [],
-				flag:false
+				flag: false
 			}
 		},
 		watch: {
@@ -64,7 +64,8 @@
 					this.rewardObj = JSON.parse(n)
 					// console.log('我是get-reward组件奖励数据', this.rewardObj)
 					this.initAwardList()
-					if (this.rewardObj.total == 0 || this.rewardObj.total == null) return false
+					if (this.rewardObj.total == 0 || this.rewardObj.total == null || this.rewardObj.reward.length == 0)
+						return false
 					this.initGetPrizeCount()
 					this.disposeGet()
 				},
@@ -76,21 +77,22 @@
 			//获取奖励
 			async getPrize(index, rewardId, activeId) {
 				// console.log(id,activeId)
-				if(this.flag) return false
+				if (this.flag) return false
 				this.flag = true
 				const res = await this.getActiveAward({
 					rewardId,
 					activeId
 				})
+				this.flag = false
 				if (res.code == 200) {
-					this.flag = false
 					this.conpareCount[index].b++
 					// console.log('我是领取后的数组',this.conpareCount)
 					this.$emit('getFinish', this.reward[index])
 				} else if (res.code == 500) {
 					uni.showToast({
 						title: '优惠券发放完毕，活动结束！',
-						duration: 2000
+						duration: 2000,
+						icon:'none'
 					})
 				}
 			},

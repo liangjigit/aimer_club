@@ -2,7 +2,7 @@
 	<view id="invite">
 		<view style="width: 100%;height: 100%;position: fixed;z-index: 1000;" v-if="showModal"
 			@click="getServicePermission"></view>
-		<login-pupop ref="login" @reGetInfo="inviteOld" @getNewPrize="showNewPrize = true">
+		<login-pupop ref="login" @reGetInfo="getIndexData('oldFromLogin')" @getNewPrize="showNewPrize = true">
 		</login-pupop>
 		<image class="background"
 			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png'"
@@ -25,6 +25,9 @@
 			<view v-if="!noActivity">
 				<button class="cu-btn round bg-white" role="button" style="width: 240rpx;height: 60rpx;"
 					aria-disabled="false" open-type="share" @click="showModalYn" v-if="isShowInvite">邀请好友</button>
+				<button class="cu-btn round bg-white" role="button"
+					style="width: 240rpx;height: 60rpx;background-color: #c1c1c1;color: #666666;" aria-disabled="false"
+					@click="showModalNp" v-else>邀请好友</button>
 			</view>
 			<view v-else>
 				<text style="color: #ffffff;font-weight: bolder;">当前没有活动</text>
@@ -175,8 +178,8 @@
 				</view>
 				<image
 					:src="newMemberPrizeList.length == 3 ? 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392421168.png':'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392452987.png'"
-					mode="widthFix" style="height: 100%;"></image>
-				<ul>
+					mode="widthFix" style="height: 100%;" @load="fromJoinUl = true"></image>
+				<ul v-if="fromJoinUl">
 					<!-- DJQ:满减券 -->
 					<li v-for="(item,index) in newMemberPrizeList">
 						<template v-if="item.type == 'DJQ' || item.rewardType == 1">
@@ -268,6 +271,7 @@
 				rewardObj: null,
 				//是从注册页来的新用户
 				fromJoin: false,
+				fromJoinUl: false,
 				showNewPrize: false,
 				showOldprize: false,
 				isShowPrize: false,
@@ -283,96 +287,100 @@
 				topHeight: '200rpx'
 			}
 		},
-		onHide() {
-			uni.hideLoading()
-			uni.removeStorageSync('clubIn')
-			console.log('我走了onHide')
-		},
 		onUnload() {
+			console.log('------onUnload------')
 			uni.removeStorageSync('inviteStatus')
 			this.GETINVITEUSERID({
 				inviteUserId: null
 			})
 			uni.removeStorageSync('invitePhone')
 			uni.removeStorageSync('fromService')
-			uni.removeStorageSync('globalScene')
-			console.log('我走了onUnload')
+			uni.removeStorageSync('clubIn')
+			// uni.removeStorageSync('globalScene')
 		},
 		onLoad(options) {
+			console.log('------onLoad------')
 			let {
-				//活动的状态 0隐藏 1显示
-				inviteStatus = 1,
-					//邀请人id
-					inviteUserId,
-					//邀请人手机号
-					invitePhone,
-					//从服务通知进入
-					fromService,
-					//是否从club进入
-					clubIn
+				//1、活动的状态 0隐藏 1显示 fx通过分享或者服务通知进来
+				inviteStatus,
+				//2、邀请人id
+				inviteUserId,
+				//3、邀请人手机号
+				invitePhone,
+				//4、从服务通知进入
+				fromService,
+				//5、是否从club进入
+				clubIn
 			} = options
-			console.log('我走了onLoad')
-			//是否从club进入 要清除其他所有状态
-			// console.log('我是clubIn', clubIn)
-			// console.log('我是inviteStatus', inviteStatus)
-			if (clubIn) {
+			//保存活动的状态
+			uni.setStorageSync('inviteStatus', inviteStatus)
+			//从club首页进入 要清除其他所有状态
+			if (clubIn === 'clubIn') {
 				uni.setStorageSync('clubIn', true)
 				this.GETINVITEUSERID({
 					inviteUserId: null
 				})
 				uni.removeStorageSync('invitePhone')
 				uni.removeStorageSync('fromService')
+			} else {
+				uni.removeStorageSync('clubIn')
 			}
-			//保存活动的状态
-			uni.setStorageSync('inviteStatus', inviteStatus)
 			//保存邀请人的id
 			if (inviteUserId) {
 				this.GETINVITEUSERID({
 					inviteUserId
+				})
+			} else {
+				this.GETINVITEUSERID({
+					inviteUserId: null
 				})
 			}
 			//保存邀请人的加密手机号
 			if (invitePhone) {
 				invitePhone = decodeURIComponent(invitePhone)
 				uni.setStorageSync('invitePhone', invitePhone)
+			} else {
+				uni.removeStorageSync('invitePhone')
 			}
 			//从服务通知进入场景
-			if (fromService) uni.setStorageSync('fromService', true)
+			if (fromService) {
+				uni.setStorageSync('fromService', true)
+			} else {
+				uni.removeStorageSync('fromService')
+			}
 		},
 		onShow() {
-			this.getPhoneScreenHeight()
-			// this.getNewMemberPrize('GET')
-			console.log('我走了onShow')
-			//通过小程序码进入 1047 1048 1049 隐藏活动
-			console.log(uni.getStorageSync('globalScene'))
-			let scene = uni.getStorageSync('globalScene')
-			if (scene == 1047 || scene == 1048 || scene == 1049) {
-				//奖励标识 目前FL固定
-				// const inviteType = 'FL'
-				uni.setStorageSync('inviteStatus', 0)
-				this.GETINVITEUSERID({
-					inviteUserId: null
-				})
-				uni.removeStorageSync('invitePhone')
-				uni.removeStorageSync('fromService')
-				uni.removeStorageSync('clubIn')
-			}
-			const _this = this
-			_this.getNowAndTwoYear()
+			console.log('------onShow------')
+			uni.hideLoading()
 			uni.showLoading({
 				title: '加载中',
 				mask: true,
 			})
+			//适配屏幕
+			this.getPhoneScreenHeight()
+			//获取两年后积分时间
+			this.getNowAndTwoYear()
+			// //通过小程序码进入 1047 1048 1049 隐藏活动
+			// let scene = uni.getStorageSync('globalScene')
+			// if (scene == 1047 || scene == 1048 || scene == 1049) {
+			// 	//奖励标识 目前FL固定
+			// 	// const inviteType = 'FL'
+			// 	uni.setStorageSync('inviteStatus', 0)
+			// 	this.GETINVITEUSERID({
+			// 		inviteUserId: null
+			// 	})
+			// 	uni.removeStorageSync('invitePhone')
+			// 	uni.removeStorageSync('fromService')
+			// 	uni.removeStorageSync('clubIn')
+			// }
 			//判断是否登陆
-			if (_this.isLogin) {
-				// console.log(111, '已登录')
-				_this.isShowInvite = true
-				_this.getIndexData()
+			if (this.isLogin) {
+				this.isShowInvite = true
+				this.getIndexData()
 			} else {
-				// console.log(222, '未登录')
-				_this.isShowInvite = false
-				_this.getNewMemberPrize('INIT')
-				_this.$refs.login.checkLogin('FL')
+				this.isShowInvite = false
+				this.getNewMemberPrize('INIT')
+				this.$refs.login.checkLogin('FL')
 			}
 		},
 		methods: {
@@ -382,27 +390,35 @@
 			...mapActions('login', ['onGetUserInfo']),
 			...mapMutations('login', ['GETINVITEUSERID']),
 			//获取页面数据
-			async getIndexData() {
-				//如果不是导购且进入的是隐藏活动则跳回首页
-				if (this.userInfo.isGuide != 1 && uni.getStorageSync('inviteStatus') == 0 && !uni.getStorageSync(
-						'invitePhone')) {
-					uni.switchTab({
-						url: '/pages/index/index'
-					})
-					return false
-				}
+			async getIndexData(oldFromLogin = undefined) {
+				// //如果不是导购且进入的是隐藏活动则跳回首页
+				// if (this.userInfo.isGuide != 1 && uni.getStorageSync('inviteStatus') == '0' && !uni.getStorageSync(
+				// 		'invitePhone')) {
+				// 	uni.switchTab({
+				// 		url: '/pages/index/index'
+				// 	})
+				// 	return false
+				// }
 				const res = await this.getActiveIndex({
 					isShowHide: uni.getStorageSync('inviteStatus')
 				})
-				if (res.code == 200) {
-					// console.log('我是首页的数据', res.data)
-					if (res.data == null) {
-						//data为空时活动时间结束
+				// console.log(res)
+				//data为空时活动时间结束，跳回首页
+				if (res.data == null) {
+					uni.showToast({
+						title: '当前时间段没有活动~',
+						duration: 2000,
+						icon: 'none'
+					});
+					setTimeout(function() {
 						uni.switchTab({
 							url: '/pages/index/index'
 						})
-						return false
-					}
+					}, 2000)
+					return false
+				}
+				//成功返回数据 code==200
+				if (res.code == 200) {
 					this.indexData = res.data
 					this.backgroundMr = res.data.userBindConfigDO.themeBg
 					this.endTime = res.data.userBindConfigDO.endTime
@@ -413,36 +429,74 @@
 						total: res.data.totalCount,
 						limit: res.data.userBindConfigDO.timeLimit
 					}
-					//从club进入且是导购 或者通过太阳码进入只存在inviteStatus
-					if (uni.getStorageSync('clubIn') || (uni.getStorageSync('inviteStatus') == 0 && !uni
-							.getStorageSync('invitePhone'))) {
+					//activeStatus == 2 表示管理员手动关闭活动或者奖励领取完毕
+					if (res.data.userBindConfigDO.activeStatus == 2) {
+						uni.hideLoading()
+						this.isShowInvite = false
+						return false
+					}
+					//从club首页进
+					if (uni.getStorageSync('clubIn')) {
+						uni.removeStorageSync('clubIn')
 						if (this.userInfo.isGuide == 1) {
-							console.log('我是导购，进入isGuide == 1')
+							console.log('------我是导购------')
 							this.bindingOld(this.userInfo)
 						}
-						uni.removeStorageSync('clubIn')
 						uni.hideLoading()
 						return false
 					}
-					//邀请老会员进入
-					if (!uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone')) {
-						await this.bindingOld(this.userInfo)
+					// // 从club进入且是导购 或者通过太阳码进入只存在inviteStatus
+					// if (uni.getStorageSync('clubIn') === 'clubIn' || (uni.getStorageSync('inviteStatus') == 0 && !uni
+					// 		.getStorageSync('invitePhone'))) {
+					// 	uni.removeStorageSync('clubIn')
+					// 	if (this.userInfo.isGuide == 1) {
+					// 		console.log('我是导购，进入isGuide == 1')
+					// 		this.bindingOld(this.userInfo)
+					// 	}
+					// 	uni.hideLoading()
+					// 	return false
+					// }
+					//邀请老会员进入(登陆中)(此时被邀请有可能是导购)
+					if (!uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone') && oldFromLogin ==
+						undefined) {
+						this.bindingOld(this.userInfo)
 						return false
 					}
-					//如果是新会员，fromjoin为true
-					if (uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone')) {
+					//oldFromLogin存在代表老会员重新登陆进入当前页
+					if (oldFromLogin === 'oldFromLogin') {
+						if (uni.getStorageSync('fromService')) {
+							uni.removeStorageSync('fromService')
+						} else {
+							//非导购时才显示
+							if (this.userInfo.isGuide != 1) {
+								this.showOldprize = true
+							}
+							this.isShowInvite = true
+							this.bindingOld(this.userInfo)
+						}
+						return false
+					}
+					//这是新会员注册完成后从注册页面过来，fromjoin为true
+					if (uni.getStorageSync('fromJoin') && uni.getStorageSync('invitePhone') && oldFromLogin ==
+						undefined) {
 						uni.removeStorageSync('fromJoin')
-						console.log('我是新会员')
 						this.getNewMemberPrize('GET')
 						this.bindingNew(this.userInfo)
 						return false
 					}
+					//从服务通知进来的不需要再进行老会员绑定了
+					if (uni.getStorageSync('fromService')) {
+						this.isShowInvite = true
+						uni.removeStorageSync('fromService')
+						return false
+					}
+					console.log('------直接获取数据，未走任何判断------')
 					uni.hideLoading()
 				} else if (res.code == 500 || res.code == 2100) {
 					this.noActivity = true
 				} else if (res.code == 2009) {
-					uni.redirectTo({
-						url: '/pages/join/index'
+					uni.switchTab({
+						url: '/pages/index/index'
 					})
 				}
 			},
@@ -463,7 +517,6 @@
 					const _this = this
 					uni.setStorageSync('indexDataId', this.indexData.userBindConfigDO.id)
 					setTimeout(async function() {
-						// console.log('我是id',uni.getStorageSync('indexDataId'))
 						await _this.getOldInvite({
 							activityId: uni.getStorageSync('indexDataId'),
 							invitationPhone: null,
@@ -473,60 +526,15 @@
 						uni.removeStorageSync('indexDataId')
 					}, 5000)
 				}
+				uni.removeStorageSync('invitePhone')
 				uni.hideLoading()
 				// console.log('我是老会员绑定之后', response)
-			},
-			//老会员被邀重新登陆进入后
-			async inviteOld() {
-				//如果不是导购且进入的是隐藏活动则跳回首页
-				if (this.userInfo.isGuide != 1 && uni.getStorageSync('inviteStatus') == 0 && !uni.getStorageSync(
-						'invitePhone')) {
-					uni.switchTab({
-						url: '/pages/index/index'
-					})
-					return false
-				}
-				const res = await this.getActiveIndex({
-					isShowHide: uni.getStorageSync('inviteStatus')
-				})
-				if (res.code == 200) {
-					console.log('我是老会员邀请结束后请求的首页数据', res.data)
-					this.indexData = res.data
-					this.backgroundMr = res.data.userBindConfigDO.themeBg
-					this.endTime = res.data.userBindConfigDO.endTime
-					this.startTime = res.data.userBindConfigDO.startTime
-					this.rewardObj = {
-						reward: res.data.rewardList,
-						receive: res.data.receiveList,
-						total: res.data.totalCount,
-						limit: res.data.userBindConfigDO.timeLimit
-					}
-					//从服务通知进来的不需要再进行老会员绑定了
-					if (uni.getStorageSync('fromService')) {
-						this.isShowInvite = true
-						uni.removeStorageSync('fromService')
-						return false
-					}
-					//非导购时才显示
-					if (this.userInfo.isGuide != 1) {
-						this.showOldprize = true
-					}
-					this.isShowInvite = true
-					await this.bindingOld(this.userInfo)
-				} else if (res.code == 500 || res.code == 2100) {
-					this.noActivity = true
-				} else if (res.code == 2009) {
-					uni.redirectTo({
-						url: '/pages/join/index'
-					})
-				}
 			},
 			//绑定新会员
 			async bindingNew(userInfo) {
 				const {
 					phone
 				} = userInfo
-				// console.log(userInfo)
 				const response = await this.getNewInvite({
 					activityId: this.indexData.userBindConfigDO.id,
 					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
@@ -534,40 +542,50 @@
 					type: null,
 					userPhone: phone
 				})
-				console.log('绑定新会员成功', response)
+				uni.hideLoading()
+				// console.log('绑定新会员成功', response)
 				if (response.code == 200) this.sendNewMemberMessage()
 			},
 			//新会员绑定后发送消息
 			async sendNewMemberMessage() {
+				let status = 'fx' + this.indexData.userBindConfigDO.id
 				const response = await this.sendMiniMessage({
 					activityId: this.indexData.userBindConfigDO.id,
 					//邀请人的手机
 					invitationPhone: uni.getStorageSync('invitePhone') ? uni.getStorageSync('invitePhone') :
 						null,
 					// invitationPhone: 'bEGA5WKzyjPg0D0QbiTkqw==',
-					type: 'pages/activity/invite/index?fromService=fromService',
+					type: `pages/activity/invite/index?fromService=fromService&inviteStatus=${status}`,
 					userPhone: null
 				})
-				console.log(response)
+				uni.removeStorageSync('invitePhone')
+				// console.log(response)
 			},
 			//获取新会员奖励列表
 			async getNewMemberPrize(type) {
 				const res = await this.getNewMemberPrizeList({
-					// activeId: this.indexData.userBindConfigDO.id
-					activeType: 'FL',
-					isShow: uni.getStorageSync('inviteStatus')
+					isShowHide: uni.getStorageSync('inviteStatus')
 				})
 				if (res.code == 200) {
+					//reward rewardShow rewardImage user_rge
 					this.backgroundMr = res.data.rewardImage
-					console.log(this.backgroundMr)
-					//新人礼满减券
-					let user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
-					//新人礼积分
+					let user_rge = []
 					let user_jf = [{
-						integral: JSON.parse(res.data.user_rge).integral
-					}]
-					//邀新礼
-					let reward = JSON.parse(res.data.reward)
+							integral: 0
+						}]
+						let reward = []
+					if (res.data.user_rge != null) {
+						//新人礼满减券
+						user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
+						//新人礼积分
+						user_jf = [{
+							integral: JSON.parse(res.data.user_rge).integral
+						}]
+					}
+					if (res.data.reward != null) {
+						//邀新礼
+						reward = JSON.parse(res.data.reward)
+					} 
 					//保存新人礼的数组
 					let saveNewArr = []
 					if (user_rge.length == 0) {
@@ -593,12 +611,12 @@
 						if (item.couponList) item.couponList = JSON.parse(item.couponList)
 					})
 					if (type == 'GET') {
-						console.log('我是新会员奖励展示', this.newMemberPrizeList)
+						// console.log('我是新会员奖励展示', this.newMemberPrizeList)
 						uni.hideLoading()
 						this.fromJoin = true
 					} else if (type == 'INIT') {
 						this.rewardObj = {
-							reward: JSON.parse(res.data.rewardShow),
+							reward: res.data.rewardShow == null ? [] : JSON.parse(res.data.rewardShow),
 							receive: [],
 							total: 0,
 							limit: 1
@@ -625,28 +643,7 @@
 				this.getPrizeInfo = data
 				// console.log(data)
 				this.isShowPrize = true
-				const res = await this.getActiveIndex({
-					isShowHide: uni.getStorageSync('inviteStatus')
-				})
-				if (res.code == 200) {
-					console.log(res.data)
-					this.indexData = res.data
-					this.backgroundMr = res.data.userBindConfigDO.themeBg
-					this.endTime = res.data.userBindConfigDO.endTime
-					this.startTime = res.data.userBindConfigDO.startTime
-					this.rewardObj = {
-						reward: res.data.rewardList,
-						receive: res.data.receiveList,
-						total: res.data.totalCount,
-						limit: res.data.userBindConfigDO.timeLimit
-					}
-				} else if (res.code == 500 || res.code == 2100) {
-					this.noActivity = true
-				} else if (res.code == 2009) {
-					uni.redirectTo({
-						url: '/pages/join/index'
-					})
-				}
+				this.getIndexData('finishGetPrize')
 			},
 			//去查看奖励
 			toSeePrize() {
@@ -745,12 +742,20 @@
 						const {
 							windowHeight
 						} = res
-						console.log(windowHeight)
+						// console.log(windowHeight)
 						if (windowHeight < 724) {
 							_this.topHeight = '80rpx'
 						}
 					}
 				});
+			},
+			//摁扭置灰奖品领完了
+			showModalNp() {
+				uni.showToast({
+					title: '活动已结束',
+					duration: 2000,
+					icon: 'none'
+				})
 			}
 		},
 		computed: {
@@ -775,9 +780,9 @@
 				phone: undefined
 			}
 			phone = encodeURIComponent(phone)
-			const status = uni.getStorageSync('inviteStatus')
+			const status = 'fx' + this.indexData.userBindConfigDO.id
 			return {
-				title: this.indexData.userBindConfigDO.friendsTitle == null ? '好友分裂活动' : this.indexData.userBindConfigDO
+				title: this.indexData.userBindConfigDO.friendsTitle == null ? 'club裂变活动' : this.indexData.userBindConfigDO
 					.friendsTitle,
 				imageUrl: this.indexData.userBindConfigDO.friendsBg == null ?
 					'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1616037395714.png' : this
@@ -789,286 +794,5 @@
 </script>
 
 <style lang="scss" scoped>
-	#invite {
-		.cancel-award {
-			position: absolute;
-			left: 50%;
-			margin-left: -33upx;
-			bottom: 15%;
-			font-size: 70upx;
-			width: 66upx;
-			height: 66upx;
-
-			image {
-				width: 100%;
-				height: 100%;
-			}
-
-		}
-
-		.cancel-btn {
-			position: absolute;
-			top: 0;
-			right: 23rpx;
-			font-size: 70rpx;
-			width: 40rpx;
-			height: 40rpx;
-			z-index: 999;
-
-			image {
-				width: 100%;
-				height: 100%;
-			}
-
-		}
-
-		.background {
-			width: 100%;
-			height: 100%;
-			position: fixed;
-			top: 0;
-			background-size: 100% 100%;
-			z-index: -2;
-		}
-
-		.small-background {
-			width: 100%;
-			position: fixed;
-			left: 50%;
-			transform: translate(-50%);
-			z-index: -1;
-		}
-
-		header {
-			position: fixed;
-			top: 30rpx;
-			right: 0;
-
-			.rule {
-				display: flex;
-				justify-content: flex-end;
-
-				.bg-blue {
-					background-color: transparent;
-					border: 1px solid #FFFFFF;
-					border-top-right-radius: 0;
-					border-bottom-right-radius: 0;
-					text-indent: 0;
-				}
-			}
-		}
-
-		main {
-			position: fixed;
-			-webkit-transform: translateZ(0);
-			overflow: hidden;
-			top: 40%;
-			// border: 1px solid black;
-			width: 100%;
-			height: 15%;
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: space-between;
-
-			.cu-btn {
-				padding: 0 50rpx;
-				height: 50rpx;
-				color: #EE194C;
-			}
-		}
-
-		footer {
-			position: fixed;
-			bottom: 8%;
-			width: 100%;
-			height: 35%;
-			// border: 1px solid black;
-			display: flex;
-			flex-direction: column;
-			justify-content: space-between;
-			align-items: center;
-
-			.top {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-
-				.header {
-					font-size: 40rpx;
-					color: #ffffff;
-					font-weight: Regular;
-					// width: 155px;
-					// height: 39px;
-					font-family: FZLanTingHeiS-DB1-GBK;
-					line-height: 95rpx;
-				}
-
-				.title {
-					// margin-top: 6rpx;
-					// width: 426px;
-					// height: 22px;
-					font-size: 22rpx;
-					font-family: FZLanTingHei-R-GBK;
-					font-weight: 400;
-					color: #010101;
-					// line-height: 95rpx;
-					letter-spacing: 2rpx;
-				}
-			}
-
-			.footer {
-				// position: absolute;
-				width: 90%;
-				height: 66%;
-				// border: 1px solid black;
-				border-radius: 30rpx;
-				background: #ffffff;
-			}
-		}
-
-		.background-img {
-			position: fixed;
-			width: 100%;
-			height: 100%;
-			background-color: rgba(0, 0, 0, .7);
-			z-index: 99;
-
-			.background-award {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				z-index: 100;
-				width: 550rpx;
-				height: 300rpx;
-				border-radius: 20rpx;
-				overflow: hidden;
-
-				.background-text {
-					position: absolute;
-					top: 60rpx;
-					width: 100%;
-					height: 12%;
-					z-index: 100;
-					color: #ffffff;
-					font-weight: bold;
-					display: flex;
-					flex-direction: column;
-					justify-content: space-between;
-					align-items: center;
-
-					.top-text {
-						font-size: 36rpx;
-						font-family: FZLanTingHeiS-B-GB;
-						font-weight: 400;
-						color: #FFFFFF;
-						line-height: 48rpx;
-					}
-				}
-
-				ul {
-					position: absolute;
-					bottom: 20rpx;
-					width: 100%;
-					height: 60%;
-					display: flex;
-					flex-direction: column;
-					justify-content: space-evenly;
-					align-items: center;
-
-					li {
-						width: fit-content;
-						height: fit-content;
-						position: relative;
-
-						.award-left {
-							width: 32%;
-							height: 100%;
-							// background: rgba(0,0,0,.6);
-							position: absolute;
-							top: 0;
-							left: 0;
-							display: flex;
-							justify-content: space-evenly;
-							padding: 0 10rpx;
-							align-items: center;
-
-							.left-style {
-								display: flex;
-								flex-direction: column;
-								justify-content: flex-end;
-								font-size: 20rpx;
-								color: #ffffff;
-								font-weight: bolder;
-								margin-top: 10rpx;
-							}
-						}
-
-						.award-right {
-							width: 62%;
-							height: 100%;
-							// background: rgba(0,0,0,.6);
-							position: absolute;
-							top: 0;
-							right: 0;
-
-							.right-10 {
-								font-size: 28rpx;
-								height: fit-content;
-								width: 280rpx;
-								font-weight: 400;
-								color: #F52F48;
-								margin-top: 20rpx;
-								text-overflow: ellipsis;
-								overflow: hidden;
-								white-space: nowrap;
-							}
-
-							.award-right-top {
-								font-family: FZLanTingHeiS-B-GB;
-								width: 100%;
-								height: 60%;
-								// background: rgba(0,0,0,.6);
-								color: #F52F48;
-								font-size: 40rpx;
-								font-weight: 400;
-								display: flex;
-								align-items: flex-end;
-								padding-left: 20rpx;
-							}
-
-							.award-right-bottom {
-								font-size: 14rpx;
-								font-family: FZLanTingHei-R-GBK;
-								font-weight: 400;
-								color: #707070;
-								line-height: 48rpx;
-								width: 100%;
-								height: 14rpx;
-								position: absolute;
-								bottom: 15rpx;
-								display: flex;
-								justify-content: center;
-								align-items: center;
-							}
-						}
-					}
-				}
-
-				.old-footer-button {
-					position: absolute;
-					bottom: 0;
-					height: 120rpx;
-					width: 100%;
-					padding-left: 20rpx;
-					padding-right: 20rpx;
-					// background: rgba(0,0,0,.7);
-					display: flex;
-					justify-content: space-between;
-					align-items: center;
-				}
-			}
-		}
-	}
+	@import '@/styles/activity/invite/index.scss'
 </style>

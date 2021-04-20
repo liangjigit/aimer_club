@@ -132,7 +132,7 @@
 			}
 		},
 		computed: {
-			...mapState('login', ['isDisabledUser', 'redirectUrl']),
+			...mapState('login', ['isDisabledUser', 'redirectUrl', 'userInfo']),
 			saveAllInfo() {
 				if (this.isSaveInfo && this.isSavePhone) {
 					if (this.redirectUrl) {
@@ -146,11 +146,17 @@
 						})
 					} else {
 						//加入fromJoin判断为从注册页面进入的新用户
-						uni.setStorageSync('fromJoin',true)
+						uni.setStorageSync('fromJoin', true)
 						if (uni.getStorageSync('invitePhone')) {
-							const inviteStatus = uni.getStorageSync('inviteStatus')
+							let inviteStatus = uni.getStorageSync('inviteStatus')
+							let invitePhone = encodeURIComponent(uni.getStorageSync('invitePhone'))
+							let {
+								id
+							} = this.userInfo || {
+								id: undefined
+							}
 							uni.reLaunch({
-								url: `/pages/activity/invite/index?inviteStatus=${inviteStatus}`
+								url: `/pages/activity/invite/index?invitePhone=${invitePhone}&inviteUserId=${id}&inviteStatus=${inviteStatus}`
 							})
 						} else {
 							uni.switchTab({
@@ -178,7 +184,7 @@
 			...mapMutations('login', ['GETREDIRECTURL']),
 			onInput(index, e) {
 				let value = e.detail.value.replace(/\d/g, "")
-				value = value.substr(0,10)
+				value = value.substr(0, 10)
 				this.fieldList[index].value = value
 				return value
 			},

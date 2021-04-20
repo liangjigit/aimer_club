@@ -18,66 +18,103 @@ const getters = {
 
 const actions = {
 	// 获取活动首页数据
-	async getActiveIndex({commit},payload){
-		const {isShowHide} = payload
-		//isShowHide为1时显示，0时隐藏
+	async getActiveIndex({
+		commit
+	}, payload) {
+		let {
+			isShowHide
+		} = payload
+		let param = ''
+		//匹配成功代表分享或者服务通知请求
+		if (/fx/.test(isShowHide)) {
+			let newIsShow = isShowHide.substr(2)
+			param = `activeId=${newIsShow}`
+		} else {
+			param = `activeType=FL&isShow=${isShowHide}`
+		}
+		console.log(param)
 		let response = (await request({
-			url:`/user/user/bind/getUserBindData?activeType=FL&isShow=${isShowHide}`,
-			method:'POST',
+			url: `/user/user/bind/getUserBindData?${param}`,
+			method: 'POST',
 			// data:payload,
 		})).data;
-		if(response.code == 200){
+		if (response.code == 200) {
 			// let {  } = response.data
 			// commit('', { })
 		}
 		return response;
 	},
 	// 领取活动奖励
-	async getActiveAward({commit},payload){
+	async getActiveAward({
+		commit
+	}, payload) {
 		let response = (await request({
-			url:`/user/user/bind/saveReward`,
-			method:'POST',
-			params:payload,
+			url: `/user/user/bind/saveReward`,
+			method: 'POST',
+			params: payload,
 		})).data;
-		if(response.code == 200){
+		if (response.code == 200) {
 			// commit('', { })
 		}
 		return response;
 	},
 	// 老会员 关系记录
-	async getOldInvite({commit},payload){
+	async getOldInvite({
+		commit
+	}, payload) {
 		let response = (await request({
-			url:'/user/user/bind/invitationActivities',
-			method:'POST',
-			data:payload,
+			url: '/user/user/bind/invitationActivities',
+			method: 'POST',
+			data: payload,
 		})).data;
 		return response;
 	},
 	// 新会员 关系记录
-	async getNewInvite({commit},payload){
+	async getNewInvite({
+		commit
+	}, payload) {
 		let response = (await request({
-			url:'/user/user/bind/newInvitationActivities',
-			method:'POST',
-			data:payload
+			url: '/user/user/bind/newInvitationActivities',
+			method: 'POST',
+			data: payload
 		})).data;
 		return response;
 	},
 	// 发送小程序消息
-	async sendMiniMessage({commit},payload){
+	async sendMiniMessage({
+		commit
+	}, payload) {
 		let response = (await request({
-			url:'/user/user/bind/sendMessage',
-			method:'POST',
-			data:payload
+			url: '/user/user/bind/sendMessage',
+			method: 'POST',
+			data: payload
 		})).data
 		return response;
 	},
 	//获取新会员奖励列表
-	async getNewMemberPrizeList({commit},payload){
+	async getNewMemberPrizeList({
+		commit
+	}, payload) {
+		let {
+			isShowHide
+		} = payload
+		let param = ''
+		//匹配成功代表分享或者服务通知请求
+		if (/fx/.test(isShowHide)) {
+			let newIsShow = isShowHide.substr(2)
+			param = `activeId=${newIsShow}`
+		} else {
+			param = `activeType=FL&isShow=${isShowHide}`
+		}
 		let response = (await request({
-			url:`/user/user/bind/getComponConfig`,
-			method:'POST',
-			params:payload
+			url: `/user/user/bind/getComponConfig?${param}`,
+			method: 'POST',
+			// params: payload
 		})).data
+		if (response.code == 200) {
+			// let {  } = response.data
+			// commit('', { })
+		}
 		return response;
 	},
 }
@@ -105,9 +142,9 @@ const mutations = {
 	// }
 }
 export default {
-  namespaced: true,
-  state,
-  actions,
-  mutations,
-  getters
+	namespaced: true,
+	state,
+	actions,
+	mutations,
+	getters
 }

@@ -285,6 +285,7 @@
 			...mapMutations('index', ['SETSELECTOR']),
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
+			...mapActions('invite', ['getActiveIndex']),
 			getData(isRefresh) {
 				this.getBanners({
 					pageId: 1
@@ -392,6 +393,21 @@
 					miniappId,
 					displayPage
 				} = item
+				//如果是去裂变活动的需要判断
+				if (bannerUrl.includes('pages/activity/invite/index')) {
+					const res = await this.getActiveIndex({
+						isShowHide: '1'
+					})
+					//data为空时活动时间结束，跳回首页
+					if (res.data == null) {
+						uni.showToast({
+							title: '当前没有活动',
+							duration: 2000,
+							icon: 'none'
+						});
+						return false
+					}
+				}
 				navigatorToPage(bannerUrl || linkUrl, linkType, miniappId, displayPage)
 			},
 			clicksStatistics(type, id) {

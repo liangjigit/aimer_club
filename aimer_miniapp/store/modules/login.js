@@ -43,6 +43,10 @@ const actions = {
 		state
 	}) {
 		const that = this;
+		uni.showLoading({
+			title:'加载中...',
+			mask:true
+		})
 		return new Promise((resolve, reject) => {
 			//微信登录获取code
 			uni.login({
@@ -100,6 +104,7 @@ const actions = {
 			needAuth: false
 		})).data;
 		if (response.code == 200) {
+			uni.hideLoading()
 			let {
 				token,
 				getPhone,
