@@ -51,7 +51,7 @@
 		onShow: function(options) {
 			const {scene} = options
 			uni.setStorageSync('globalScene',scene)
-			console.log('App Show',scene)
+			// console.log('App Show',scene)
 		},
 		onHide: function() {
 			// console.log('App Hide')

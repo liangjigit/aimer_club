@@ -122,8 +122,8 @@
 					this.cardType = this.list.map(item=>{
 						return item.couponId.substr(0,2)
 					})
-					console.log('我是列表',this.list)
-					console.log('我是类型',this.cardType)
+					// console.log('我是列表',this.list)
+					// console.log('我是类型',this.cardType)
 					if (isRefresh) {
 						uni.showToast({
 							title: "已刷新",

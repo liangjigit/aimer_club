@@ -393,8 +393,9 @@
 					miniappId,
 					displayPage
 				} = item
+				// console.log(item)
 				//如果是去裂变活动的需要判断
-				if (bannerUrl.includes('pages/activity/invite/index')) {
+				if (bannerUrl && bannerUrl.includes('pages/activity/invite/index')) {
 					const res = await this.getActiveIndex({
 						isShowHide: '1'
 					})
