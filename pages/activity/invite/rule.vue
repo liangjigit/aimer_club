@@ -1,34 +1,35 @@
 <template>
 	<view id="rule">
-		<image class="background" src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png" mode="scaleToFill"></image>
+		<image class="background" src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png"
+			mode="scaleToFill"></image>
 		<view class="text">
 			<text>活动规则</text>
 		</view>
 		<view class="content">
-			<view v-html="content"></view>
+			<!-- <view v-html="content"></view> --><text>{{content}}</text>
 		</view>
 	</view>
 </template>
 
 <script>
 	export default {
-		name:'rule',
+		name: 'rule',
 		onLoad() {
-			const content  = uni.getStorageSync('content')
+			const content = uni.getStorageSync('content')
 			// console.log(content)
 			this.content = content
 			uni.removeStorageSync('content')
 		},
-		data(){
-			return{
-				content:''
+		data() {
+			return {
+				content: ''
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	#rule{
+	#rule {
 		.background {
 			width: 100%;
 			height: 100%;
@@ -37,7 +38,8 @@
 			background-size: 100% 100%;
 			z-index: -1;
 		}
-		.text{
+
+		.text {
 			position: fixed;
 			top: 3%;
 			width: 100%;
@@ -47,11 +49,12 @@
 			font-weight: bolder;
 			color: #ffffff;
 		}
-		.content{
+
+		.content {
 			position: absolute;
 			left: 50%;
 			top: 50%;
-			transform: translate(-50%,-50%);
+			transform: translate(-50%, -50%);
 			width: 90%;
 			height: 80%;
 			background: #FFFFFF;
