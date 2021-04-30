@@ -32,7 +32,7 @@ const actions = {
 		} else {
 			param = `activeType=FL&isShow=${isShowHide}`
 		}
-		console.log(param)
+		// console.log(param)
 		let response = (await request({
 			url: `/user/user/bind/getUserBindData?${param}`,
 			method: 'POST',

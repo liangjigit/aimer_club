@@ -6,7 +6,8 @@
 			<text>活动规则</text>
 		</view>
 		<view class="content">
-			<!-- <view v-html="content"></view> --><text>{{content}}</text>
+			<!-- <view v-html="content"></view> -->
+			<text :user-select="userSele">{{content}}</text>
 		</view>
 	</view>
 </template>
@@ -22,7 +23,8 @@
 		},
 		data() {
 			return {
-				content: ''
+				content: '',
+				userSele: true
 			}
 		}
 	}

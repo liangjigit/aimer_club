@@ -4,12 +4,15 @@
 			@click="getServicePermission"></view>
 		<login-pupop ref="login" @reGetInfo="getIndexData('oldFromLogin')" @getNewPrize="showNewPrize = true">
 		</login-pupop>
-		<image class="background"
+		<!-- <image class="background"
 			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png'"
-			mode="scaleToFill"></image>
+			mode="scaleToFill"></image> -->
+		<image class="background"
+			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1619748011251.jpg'"
+			mode="widthFix" style="width: 100%;"></image>
 		<image class="small-background"
-			src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392341758.png" mode="widthFix"
-			:style="{'top':topHeight}"></image>
+			src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392341758.png" mode="heightFix"
+			:style="{'top':topHeight,'height':smallHeight}"></image>
 		<header v-if="isShowInvite || !noActivity">
 			<view class="rule">
 				<view class="cu-capsule round">
@@ -284,7 +287,8 @@
 				noActivity: false,
 				isShowInvite: false,
 				backgroundMr: '',
-				topHeight: '200rpx'
+				topHeight: '',
+				smallHeight:''
 			}
 		},
 		onUnload() {
@@ -571,9 +575,9 @@
 					this.backgroundMr = res.data.rewardImage
 					let user_rge = []
 					let user_jf = [{
-							integral: 0
-						}]
-						let reward = []
+						integral: 0
+					}]
+					let reward = []
 					if (res.data.user_rge != null) {
 						//新人礼满减券
 						user_rge = JSON.parse(JSON.parse(res.data.user_rge).couponList)
@@ -585,7 +589,7 @@
 					if (res.data.reward != null) {
 						//邀新礼
 						reward = JSON.parse(res.data.reward)
-					} 
+					}
 					//保存新人礼的数组
 					let saveNewArr = []
 					if (user_rge.length == 0) {
@@ -734,7 +738,7 @@
 					}
 				})
 			},
-			//获取屏幕宽度
+			//获取屏幕高度
 			getPhoneScreenHeight() {
 				const _this = this
 				uni.getSystemInfo({
@@ -742,9 +746,21 @@
 						const {
 							windowHeight
 						} = res
-						// console.log(windowHeight)
-						if (windowHeight < 724) {
-							_this.topHeight = '80rpx'
+						// console.log(res)
+						if (800 < windowHeight) {
+							_this.topHeight = '280rpx'
+							_this.smallHeight = '550rpx'
+						}else if(700 < windowHeight && windowHeight <= 800){
+							_this.topHeight = '290rpx'
+							_this.smallHeight = '530rpx'
+						}else if(650 < windowHeight && windowHeight <= 700){
+							_this.topHeight = '250rpx'
+						}else if(600 < windowHeight && windowHeight <= 650){
+							_this.topHeight = '250rpx'
+							_this.smallHeight = '450rpx'
+						}else{
+							_this.topHeight = '250rpx'
+							_this.smallHeight = '420rpx'
 						}
 					}
 				});
