@@ -145,9 +145,9 @@
 							redirectUrl: null
 						})
 					} else {
-						//加入fromJoin判断为从注册页面进入的新用户
-						uni.setStorageSync('fromJoin', true)
 						if (uni.getStorageSync('invitePhone')) {
+							//加入fromJoin判断为从注册页面进入的新用户
+							uni.setStorageSync('fromJoin', true)
 							let inviteStatus = uni.getStorageSync('inviteStatus')
 							let invitePhone = encodeURIComponent(uni.getStorageSync('invitePhone'))
 							let {

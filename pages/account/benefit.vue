@@ -37,12 +37,12 @@
 								<text class="text-grey">{{userInfo.level ? benefits.couponNum : ""}}</text>
 							</view>
 						</view>
-						<view class="cu-item arrow" @click="goCarmi">
+						<!-- <view class="cu-item arrow" @click="goCarmi">
 							<view class="content">
 								<image src="/static/account/benefit/carmi-icon.png" class="icon" mode="aspectFit"></image>
 								<text class="text-black margin-right-lg">电子券卡密</text>
 							</view>
-						</view>
+						</view> -->
 						<view class="cu-item arrow">
 							<view class="content">
 								<image src="/static/account/benefit/privileges-icon.png" class="icon" mode="aspectFit"></image>
@@ -139,8 +139,9 @@
 			},
 			goIntegral() {
 				uni.navigateToMiniProgram({
-					appId: 'wx203ab2d5cb638d1d',
-					path: '/integral_mall/index/index'
+					// appId: 'wx203ab2d5cb638d1d',
+					appId:'wx4f98518f4a2124a8',
+					// path: 'pagesB/myIntegral/myIntegral'
 				})
 			},
 			goCarmi() {
@@ -236,7 +237,7 @@
 
 	.content-box {
 		width: 690upx;
-		height: 548upx;
+		height: 450upx;
 		background: rgba(255, 255, 255, 1);
 		box-shadow: 0upx 0upx 15upx 0upx rgba(0, 0, 0, 0.17);
 		border-radius: 10upx;

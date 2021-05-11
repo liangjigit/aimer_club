@@ -18,11 +18,16 @@
 						<view class="username">{{userInfo.nickName}}</view>
 						<view class="flex align-center" v-if="userInfo.level">
 							<view class="vip-icon">
-								<image src="/static/account/index/level-2.png" mode="aspectFit" v-if="userInfo.level == 'JT普卡'"></image>
-								<image src="/static/account/index/level-1.png" mode="aspectFit" v-if="userInfo.level == 'JT银卡'"></image>
-								<image src="/static/account/index/level-3.png" mode="aspectFit" v-if="userInfo.level == 'JT金卡'"></image>
-								<image src="/static/account/index/level-4.png" mode="aspectFit" v-if="userInfo.level == 'JT白金卡'"></image>
-								<image src="/static/account/index/level-5.png" mode="aspectFit" v-if="userInfo.level == 'JT至尊卡'"></image>
+								<image src="/static/account/index/level-2.png" mode="aspectFit"
+									v-if="userInfo.level == 'JT普卡'"></image>
+								<image src="/static/account/index/level-1.png" mode="aspectFit"
+									v-if="userInfo.level == 'JT银卡'"></image>
+								<image src="/static/account/index/level-3.png" mode="aspectFit"
+									v-if="userInfo.level == 'JT金卡'"></image>
+								<image src="/static/account/index/level-4.png" mode="aspectFit"
+									v-if="userInfo.level == 'JT白金卡'"></image>
+								<image src="/static/account/index/level-5.png" mode="aspectFit"
+									v-if="userInfo.level == 'JT至尊卡'"></image>
 							</view>
 							<view class="vip-name">
 								{{userInfo.level}}
@@ -31,12 +36,15 @@
 					</view>
 				</view>
 				<view class="tip-box flex justify-center align-center" v-show="showGiftPopup&&showActivity">
-					<image src="/static/account/index/gift-box-close.png" class="close-btn" mode="aspectFit" @click.stop="hideGiftPopup"></image>
-					<image src="/static/account/index/gift-box-icon.png" mode="aspectFit"  @click.stop="goBaseInfo"></image>
+					<image src="/static/account/index/gift-box-close.png" class="close-btn" mode="aspectFit"
+						@click.stop="hideGiftPopup"></image>
+					<image src="/static/account/index/gift-box-icon.png" mode="aspectFit" @click.stop="goBaseInfo">
+					</image>
 				</view>
 				<view class="addressbook" @click="goBaseInfo" v-if="showActivity">
 					<!-- <image class="icon-addressbok" src="/static/account/index/addressbook-icon.png" mode="aspectFit"></image> -->
-					<image class="icon-addressbok" src="/static/account/index/addressbook-reddot-icon.png" mode="aspectFit"></image>
+					<image class="icon-addressbok" src="/static/account/index/addressbook-reddot-icon.png"
+						mode="aspectFit"></image>
 				</view>
 			</view>
 			<view class="flex justify-between">
@@ -49,10 +57,13 @@
 					<text class="num">{{userInfo.currentIntegral}}</text>
 				</view>
 			</view>
-			
+
 		</view>
-		<button open-type="share" class="cu-btn banner-center">
-			<image src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392393665.png" mode="aspectFill"></image>
+		<!-- <button open-type="share" class="cu-btn banner-center">
+			<image src="/static/account/index/invite.png" mode="aspectFill"></image>
+		</button> -->
+		<button class="cu-btn banner-center" @click="toClub">
+			<image src="/static/account/index/invite.png" mode="aspectFill"></image>
 		</button>
 		<view class="menu-box flex align-center justify-center">
 			<view class="grid col-3">
@@ -136,65 +147,85 @@
 </template>
 
 <script>
-	import {mapState,mapActions,mapGetters,mapMutations} from 'vuex'
+	import {
+		mapState,
+		mapActions,
+		mapGetters,
+		mapMutations
+	} from 'vuex'
 	import dialogPopup from '@/pages/components/popup/dialog-pupop.vue'
 	import loadMore from '@/pages/components/footer/loadMore.vue'
-	import {navigatorToPage} from '@/common/index.js'
+	import {
+		navigatorToPage
+	} from '@/common/index.js'
 	import login from '@/common/login.js'
-	export default{
-		onShow(){ 
+	export default {
+		onShow() {
 			this.showGiftPopup = true
 			// this.$refs.login.checkLogin('tabBar')
-			if(this.isLogin){
+			if (this.isLogin) {
 				this.getMyInfo({})
 			}
 		},
-		mixins:[login],
-		components:{
+		mixins: [login],
+		components: {
 			dialogPopup,
 			loadMore
 		},
-		data(){
-			return{
-				needWriteInformation:true ,// 是否要完善个人资料
-				showGiftPopup:true //显示领好礼
-			}
-		},
-		computed:{
-			...mapState('login',['userInfo','showActivity']),
-			...mapState('index',['miniProgramShare']),
-			...mapGetters('login',['isLogin'])
-		},
-		onShareAppMessage(){
-			const {title,image} = this.miniProgramShare
-			const {id} = this.userInfo || {id:undefined}
+		data() {
 			return {
-				title:title,
-				imageUrl:image,
-				path:'/pages/index/index?inviteUserId='+id
+				needWriteInformation: true, // 是否要完善个人资料
+				showGiftPopup: true //显示领好礼
 			}
 		},
-		
-		methods:{
-			...mapMutations('poster',['GETSHAREINFO']),
+		computed: {
+			...mapState('login', ['userInfo', 'showActivity']),
+			...mapState('index', ['miniProgramShare']),
+			...mapGetters('login', ['isLogin'])
+		},
+		onShareAppMessage() {
+			const {
+				title,
+				image
+			} = this.miniProgramShare
+			const {
+				id
+			} = this.userInfo || {
+				id: undefined
+			}
+			return {
+				title: title,
+				imageUrl: image,
+				path: '/pages/index/index?inviteUserId=' + id
+			}
+		},
+
+		methods: {
+			...mapMutations('poster', ['GETSHAREINFO']),
 			...mapMutations('login', ['GETLOGINPOPUP']),
-			...mapActions('login',['getMyInfo']),
-			...mapActions('index',['getLiveRoom']),
-			// 跳转到发票
-			goInvoice(){
-				navigatorToPage('https://m.aimer.com.cn/shopcart/myinvoice',2)
+			...mapActions('login', ['getMyInfo']),
+			...mapActions('index', ['getLiveRoom']),
+			//去裂变活动
+			toClub() {
+				uni.navigateTo({
+					url: '/pages/activity/invite/index?clubIn=clubIn&inviteStatus=1'
+				})
 			},
-			hideGiftPopup(){
+			// 跳转到发票
+			goInvoice() {
+				navigatorToPage('https://m.aimer.com.cn/shopcart/myinvoice', 2)
+			},
+			hideGiftPopup() {
 				this.showGiftPopup = false //隐藏领取好礼
 			},
 			// 客服弹窗
-			showContactService(){
+			showContactService() {
 				uni.showModal({
-					title:"联系客服",
-					content:"服务时间9:00-22:00",
-					confirmText:"拨打电话",
+					title: "联系客服",
+					content: "服务时间9:00-22:00",
+					confirmText: "拨打电话",
 					success(res) {
-						if(res.confirm){
+						if (res.confirm) {
 							let phoneNumber = "4006505299"
 							uni.makePhoneCall({
 								phoneNumber
@@ -212,62 +243,65 @@
 			// 		url:"/pages/poster/index"
 			// 	})
 			// },
-			async goCarmi(){
+			async goCarmi() {
 				const isLogin = await this.$refs.login.checkLogin()
-				if(!isLogin){
+				if (!isLogin) {
 					return
 				}
 				uni.navigateTo({
-					url:'/pages/account/carmi'
+					url: '/pages/account/carmi'
 				})
 			},
-			goTraining(){
+			goTraining() {
 				uni.switchTab({
-					url:'/pages/training/index'
+					url: '/pages/training/index'
 				})
 			},
-			async goBaseInfo(){
+			async goBaseInfo() {
 				const isLogin = await this.$refs.login.checkLogin()
-				if(!isLogin){
+				if (!isLogin) {
 					return
 				}
 				uni.navigateTo({
-					url:'/pages/account/baseInfo/index'
+					url: '/pages/account/baseInfo/index'
 				})
 			},
-			async goCollect(){
+			async goCollect() {
 				const isLogin = await this.$refs.login.checkLogin()
-				if(!isLogin){
+				if (!isLogin) {
 					return
 				}
 				uni.navigateTo({
-					url:'/pages/account/collect'
+					url: '/pages/account/collect'
 				})
 			},
-			async goBenefit(){
+			async goBenefit() {
 				const isLogin = await this.$refs.login.checkLogin()
-				if(!isLogin){
+				if (!isLogin) {
 					return
 				}
 				uni.navigateTo({
-					url:'/pages/account/benefit'
+					url: '/pages/account/benefit'
 				})
 			},
-			async goStoreNav(){
+			async goStoreNav() {
 				const isLogin = await this.$refs.login.checkLogin()
-				if(!isLogin){
+				if (!isLogin) {
 					return
 				}
 				uni.navigateTo({
-					url:'/pages/account/storeNav/index'
+					url: '/pages/account/storeNav/index'
 				})
 			},
 			// 跳转到直播间
-			async goLiveRoom(){
+			async goLiveRoom() {
 				// 获取直播间跳转地址
 				let response = await this.getLiveRoom({})
-				if(response.code == 200){
-					const {miniappId:appId,miniappUrl:path} = response.data
+				if (response.code == 200) {
+					const {
+						miniappId: appId,
+						miniappUrl: path
+					} = response.data
 					uni.navigateToMiniProgram({
 						appId,
 						path
@@ -275,10 +309,10 @@
 				}
 			},
 			// 跳转到商城
-			goShop(){
+			goShop() {
 				uni.navigateToMiniProgram({
-					appId:'wx203ab2d5cb638d1d',
-					path:'/pages/index/index'
+					appId: 'wx203ab2d5cb638d1d',
+					path: '/pages/index/index'
 				})
 			}
 		}
@@ -286,50 +320,59 @@
 </script>
 
 <style lang="scss" scoped>
-	.tip-box{
+	.tip-box {
 		position: absolute;
-		right:120upx;
+		right: 120upx;
 		top: 67upx;
-		.close-btn{
+
+		.close-btn {
 			width: 30upx;
 			height: 30upx;
 			position: absolute;
-			top:-15upx;
+			top: -15upx;
 			left: -15upx;
 			border-radius: 100%;
 			z-index: 2;
 		}
-		image{
+
+		image {
 			width: 166upx;
 			height: 66upx;
 		}
 	}
-	.menu-box{
-		width:690upx;
-		height:550upx;
-		background:rgba(255,255,255,1);
-		box-shadow:0upx 15upx 60upx 0upx rgba(0,15,41,0.08);
-		border-radius:20upx;
-		.icon-img{
+
+	.menu-box {
+		width: 690upx;
+		height: 550upx;
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0upx 15upx 60upx 0upx rgba(0, 15, 41, 0.08);
+		border-radius: 20upx;
+
+		.icon-img {
 			width: 54upx;
 			height: 54upx;
 			margin-bottom: 26upx;
-			image{
+
+			image {
 				width: 100%;
 				height: 100%;
 			}
 		}
-		.name{
-			font-size:26upx;
-			font-weight:400;
+
+		.name {
+			font-size: 26upx;
+			font-weight: 400;
 			color: #111111;
 		}
-		.grid{
+
+		.grid {
 			width: 100%;
-			.item{
+
+			.item {
 				padding: 30upx 0;
 				position: relative;
-				&::after{
+
+				&::after {
 					content: "";
 					position: absolute;
 					right: 0;
@@ -338,121 +381,140 @@
 					height: 62upx;
 					background-color: #DDDDDD;
 				}
+
 				&:last-child,
-				&:nth-child(3n+0){
-					&::after{
+				&:nth-child(3n+0) {
+					&::after {
 						width: 0;
 					}
 				}
 			}
 		}
-		
+
 	}
-	.banner-center{
-		width:690upx;
-		height:150upx;
-		background:rgba(255,255,255,1);
-		box-shadow:0upx 15upx 60upx 0upx rgba(0,15,41,0.12);
-		border-radius:20upx;
+
+	.banner-center {
+		width: 690upx;
+		height: 150upx;
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0upx 15upx 60upx 0upx rgba(0, 15, 41, 0.12);
+		border-radius: 20upx;
 		margin-bottom: 54upx;
 		overflow: hidden;
-		padding:0;
-		image{
+		padding: 0;
+
+		image {
 			width: 100%;
 			height: 100%;
 		}
-		&::after{
+
+		&::after {
 			content: "";
 			border: 0px;
 		}
 	}
-	.userinfo{
-		width:690upx;
-		height:278upx;
-		background:rgba(255,255,255,1);
-		box-shadow:0upx 15upx 60upx 0upx rgba(0,15,41,0.08);
-		border-radius:20upx;
+
+	.userinfo {
+		width: 690upx;
+		height: 278upx;
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0upx 15upx 60upx 0upx rgba(0, 15, 41, 0.08);
+		border-radius: 20upx;
 		margin-bottom: 54upx;
-		.avatar{
-			width:118upx;
-			height:118upx;
-			border-radius:100%;
+
+		.avatar {
+			width: 118upx;
+			height: 118upx;
+			border-radius: 100%;
 			margin-right: 31upx;
 			overflow: hidden;
-			image{
+
+			image {
 				width: 100%;
 				height: 100%;
 			}
 		}
-		.username{
-			font-size:34upx;
-			font-weight:500;
+
+		.username {
+			font-size: 34upx;
+			font-weight: 500;
 			color: #111111;
 			padding-top: 23upx;
 			padding-bottom: 34upx;
 			line-height: 1;
 		}
-		.card-info{
-			.text{
-				font-size:26upx;
-				font-weight:400;
+
+		.card-info {
+			.text {
+				font-size: 26upx;
+				font-weight: 400;
 				color: #111111;
 				margin-right: 18upx;
 			}
-			.num{
-				font-size:26upx;
-				font-weight:400;
+
+			.num {
+				font-size: 26upx;
+				font-weight: 400;
 				color: #999999;
 			}
 		}
-		.vip-icon{
+
+		.vip-icon {
 			width: 32upx;
 			height: 32upx;
 			margin-right: 11upx;
-			image{
+
+			image {
 				width: 100%;
 				height: 100%;
 			}
 		}
+
 		.vip-name {
-			font-size:30upx;
-			font-weight:400;
+			font-size: 30upx;
+			font-weight: 400;
 			color: #999999;
 			line-height: 1;
 		}
-		.addressbook{
+
+		.addressbook {
 			width: 45upx;
 			height: 45upx;
 			margin-top: 15upx;
-			.icon-addressbok{
+
+			.icon-addressbok {
 				width: 100%;
 				height: 100%;
 			}
 		}
 	}
-	.state-log-out{
-		width:690upx;
-		height:200upx;
-		background:rgba(255,255,255,1);
-		box-shadow:0upx 15upx 60upx 0upx rgba(0,15,41,0.08);
-		border-radius:20upx;
+
+	.state-log-out {
+		width: 690upx;
+		height: 200upx;
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0upx 15upx 60upx 0upx rgba(0, 15, 41, 0.08);
+		border-radius: 20upx;
 		padding: 40upx 30upx;
 		margin-bottom: 54upx;
-		.avatar{
-			width:120upx;
-			height:120upx;
-			background:rgba(201,201,201,1);
-			border-radius:100%;
+
+		.avatar {
+			width: 120upx;
+			height: 120upx;
+			background: rgba(201, 201, 201, 1);
+			border-radius: 100%;
 			overflow: hidden;
 			margin-right: 45upx;
-			image{
+
+			image {
 				width: 100%;
 				height: 100%;
 			}
 		}
-		.text{
-			font-size:34upx;
-			font-weight:500;
+
+		.text {
+			font-size: 34upx;
+			font-weight: 500;
 			color: #111111;
 		}
 	}

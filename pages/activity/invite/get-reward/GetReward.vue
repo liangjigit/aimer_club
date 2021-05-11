@@ -30,7 +30,7 @@
 					v-else-if="(totalInvite >= item.inviteCount) && (conpareCount[index].a > conpareCount[index].b)"
 					@click="getPrize(index,item.id,item.activeId)">
 					可领取</view>
-				<view class="button_see" v-else @click="$emit('seePrize')">查看奖励</view>
+				<view class="button_see" v-else @click="$emit('seePrize',item)">查看奖励</view>
 			</li>
 		</ul>
 	</view>
@@ -90,7 +90,7 @@
 					this.$emit('getFinish', this.reward[index])
 				} else if (res.code == 500) {
 					uni.showToast({
-						title: '优惠券发放完毕，活动结束！',
+						title: '优惠券发放完毕！',
 						duration: 2000,
 						icon:'none'
 					})
@@ -217,7 +217,7 @@
 	.get_reward {
 		width: 100%;
 		height: 100%;
-		padding-top: 25rpx;
+		padding-top: 38rpx;
 
 		ul {
 			width: 100%;

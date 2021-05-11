@@ -44,8 +44,12 @@
 		<footer>
 			<view class="top">
 				<view class="header">邀新奖励</view>
-				<view class="title">您已邀请<text
-						style="color: #ffffff;">{{rewardObj.total == undefined ? 0 : rewardObj.total}}</text>人，邀请好友越多，奖励越多
+				<view class="title">您已邀请
+					<view style="width: 10rpx;"></view>
+					<text style="color: #ffffff;font-size: 25rpx;">
+						{{rewardObj.total == undefined ? 0 : rewardObj.total}}
+					</text>
+					<view style="width: 10rpx;"></view>人，邀请好友越多，奖励越多
 				</view>
 			</view>
 			<view class="footer">
@@ -288,8 +292,12 @@
 				isShowInvite: false,
 				backgroundMr: '',
 				topHeight: '',
-				smallHeight:''
+				smallHeight: '',
+				receiveListSave: []
 			}
+		},
+		onHide() {
+			console.log('------onHide------')
 		},
 		onUnload() {
 			console.log('------onUnload------')
@@ -300,10 +308,11 @@
 			uni.removeStorageSync('invitePhone')
 			uni.removeStorageSync('fromService')
 			uni.removeStorageSync('clubIn')
-			// uni.removeStorageSync('globalScene')
 		},
 		onLoad(options) {
 			console.log('------onLoad------')
+			//适配屏幕
+			this.getPhoneScreenHeight()
 			let {
 				//1、活动的状态 0隐藏 1显示 fx通过分享或者服务通知进来
 				inviteStatus,
@@ -355,13 +364,11 @@
 		},
 		onShow() {
 			console.log('------onShow------')
-			uni.hideLoading()
-			uni.showLoading({
-				title: '加载中',
-				mask: true,
-			})
-			//适配屏幕
-			this.getPhoneScreenHeight()
+			// uni.hideLoading()
+			// uni.showLoading({
+			// 	title: '加载中',
+			// 	mask: true,
+			// })
 			//获取两年后积分时间
 			this.getNowAndTwoYear()
 			// //通过小程序码进入 1047 1048 1049 隐藏活动
@@ -433,9 +440,10 @@
 						total: res.data.totalCount,
 						limit: res.data.userBindConfigDO.timeLimit
 					}
+					this.receiveListSave = res.data.receiveList
 					//activeStatus == 2 表示管理员手动关闭活动或者奖励领取完毕
 					if (res.data.userBindConfigDO.activeStatus == 2) {
-						uni.hideLoading()
+						// uni.hideLoading()
 						this.isShowInvite = false
 						return false
 					}
@@ -446,7 +454,7 @@
 							console.log('------我是导购------')
 							this.bindingOld(this.userInfo)
 						}
-						uni.hideLoading()
+						// uni.hideLoading()
 						return false
 					}
 					// // 从club进入且是导购 或者通过太阳码进入只存在inviteStatus
@@ -471,12 +479,8 @@
 						if (uni.getStorageSync('fromService')) {
 							uni.removeStorageSync('fromService')
 						} else {
-							//非导购时才显示
-							if (this.userInfo.isGuide != 1) {
-								this.showOldprize = true
-							}
 							this.isShowInvite = true
-							this.bindingOld(this.userInfo)
+							this.bindingOld(this.userInfo, 'oldFromLogin')
 						}
 						return false
 					}
@@ -495,7 +499,7 @@
 						return false
 					}
 					console.log('------直接获取数据，未走任何判断------')
-					uni.hideLoading()
+					// uni.hideLoading()
 				} else if (res.code == 500 || res.code == 2100) {
 					this.noActivity = true
 				} else if (res.code == 2009) {
@@ -505,7 +509,7 @@
 				}
 			},
 			//绑定老会员
-			async bindingOld(userInfo) {
+			async bindingOld(userInfo, isReGet) {
 				const {
 					phone
 				} = userInfo
@@ -530,8 +534,12 @@
 						uni.removeStorageSync('indexDataId')
 					}, 5000)
 				}
+				//非导购且重新载入时才显示
+				if (this.userInfo.isGuide != 1 && isReGet == 'oldFromLogin' && response.code != 2012 && response.code == 200) {
+					this.showOldprize = true
+				}
 				uni.removeStorageSync('invitePhone')
-				uni.hideLoading()
+				// uni.hideLoading()
 				// console.log('我是老会员绑定之后', response)
 			},
 			//绑定新会员
@@ -546,7 +554,7 @@
 					type: null,
 					userPhone: phone
 				})
-				uni.hideLoading()
+				// uni.hideLoading()
 				// console.log('绑定新会员成功', response)
 				if (response.code == 200) this.sendNewMemberMessage()
 			},
@@ -616,7 +624,7 @@
 					})
 					if (type == 'GET') {
 						// console.log('我是新会员奖励展示', this.newMemberPrizeList)
-						uni.hideLoading()
+						// uni.hideLoading()
 						this.fromJoin = true
 					} else if (type == 'INIT') {
 						this.rewardObj = {
@@ -625,7 +633,7 @@
 							total: 0,
 							limit: 1
 						}
-						uni.hideLoading()
+						// uni.hideLoading()
 					}
 				}
 			},
@@ -650,10 +658,26 @@
 				this.getIndexData('finishGetPrize')
 			},
 			//去查看奖励
-			toSeePrize() {
-				uni.navigateTo({
-					url: '/pages/account/benefit'
-				})
+			toSeePrize(prizeInfo) {
+				const {
+					rewardType,
+					id
+				} = prizeInfo
+				let couponId = undefined
+				// console.log(prizeInfo)
+				couponId = this.receiveListSave.find(function(item) {
+					return item.rewardId == id
+				}).memberNo
+				//rewardType == 2时为积分
+				if (rewardType == 2) {
+					uni.navigateTo({
+						url: '/pages/account/benefit'
+					})
+				} else {
+					uni.navigateTo({
+						url: '/pages/coupon/detail?couponId=' + couponId
+					})
+				}
 			},
 			//获取当前以及两年后时间
 			getNowAndTwoYear() {
@@ -670,13 +694,13 @@
 			getRule() {
 				// console.log(this.indexData.userBindConfigDO.content)
 				const rule =
-					`1、分享方式：在此活动页面点击【邀请好友】分享给准备邀请的好友，好友成功注册后即完成爱慕会员邀请活动。<br/>
-				2、分享者发起分享活动，在活动有效期内邀请好友注册，完成分享活动并达到邀请好友注册数量，即可领取邀请好友专属优惠券或实物兑换券（具体奖励以活动设置为准）。<br/>
-				3、被分享者通过邀请链接注册成为爱慕会员，即可获得专属导购服务及新人专属好礼。<br/>
-				4、分享活动进行中，如分享者邀请人数已达上限，则不再获得邀请人奖励，仍可邀请好友参与活动。<br/>
-				5、可在活动页“查看奖励”或在“我的账户-我的优惠券”中查看获得的邀请奖励。实物兑换券需使用其下单成功才会发货。<br/> 
-				6、同一设备id、用户id只能绑定一张券，同一IP同一收货地址同一收货人视为恶意刷单行为有权取消资格。<br/>
-				7、针对不正当手段（如作弊、扰乱系统、实施网络攻击等）参与活动的用户，爱慕有权禁止其参与活动并取消获奖资格（如已发放，有权追回）。<br/>
+					`1、分享方式：在此活动页面点击【邀请好友】分享给准备邀请的好友，好友成功注册后即完成爱慕会员邀请活动。
+				2、分享者发起分享活动，在活动有效期内邀请好友注册，完成分享活动并达到邀请好友注册数量，即可领取邀请好友专属优惠券或实物兑换券（具体奖励以活动设置为准）。
+				3、被分享者通过邀请链接注册成为爱慕会员，即可获得专属导购服务及新人专属好礼。
+				4、分享活动进行中，如分享者邀请人数已达上限，则不再获得邀请人奖励，仍可邀请好友参与活动。
+				5、可在活动页“查看奖励”或在“我的账户-我的优惠券”中查看获得的邀请奖励。实物兑换券需使用其下单成功才会发货。
+				6、同一设备id、用户id只能绑定一张券，同一IP同一收货地址同一收货人视为恶意刷单行为有权取消资格。
+				7、针对不正当手段（如作弊、扰乱系统、实施网络攻击等）参与活动的用户，爱慕有权禁止其参与活动并取消获奖资格（如已发放，有权追回）。
 				8、最终解释权归爱慕股份有限公司所有`
 				// uni.setStorageSync('content', )
 				let content = this.indexData.userBindConfigDO.content || rule
@@ -750,15 +774,15 @@
 						if (800 < windowHeight) {
 							_this.topHeight = '280rpx'
 							_this.smallHeight = '550rpx'
-						}else if(700 < windowHeight && windowHeight <= 800){
+						} else if (700 < windowHeight && windowHeight <= 800) {
 							_this.topHeight = '290rpx'
 							_this.smallHeight = '530rpx'
-						}else if(650 < windowHeight && windowHeight <= 700){
+						} else if (650 < windowHeight && windowHeight <= 700) {
 							_this.topHeight = '250rpx'
-						}else if(600 < windowHeight && windowHeight <= 650){
+						} else if (600 < windowHeight && windowHeight <= 650) {
 							_this.topHeight = '250rpx'
 							_this.smallHeight = '450rpx'
-						}else{
+						} else {
 							_this.topHeight = '250rpx'
 							_this.smallHeight = '420rpx'
 						}
