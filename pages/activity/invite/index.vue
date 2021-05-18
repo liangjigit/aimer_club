@@ -476,10 +476,10 @@
 					}
 					//oldFromLogin存在代表老会员重新登陆进入当前页
 					if (oldFromLogin === 'oldFromLogin') {
+						this.isShowInvite = true
 						if (uni.getStorageSync('fromService')) {
 							uni.removeStorageSync('fromService')
 						} else {
-							this.isShowInvite = true
 							this.bindingOld(this.userInfo, 'oldFromLogin')
 						}
 						return false
@@ -535,7 +535,8 @@
 					}, 5000)
 				}
 				//非导购且重新载入时才显示
-				if (this.userInfo.isGuide != 1 && isReGet == 'oldFromLogin' && response.code != 2012 && response.code == 200) {
+				if (this.userInfo.isGuide != 1 && isReGet == 'oldFromLogin' && response.code != 2012 && response
+					.code == 200) {
 					this.showOldprize = true
 				}
 				uni.removeStorageSync('invitePhone')

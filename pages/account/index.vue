@@ -63,7 +63,8 @@
 			<image src="/static/account/index/invite.png" mode="aspectFill"></image>
 		</button> -->
 		<button class="cu-btn banner-center" @click="toClub">
-			<image src="/static/account/index/invite.png" mode="aspectFill"></image>
+			<!-- <image src="/static/account/index/invite.png" mode="aspectFill"></image> -->
+			<image src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1620804997379.jpg" mode="aspectFill"></image>
 		</button>
 		<view class="menu-box flex align-center justify-center">
 			<view class="grid col-3">
@@ -206,14 +207,18 @@
 			...mapActions('login', ['getMyInfo']),
 			...mapActions('index', ['getLiveRoom']),
 			//去裂变活动
-			toClub() {
+			async toClub() {
+				const isLogin = await this.$refs.login.checkLogin()
+				if (!isLogin) {
+					return
+				}
 				uni.navigateTo({
 					url: '/pages/activity/invite/index?clubIn=clubIn&inviteStatus=1'
 				})
 			},
 			// 跳转到发票
 			goInvoice() {
-				navigatorToPage('https://m.aimer.com.cn/shopcart/myinvoice', 2)
+				navigatorToPage('https://m.aimer.com.cn/#/einvoice/list', 2)
 			},
 			hideGiftPopup() {
 				this.showGiftPopup = false //隐藏领取好礼

@@ -4,7 +4,11 @@
 			<view class="bg-mask flex align-center justify-center">
 				<view class="card flex flex-direction align-center">
 					<!-- popup数据存在image -->
-					<button v-if="pupop.image&&!isDefault" @click="getSelfInfo" class="btn">
+					<button v-if="pupop.image&&!isDefault&&canIUseGetUserProfile" @click="getSelfInfo" class="btn">
+						<image :src="pupop.image" mode="aspectFill"></image>
+					</button>
+					<button v-else-if="pupop.image&&!isDefault&&!canIUseGetUserProfile" open-type="getUserInfo"
+						@getuserinfo="getUserInfo" class="btn">
 						<image :src="pupop.image" mode="aspectFill"></image>
 					</button>
 					<view class="bg-white flex flex-direction align-center" v-else>
@@ -17,7 +21,10 @@
 						<text class="unit">元</text> -->
 						</text>
 						<text class="tip">{{defaultDesc}}</text>
-						<button @click="getSelfInfo" class="cu-btn line-red text-red">登录</button>
+						<button v-if="canIUseGetUserProfile" @click="getSelfInfo"
+							class="cu-btn line-red text-red">登录</button>
+						<button v-else open-type="getUserInfo" @getuserinfo="getUserInfo"
+							class="cu-btn line-red text-red">登录</button>
 					</view>
 					<view @click="hide" class="cancel-btn" v-if="showHide">
 						<image src="/static/close-icon.png" mode="aspectFit"></image>
@@ -33,10 +40,14 @@
 			<view class="login-text">
 				<image src="/static/index/sign_3.png" mode="widthFix" style="width: 312rpx;"></image>
 			</view>
-			<view class="login-sign" @click="getSelfInfo">
+			<view class="login-sign" v-if="canIUseGetUserProfile" @click="getSelfInfo">
 				<image src="/static/index/sign_4.png" mode="widthFix" style="width: 160rpx;"></image>
 				<image src="/static/index/sign_5.png" mode="widthFix" class="sign5"></image>
 			</view>
+			<button class="login-sign" v-else open-type="getUserInfo" @getuserinfo="getUserInfo">
+				<image src="/static/index/sign_4.png" mode="widthFix" style="width: 160rpx;"></image>
+				<image src="/static/index/sign_5.png" mode="widthFix" class="sign5"></image>
+			</button>
 		</view>
 	</view>
 </template>
@@ -69,7 +80,15 @@
 		data() {
 			return {
 				showHide: true,
-				showTopLogin: false
+				showTopLogin: false,
+				canIUseGetUserProfile: false
+			}
+		},
+		created() {
+			if (wx.getUserProfile) {
+				this.canIUseGetUserProfile = true
+			} else {
+				this.canIUseGetUserProfile = false
 			}
 		},
 		computed: {
@@ -115,6 +134,7 @@
 					}
 					return false
 				} else {
+					this.showTopLogin = false
 					this.checkJoinState()
 				}
 				return true
@@ -134,6 +154,19 @@
 						})
 					}
 				}
+			},
+			getUserInfo(e) {
+				// 不推荐使用getUserInfo获取用户信息，预计自2021年4月13日起，getUserInfo将不再弹出弹窗，并直接返回匿名的用户个人信息
+				const _this = this
+				wx.getUserInfo({
+					success: function(res) {
+						uni.setStorageSync('saveUserProfile', res.userInfo)
+						_this.login()
+					},
+					fail: function(err) {
+						console.log(err)
+					}
+				})
 			},
 			//获取个人资料
 			getSelfInfo() {
@@ -182,7 +215,7 @@
 							if (!isCurrentPage) {
 								navigatorToPage(url, type, null, null, true)
 							}
-						} else if (id) {
+						} else if (id && !(uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus') !== '')) {
 							const {
 								linkType,
 								linkUrl,
@@ -269,6 +302,12 @@
 			top: 25rpx;
 			width: 160rpx;
 			height: 50rpx;
+			line-height: 1;
+			padding: 0;
+
+			&::after {
+				border: none;
+			}
 
 			.sign5 {
 				width: 124rpx;
