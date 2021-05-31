@@ -102,9 +102,11 @@
 			<empty-page v-if="isEmpty" :image-height="'0px'" :top="'0px'" :noContent="'持续更新中，敬请期待~'"></empty-page>
 		</view>
 		<load-more :isLoad="isLoading" :isShow="!isEmpty"></load-more>
-		<login-pupop ref="login"></login-pupop>
+		<login-pupop ref="login" @phoneIsFalse="isShowMarketing=true"></login-pupop>
 		<!-- 导购海报弹窗 -->
 		<guide-popup ref="guidePopup"></guide-popup>
+		<!-- 营销弹窗 -->
+		<marketing @hideMarket="isShowMarketing=false" v-show="isShowMarketing"></marketing>
 	</view>
 </template>
 
@@ -129,6 +131,7 @@
 	import {
 		guidePopup
 	} from '@/pages/components/popup/guide-popup.vue'
+	import marketing from '@/pages/components/marketing/marketing.vue'
 	const Model = 1; // cup 有料
 	export default {
 		components: {
@@ -136,7 +139,8 @@
 			listItemLike,
 			emptyPage,
 			loadMore,
-			guidePopup
+			guidePopup,
+			marketing
 		},
 		data() {
 			return {
@@ -147,7 +151,8 @@
 				experts: [],
 				tags: [],
 				selectedTagsId: 0,
-				onCreated: false
+				onCreated: false,
+				isShowMarketing: false
 			}
 		},
 		computed: {
@@ -209,6 +214,9 @@
 			}
 		},
 		onShow() {
+			if (this.isLogin) {
+				this.isShowMarketing = true
+			}
 			//删除裂变活动的缓存
 			uni.removeStorageSync('inviteStatus')
 			this.$refs.login.checkLogin('tabBar')
