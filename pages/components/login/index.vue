@@ -227,6 +227,7 @@
 						//获取getPhone 为false则代表已经注册过
 						const getPhone = uni.getStorageSync('getPhone');
 						if (!getPhone) {
+							this.$emit('phoneIsFalse')
 							//重定向路径为空
 							this.GETREDIRECTURL({
 								redirectUrl: null
