@@ -746,7 +746,9 @@
 			//获取拉起服务通知权限
 			getServicePermission() {
 				const _this = this
-				const TMPLID = 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y'
+				const TMPLID = process.env.NODE_ENV === 'development' ? 'KarFydEdLKD4_HI0O3A7s5_WjsxmDbr7JXVe23Z2A7Y' :
+					'5V-jOqqs_9WPyhkdusoGekHUBg5rr5KYFF19ExBDDh4'
+				// console.log(TMPLID)
 				uni.requestSubscribeMessage({
 					tmplIds: [TMPLID],
 					success(res) {
@@ -759,7 +761,13 @@
 						_this.showModal = false
 					},
 					fail(err) {
-						console.log(err + 'requestSubscribeMessage失败')
+						console.log(err)
+						uni.showToast({
+							title: 'requestSubscribeMessage失败',
+							duration: 2000,
+							icon: 'none'
+						})
+						_this.showModal = false
 					}
 				})
 			},
