@@ -37,7 +37,10 @@
 				} = res
 				if (code == 200) {
 					this.popData = JSON.parse(data)
-					console.log(this.popData)
+					console.log('-----',this.popData)
+					if(this.popData == null){
+						this.$emit('noMarket')
+					}
 				}
 			},
 			//点击图片跳转
@@ -71,7 +74,7 @@
 
 <style scoped lang="scss">
 	.marketing {
-		position: absolute;
+		position: fixed;
 		width: 100%;
 		height: 100%;
 		background: rgba(0, 0, 0, .6);
@@ -85,14 +88,14 @@
 		overflow: hidden;
 
 		image {
-			width: 60%;
+			width: 78.13%;
 		}
 
 		.cancel-btn {
 			position: absolute;
 			left: 50%;
 			margin-left: -33upx;
-			bottom: 100rpx;
+			bottom: 50rpx;
 			font-size: 70upx;
 			width: 66upx;
 			height: 66upx;

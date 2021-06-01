@@ -159,6 +159,7 @@
 								url: `/pages/activity/invite/index?invitePhone=${invitePhone}&inviteUserId=${id}&inviteStatus=${inviteStatus}`
 							})
 						} else {
+							uni.setStorageSync('joinToIndex', true)
 							uni.switchTab({
 								url: "/pages/index/index"
 							})

@@ -106,7 +106,8 @@
 		<!-- 导购海报弹窗 -->
 		<guide-popup ref="guidePopup"></guide-popup>
 		<!-- 营销弹窗 -->
-		<marketing @hideMarket="isShowMarketing=false" v-show="isShowMarketing"></marketing>
+		<marketing @hideMarket="isShowMarketing=false" @noMarket="noMarket=true" v-show="!noMarket && isShowMarketing">
+		</marketing>
 	</view>
 </template>
 
@@ -144,6 +145,7 @@
 		},
 		data() {
 			return {
+				noMarket: false,
 				currentCur: 0,
 				currentBanner: 0,
 				isLoading: false,
@@ -214,9 +216,11 @@
 			}
 		},
 		onShow() {
-			if (this.isLogin) {
+			if (this.isLogin && !uni.getStorageSync('joinToIndex')) {
 				this.isShowMarketing = true
 			}
+			//删除从注册页来的缓存
+			uni.removeStorageSync('joinToIndex')
 			//删除裂变活动的缓存
 			uni.removeStorageSync('inviteStatus')
 			this.$refs.login.checkLogin('tabBar')
