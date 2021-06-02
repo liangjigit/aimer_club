@@ -2,7 +2,7 @@
 	<view id="invite">
 		<view style="width: 100%;height: 100%;position: fixed;z-index: 1000;" v-if="showModal"
 			@click="getServicePermission"></view>
-		<login-pupop ref="login" @reGetInfo="getIndexData('oldFromLogin')" @getNewPrize="showNewPrize = true">
+		<login-pupop ref="login" @reGetInfo="getIndexData('oldFromLogin')" @getNewPrize="getNewPrize">
 		</login-pupop>
 		<!-- <image class="background"
 			:src="backgroundMr ? backgroundMr : 'https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1618392284802.png'"
@@ -264,6 +264,9 @@
 		mapMutations,
 		mapGetters
 	} from 'vuex'
+	import {
+		debounce
+	} from '@/common/index.js'
 	export default {
 		name: 'invite',
 		components: {
@@ -396,7 +399,7 @@
 		},
 		methods: {
 			...mapActions('invite', ['getActiveIndex', 'getOldInvite', 'getNewInvite', 'sendMiniMessage',
-				'getNewMemberPrizeList'
+				'getNewMemberPrizeList', 'getBuriedPoint'
 			]),
 			...mapActions('login', ['onGetUserInfo']),
 			...mapMutations('login', ['GETINVITEUSERID']),
@@ -805,7 +808,21 @@
 					duration: 2000,
 					icon: 'none'
 				})
-			}
+			},
+			//设置裂变活动埋点
+			getNewPrize: debounce(function() {
+				const params = {
+					activeId: uni.getStorageSync('inviteStatus').substr(2),
+					invitePhone: uni.getStorageSync('invitePhone'),
+					type: "ONE",
+					userWx: this.userInfo.id
+				}
+				this.getBuriedPoint(params)
+				this.showNewPrize = true
+				console.log('邀请人手机', uni.getStorageSync('invitePhone'))
+				console.log('被邀请人wx', this.userInfo.id)
+				console.log('活动id', uni.getStorageSync('inviteStatus').substr(2))
+			}, 300)
 		},
 		computed: {
 			...mapState('login', ['userInfo', 'loginState']),
@@ -830,6 +847,7 @@
 			}
 			phone = encodeURIComponent(phone)
 			const status = 'fx' + this.indexData.userBindConfigDO.id
+			console.log(phone, id, status)
 			return {
 				title: this.indexData.userBindConfigDO.friendsTitle == null ? 'club裂变活动' : this.indexData.userBindConfigDO
 					.friendsTitle,

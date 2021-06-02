@@ -1,22 +1,22 @@
 import {} from '@/store/mutations_type.js'
 import request from '@/utils/request.js'
 
-const state = {
-	// list:[] ,// 我的收藏列表
-	// pageNum: 0,
-	// pageSize: 10,
-	// totalSize: 0,
-	// currentCity:"",
-	// activityCities:[]// 活动城市列表
-}
+const state = {}
 
 const getters = {
-	// isEmpty(state){
-	// 	return !state.list.length
-	// }
+
 }
 
 const actions = {
+	//埋点数据接口
+	async getBuriedPoint(context, payload) {
+		const response = (await request({
+			url: '/content/admin/burying/saveBuryingData',
+			method: 'POST',
+			data: payload
+		})).data
+		console.log(response)
+	},
 	// 获取活动首页数据
 	async getActiveIndex({
 		commit
@@ -120,26 +120,7 @@ const actions = {
 }
 
 const mutations = {
-	// [GETACTIVITYLIST](state,payload){
-	// 	let list = payload.list.map(item=>{
-	// 		item.code = item.activityCode
-	// 		item.browseUserCount = item.browseUserCount > 10000 ? (item.browseUserCount/10000).toFixed(1) +'万':item.browseUserCount;
-	// 		return item 
-	// 	})
-	// 	if(payload.pageNum == 1){
-	// 		state.list = []
-	// 	}
-	// 	state.list = [...state.list, ...list]
-	// 	state.pageNum = payload.pageNum
-	// 	state.pageSize = payload.pageSize
-	// 	state.totalSize = payload.totalSize
-	// },
-	// [GETCURRENTCITY](state,payload){
-	// 	state.currentCity = payload.currentCity
-	// },
-	// [GETACTIVITYCITIES](state,payload){
-	// 	state.activityCities = [...payload.activityCities]
-	// }
+
 }
 export default {
 	namespaced: true,
