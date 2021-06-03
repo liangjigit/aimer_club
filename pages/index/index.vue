@@ -106,7 +106,7 @@
 		<!-- 导购海报弹窗 -->
 		<guide-popup ref="guidePopup"></guide-popup>
 		<!-- 营销弹窗 -->
-		<marketing @hideMarket="isShowMarketing=false" @noMarket="noMarket=true" v-show="!noMarket && isShowMarketing">
+		<marketing @hideMarket="isShowMarketing=false" @noMarket="noMarket=true" v-if="!noMarket && isShowMarketing">
 		</marketing>
 	</view>
 </template>

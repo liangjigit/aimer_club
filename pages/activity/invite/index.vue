@@ -403,6 +403,7 @@
 			]),
 			...mapActions('login', ['onGetUserInfo']),
 			...mapMutations('login', ['GETINVITEUSERID']),
+			...mapMutations('invite',['GETBURIEDPOINT']),
 			//获取页面数据
 			async getIndexData(oldFromLogin = undefined) {
 				// //如果不是导购且进入的是隐藏活动则跳回首页
@@ -817,6 +818,7 @@
 					type: "ONE",
 					userWx: this.userInfo.id
 				}
+				this.GETBURIEDPOINT(params)
 				this.getBuriedPoint(params)
 				this.showNewPrize = true
 				console.log('邀请人手机', uni.getStorageSync('invitePhone'))

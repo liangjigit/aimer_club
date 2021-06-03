@@ -1,7 +1,11 @@
-import {} from '@/store/mutations_type.js'
+import {
+	GETBURIEDPOINT
+} from '@/store/mutations_type.js'
 import request from '@/utils/request.js'
 
-const state = {}
+const state = {
+	buriedData: null
+}
 
 const getters = {
 
@@ -120,7 +124,9 @@ const actions = {
 }
 
 const mutations = {
-
+	[GETBURIEDPOINT](state, payload) {
+		state.buriedData = payload
+	}
 }
 export default {
 	namespaced: true,

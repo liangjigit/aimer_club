@@ -47,8 +47,12 @@
 			goPath() {
 				const {
 					linkType,
-					pageUrl
+					pageUrl,
+					url,
+					miniappUrl,
+					appId
 				} = this.popData
+				console.log(this.popData)
 				if (linkType == 1) {
 					//跳转小程序内
 					navigatorToPage(pageUrl, linkType)

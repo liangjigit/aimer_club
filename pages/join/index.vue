@@ -133,6 +133,7 @@
 		},
 		computed: {
 			...mapState('login', ['isDisabledUser', 'redirectUrl', 'userInfo']),
+			...mapState('invite', ['buriedData']),
 			saveAllInfo() {
 				if (this.isSaveInfo && this.isSavePhone) {
 					if (this.redirectUrl) {
@@ -145,6 +146,7 @@
 							redirectUrl: null
 						})
 					} else {
+						this.getBuried()
 						if (uni.getStorageSync('invitePhone')) {
 							//加入fromJoin判断为从注册页面进入的新用户
 							uni.setStorageSync('fromJoin', true)
@@ -183,6 +185,44 @@
 			...mapActions('login', ['savePhoneNumber', 'wxworkLogin', 'getMyInfo']),
 			...mapActions('accoutBaseInfo', ['getJoinConfig', 'saveJoinInfo']),
 			...mapMutations('login', ['GETREDIRECTURL']),
+			...mapActions('invite', ['getBuriedPoint']),
+			...mapMutations('invite', ['GETBURIEDPOINT']),
+			//注册页埋点
+			getBuried() {
+				console.log('被邀请id', this.userInfo.id)
+				console.log('被邀请phone', this.userInfo.phone)
+				//上个页面路径
+				let prevpage = getCurrentPages()[getCurrentPages().length - 2];
+				if (prevpage != undefined) prevpage = prevpage.route
+				const page = ['pages/activity/invite/index', undefined]
+				// console.log('上个页面路径', prevpage)
+				let prevpagetype
+				switch (prevpage) {
+					case page[0]:
+						prevpagetype = '活动页'
+						break;
+					case page[1]:
+						prevpagetype = '首页'
+						break;
+					default:
+						prevpagetype = '其他'
+				}
+				console.log(prevpagetype)
+				const {
+					activeId,
+					invitePhone
+				} = this.buriedData
+				const params = {
+					pageUrl: prevpagetype,
+					type: "TWO",
+					userPhone: this.userInfo.phone,
+					userWx: this.userInfo.id,
+					activeId,
+					invitePhone
+				}
+				this.GETBURIEDPOINT(params)
+				this.getBuriedPoint(params)
+			},
 			onInput(index, e) {
 				let value = e.detail.value.replace(/\d/g, "")
 				value = value.substr(0, 10)
