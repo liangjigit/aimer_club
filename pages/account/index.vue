@@ -1,6 +1,6 @@
 <template>
 	<view class="flex align-center flex-direction padding-tb">
-		<view class="state-log-out flex align-center" v-if="!isLogin" @click="GETLOGINPOPUP">
+		<view class="state-log-out flex align-center" v-if="!isLogin" @click="getLogin">
 			<view class="avatar">
 				<image src="/static/default-avatar.png" mode="aspectFill"></image>
 			</view>
@@ -64,7 +64,8 @@
 		</button> -->
 		<button class="cu-btn banner-center" @click="toClub">
 			<!-- <image src="/static/account/index/invite.png" mode="aspectFill"></image> -->
-			<image src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1620804997379.jpg" mode="aspectFill"></image>
+			<image src="https://aimer-zt.oss-cn-beijing.aliyuncs.com/pictures_test/1620804997379.jpg" mode="aspectFill">
+			</image>
 		</button>
 		<view class="menu-box flex align-center justify-center">
 			<view class="grid col-3">
@@ -206,6 +207,14 @@
 			...mapMutations('login', ['GETLOGINPOPUP']),
 			...mapActions('login', ['getMyInfo']),
 			...mapActions('index', ['getLiveRoom']),
+			//顶部登录
+			getLogin() {
+				if (this.$refs.login.canIUseGetUserProfile) {
+					this.$refs.login.getSelfInfo()
+				} else {
+					this.$refs.login.getUserInfo()
+				}
+			},
 			//去裂变活动
 			async toClub() {
 				const isLogin = await this.$refs.login.checkLogin()

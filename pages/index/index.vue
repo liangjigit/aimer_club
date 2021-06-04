@@ -102,11 +102,11 @@
 			<empty-page v-if="isEmpty" :image-height="'0px'" :top="'0px'" :noContent="'持续更新中，敬请期待~'"></empty-page>
 		</view>
 		<load-more :isLoad="isLoading" :isShow="!isEmpty"></load-more>
-		<login-pupop ref="login" @phoneIsFalse="isShowMarketing=true"></login-pupop>
+		<login-pupop ref="login" @phoneIsFalse="phoneIsFalse"></login-pupop>
 		<!-- 导购海报弹窗 -->
 		<guide-popup ref="guidePopup"></guide-popup>
 		<!-- 营销弹窗 -->
-		<marketing @hideMarket="isShowMarketing=false" @noMarket="noMarket=true" v-if="!noMarket && isShowMarketing">
+		<marketing ref="marketing" @backMini="backMini = true">
 		</marketing>
 	</view>
 </template>
@@ -154,7 +154,7 @@
 				tags: [],
 				selectedTagsId: 0,
 				onCreated: false,
-				isShowMarketing: false
+				backMini: false
 			}
 		},
 		computed: {
@@ -183,7 +183,7 @@
 			// 		url: '/pages/account/benefit?level=lv'
 			// 	})
 			// }
-			// console.log(options)
+			console.log('', options)
 			// 	guidecode: '', // 如果从小程序卡片进入（导购二维码、关注公众号）、扫门店二维码
 			// 	source:'WXC实体店微信', // 来源
 			// 	aimerid:'olhZPv-4Tqthr4D104cTsvlTAWyY',
@@ -215,9 +215,15 @@
 				})
 			}
 		},
+		onHide() {
+			getApp().globalData.hotOpen = false
+		},
 		onShow() {
-			if (this.isLogin && !uni.getStorageSync('joinToIndex')) {
-				this.isShowMarketing = true
+			if (this.isLogin && !uni.getStorageSync('joinToIndex') && getApp().globalData.hotOpen && !this.backMini) {
+				this.$refs.marketing.noMarket = false
+			} else {
+				this.$refs.marketing.noMarket = true
+				this.backMini = false
 			}
 			//删除从注册页来的缓存
 			uni.removeStorageSync('joinToIndex')
@@ -298,6 +304,9 @@
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
 			...mapActions('invite', ['getActiveIndex']),
+			phoneIsFalse(){
+				this.$refs.marketing.noMarket = false
+			},
 			getData(isRefresh) {
 				this.getBanners({
 					pageId: 1

@@ -4,7 +4,10 @@ import {
 import request from '@/utils/request.js'
 
 const state = {
-	buriedData: null
+	buriedData: {
+		activeId: 666666,
+		invitePhone: 'string'
+	}
 }
 
 const getters = {

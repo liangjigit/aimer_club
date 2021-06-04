@@ -49,15 +49,21 @@
 			})
 		},
 		onShow: function(options) {
-			const {scene} = options
-			uni.setStorageSync('globalScene',scene)
-			// console.log('App Show',scene)
+			const {
+				scene
+			} = options
+			uni.setStorageSync('globalScene', scene)
+			if (getCurrentPages()[0] && getCurrentPages()[0].route == 'pages/index/index') {
+				this.globalData.hotOpen = true
+			}
+			// console.log('App Show', scene)
 		},
 		onHide: function() {
 			// console.log('App Hide')
 		},
-		globalData:{
-			level:false,
+		globalData: {
+			level: false,
+			hotOpen: false
 		}
 	}
 </script>

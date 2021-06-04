@@ -1,5 +1,5 @@
 <template>
-	<view class="marketing" @touchmove.stop.prevent="moveHandle">
+	<view class="marketing" @touchmove.stop.prevent="moveHandle" v-show="!noMarket">
 		<image :src="popData.image" @click="goPath" mode="widthFix"></image>
 		<view @click="hide" class="cancel-btn">
 			<image src="/static/close-icon.png" mode="aspectFit"></image>
@@ -19,7 +19,8 @@
 		name: 'marketing',
 		data() {
 			return {
-				popData: {}
+				popData: {},
+				noMarket: true
 			}
 		},
 		created() {
@@ -37,14 +38,17 @@
 				} = res
 				if (code == 200) {
 					this.popData = JSON.parse(data)
-					console.log('-----',this.popData)
-					if(this.popData == null){
-						this.$emit('noMarket')
+					console.log('-----', this.popData)
+					if (this.popData == null) {
+						this.noMarket = true
+					}else{
+						this.noMarket = false
 					}
 				}
 			},
 			//点击图片跳转
 			goPath() {
+				const _this = this
 				const {
 					linkType,
 					pageUrl,
@@ -61,12 +65,14 @@
 					navigatorToPage(url, linkType)
 				} else if (linkType == 3) {
 					//跳转其他小程序
-					navigatorToPage(miniappUrl, linkType, appId)
+					navigatorToPage(miniappUrl, linkType, appId).then(() => {
+						_this.$emit('backMini')
+					})
 				}
 			},
 			//隐藏弹窗
 			hide() {
-				this.$emit('hideMarket')
+				this.noMarket = true
 			},
 			moveHandle() {}
 		},

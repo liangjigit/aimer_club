@@ -208,6 +208,7 @@
 						prevpagetype = '其他'
 				}
 				console.log(prevpagetype)
+				console.log(this.buriedData)
 				const {
 					activeId,
 					invitePhone
@@ -220,6 +221,7 @@
 					activeId,
 					invitePhone
 				}
+				console.log(params)
 				this.GETBURIEDPOINT(params)
 				this.getBuriedPoint(params)
 			},

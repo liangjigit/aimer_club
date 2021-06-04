@@ -1,38 +1,44 @@
 // 页面跳转
 export function navigatorToPage(url, type, miniappId, displayPage, isRedirect) { //type: 跳转到 1、小程序页面 2 web地址 3 其他小程序
-	switch (type) {
-		case 1: // 小程序内部页面
-			let tabbars = ['pages/index/index', 'pages/brarts/index', 'pages/activity/index', 'pages/training/index',
-				'pages/account/index'
-			]
-			if (tabbars.indexOf(url) > -1) {
-				uni.switchTab({
-					url: '/' + url
-				})
-			} else if (isRedirect) {
-				uni.redirectTo({
-					url: '/' + url
-				})
-			} else {
+	return new Promise((resolve, reject) => {
+		switch (type) {
+			case 1: // 小程序内部页面
+				let tabbars = ['pages/index/index', 'pages/brarts/index', 'pages/activity/index',
+					'pages/training/index',
+					'pages/account/index'
+				]
+				if (tabbars.indexOf(url) > -1) {
+					uni.switchTab({
+						url: '/' + url
+					})
+				} else if (isRedirect) {
+					uni.redirectTo({
+						url: '/' + url
+					})
+				} else {
+					uni.navigateTo({
+						url: '/' + url
+					})
+				}
+				break;
+			case 2: //  webview 
 				uni.navigateTo({
-					url: '/' + url
+					url: '/pages/webview/index?url=' + url
 				})
-			}
-			break;
-		case 2: //  webview 
-			uni.navigateTo({
-				url: '/pages/webview/index?url=' + url
-			})
-			break;
-		case 3: // 跳转到外部小程序
-			uni.navigateToMiniProgram({
-				appId: miniappId,
-				path: url
-			})
-			break;
-		default:
-			break;
-	}
+				break;
+			case 3: // 跳转到外部小程序
+				uni.navigateToMiniProgram({
+					appId: miniappId,
+					path: url,
+					success() {
+						resolve()
+					}
+				})
+				break;
+			default:
+				break;
+		}
+	})
 }
 //日期 格式化 2020-8-26
 export function getNowDate() {
