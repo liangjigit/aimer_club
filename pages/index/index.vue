@@ -106,8 +106,7 @@
 		<!-- 导购海报弹窗 -->
 		<guide-popup ref="guidePopup"></guide-popup>
 		<!-- 营销弹窗 -->
-		<marketing ref="marketing" @backMini="backMini = true">
-		</marketing>
+		<marketing ref="marketing" @hasMarketResult="hasMarketResult"></marketing>
 	</view>
 </template>
 
@@ -145,7 +144,6 @@
 		},
 		data() {
 			return {
-				noMarket: false,
 				currentCur: 0,
 				currentBanner: 0,
 				isLoading: false,
@@ -154,7 +152,6 @@
 				tags: [],
 				selectedTagsId: 0,
 				onCreated: false,
-				backMini: false
 			}
 		},
 		computed: {
@@ -177,13 +174,11 @@
 			}
 		},
 		onLoad(options) {
-			// console.log(getApp().globalData.fromJoin)
 			// if (getApp().globalData.level) {
 			// 	uni.reLaunch({
 			// 		url: '/pages/account/benefit?level=lv'
 			// 	})
 			// }
-			console.log('', options)
 			// 	guidecode: '', // 如果从小程序卡片进入（导购二维码、关注公众号）、扫门店二维码
 			// 	source:'WXC实体店微信', // 来源
 			// 	aimerid:'olhZPv-4Tqthr4D104cTsvlTAWyY',
@@ -217,16 +212,12 @@
 		},
 		onHide() {
 			getApp().globalData.hotOpen = false
+			this.$refs.marketing.hasMarket = false
 		},
 		onShow() {
-			if (this.isLogin && !uni.getStorageSync('joinToIndex') && getApp().globalData.hotOpen && !this.backMini) {
-				this.$refs.marketing.noMarket = false
-			} else {
-				this.$refs.marketing.noMarket = true
-				this.backMini = false
+			if (getApp().globalData.hotOpen && !uni.getStorageSync('joinToIndex')) {
+				this.$refs.marketing.getMarketing()
 			}
-			//删除从注册页来的缓存
-			uni.removeStorageSync('joinToIndex')
 			//删除裂变活动的缓存
 			uni.removeStorageSync('inviteStatus')
 			this.$refs.login.checkLogin('tabBar')
@@ -245,7 +236,6 @@
 							this.SETSELECTOR({
 								selector: null
 							})
-							// console.log('complete')
 						}
 					})
 				})
@@ -304,8 +294,16 @@
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
 			...mapActions('invite', ['getActiveIndex']),
-			phoneIsFalse(){
-				this.$refs.marketing.noMarket = false
+			hasMarketResult() {
+				//获取营销弹窗数据
+				if (uni.getStorageSync('joinToIndex')) {
+					this.$refs.marketing.hasMarket = false
+				}
+				//删除从注册页来的缓存
+				uni.removeStorageSync('joinToIndex')
+			},
+			phoneIsFalse() {
+				this.$refs.marketing.getMarketing()
 			},
 			getData(isRefresh) {
 				this.getBanners({
@@ -322,7 +320,6 @@
 				}
 				// 小程序分享内容
 				this.getShareContent({})
-
 			},
 			// 点击头像 获取导购海报
 			showGuidePopup() {
@@ -414,7 +411,6 @@
 					miniappId,
 					displayPage
 				} = item
-				// console.log(item)
 				//如果是去裂变活动的需要判断
 				if (bannerUrl && bannerUrl.includes('pages/activity/invite/index')) {
 					const res = await this.getActiveIndex({

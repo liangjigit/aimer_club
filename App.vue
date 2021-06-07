@@ -55,6 +55,8 @@
 			uni.setStorageSync('globalScene', scene)
 			if (getCurrentPages()[0] && getCurrentPages()[0].route == 'pages/index/index') {
 				this.globalData.hotOpen = true
+			}else{
+				this.globalData.hotOpen = false
 			}
 			// console.log('App Show', scene)
 		},

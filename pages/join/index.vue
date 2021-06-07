@@ -189,8 +189,8 @@
 			...mapMutations('invite', ['GETBURIEDPOINT']),
 			//注册页埋点
 			getBuried() {
-				console.log('被邀请id', this.userInfo.id)
-				console.log('被邀请phone', this.userInfo.phone)
+				// console.log('被邀请id', this.userInfo.id)
+				// console.log('被邀请phone', this.userInfo.phone)
 				//上个页面路径
 				let prevpage = getCurrentPages()[getCurrentPages().length - 2];
 				if (prevpage != undefined) prevpage = prevpage.route
@@ -207,8 +207,8 @@
 					default:
 						prevpagetype = '其他'
 				}
-				console.log(prevpagetype)
-				console.log(this.buriedData)
+				// console.log(prevpagetype)
+				// console.log(this.buriedData)
 				const {
 					activeId,
 					invitePhone
@@ -221,7 +221,7 @@
 					activeId,
 					invitePhone
 				}
-				console.log(params)
+				// console.log(params)
 				this.GETBURIEDPOINT(params)
 				this.getBuriedPoint(params)
 			},

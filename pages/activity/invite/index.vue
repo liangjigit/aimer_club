@@ -299,6 +299,43 @@
 				receiveListSave: []
 			}
 		},
+		watch: {
+			fromJoin: {
+				handler(val) {
+					if (val) {
+						let prevpage = getCurrentPages()[getCurrentPages().length - 2];
+						// console.log(prevpage)
+						if (prevpage != undefined) prevpage = prevpage.route
+						const page = ['pages/activity/invite/index', undefined]
+						// console.log('上个页面路径', prevpage)
+						let prevpagetype
+						switch (prevpage) {
+							case page[0]:
+								prevpagetype = '活动页'
+								break;
+							case page[1]:
+								prevpagetype = '注册页'
+								break;
+							default:
+								prevpagetype = '其他'
+						}
+						// console.log(prevpagetype)
+						const params = {
+							activeId: this.buriedData.activeId,
+							invitePhone: this.buriedData.invitePhone,
+							pageUrl: prevpagetype,
+							type: 'THREE',
+							userPhone: this.buriedData.userPhone,
+							userWx: this.buriedData.userWx
+						}
+						// console.log(params)
+						this.getBuriedPoint(params)
+					}
+				},
+				deep: true,
+				immediate: true
+			}
+		},
 		onHide() {
 			console.log('------onHide------')
 		},
@@ -403,7 +440,7 @@
 			]),
 			...mapActions('login', ['onGetUserInfo']),
 			...mapMutations('login', ['GETINVITEUSERID']),
-			...mapMutations('invite',['GETBURIEDPOINT']),
+			...mapMutations('invite', ['GETBURIEDPOINT']),
 			//获取页面数据
 			async getIndexData(oldFromLogin = undefined) {
 				// //如果不是导购且进入的是隐藏活动则跳回首页
@@ -821,14 +858,15 @@
 				this.GETBURIEDPOINT(params)
 				this.getBuriedPoint(params)
 				this.showNewPrize = true
-				console.log('邀请人手机', uni.getStorageSync('invitePhone'))
-				console.log('被邀请人wx', this.userInfo.id)
-				console.log('活动id', uni.getStorageSync('inviteStatus').substr(2))
+				// console.log('邀请人手机', uni.getStorageSync('invitePhone'))
+				// console.log('被邀请人wx', this.userInfo.id)
+				// console.log('活动id', uni.getStorageSync('inviteStatus').substr(2))
 			}, 300)
 		},
 		computed: {
 			...mapState('login', ['userInfo', 'loginState']),
 			...mapGetters('login', ['isLogin']),
+			...mapState('invite', ['buriedData']),
 		},
 		filters: {
 			transformDate(time) {

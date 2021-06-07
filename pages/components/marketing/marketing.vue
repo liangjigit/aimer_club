@@ -1,5 +1,5 @@
 <template>
-	<view class="marketing" @touchmove.stop.prevent="moveHandle" v-show="!noMarket">
+	<view class="marketing" @touchmove.stop.prevent="moveHandle" v-if="isShowMarketing">
 		<image :src="popData.image" @click="goPath" mode="widthFix"></image>
 		<view @click="hide" class="cancel-btn">
 			<image src="/static/close-icon.png" mode="aspectFit"></image>
@@ -10,7 +10,8 @@
 <script>
 	import {
 		mapActions,
-		mapState
+		mapState,
+		mapGetters
 	} from 'vuex'
 	import {
 		navigatorToPage
@@ -20,7 +21,9 @@
 		data() {
 			return {
 				popData: {},
-				noMarket: true
+				// 是否有弹框数据
+				hasMarket: false,
+				backMini: false
 			}
 		},
 		created() {
@@ -38,12 +41,14 @@
 				} = res
 				if (code == 200) {
 					this.popData = JSON.parse(data)
-					console.log('-----', this.popData)
-					if (this.popData == null) {
-						this.noMarket = true
-					}else{
-						this.noMarket = false
+					// console.log('-----', this.popData)
+					if (this.popData == null || this.backMini) {
+						this.hasMarket = false
+						this.backMini = false
+					} else {
+						this.hasMarket = true
 					}
+					this.$emit('hasMarketResult')
 				}
 			},
 			//点击图片跳转
@@ -56,7 +61,7 @@
 					miniappUrl,
 					appId
 				} = this.popData
-				console.log(this.popData)
+				// console.log(this.popData)
 				if (linkType == 1) {
 					//跳转小程序内
 					navigatorToPage(pageUrl, linkType)
@@ -66,18 +71,22 @@
 				} else if (linkType == 3) {
 					//跳转其他小程序
 					navigatorToPage(miniappUrl, linkType, appId).then(() => {
-						_this.$emit('backMini')
+						_this.backMini = true
 					})
 				}
 			},
 			//隐藏弹窗
 			hide() {
-				this.noMarket = true
+				this.hasMarket = false
 			},
 			moveHandle() {}
 		},
 		computed: {
-			...mapState('index', ['marketing'])
+			...mapState('index', ['marketing']),
+			...mapGetters('login', ['isLogin']),
+			isShowMarketing() {
+				return this.hasMarket && this.isLogin
+			}
 		}
 	}
 </script>
