@@ -5,15 +5,15 @@
 				<view class="card flex flex-direction align-center">
 					<!-- popup数据存在image -->
 					<button v-if="pupop.image&&!isDefault&&canIUseGetUserProfile" @click="getSelfInfo" class="btn">
-						<image :src="pupop.image" mode="aspectFill"></image>
+						<image class="image1" :src="pupop.image" mode="aspectFill"></image>
 					</button>
 					<button v-else-if="pupop.image&&!isDefault&&!canIUseGetUserProfile" open-type="getUserInfo"
 						@getuserinfo="getUserInfo" class="btn">
-						<image :src="pupop.image" mode="aspectFill"></image>
+						<image class="image1" :src="pupop.image" mode="aspectFill"></image>
 					</button>
 					<view class="bg-white flex flex-direction align-center" v-else>
 						<view class="title-img">
-							<image src="/static/index/login.png" mode="aspectFill"></image>
+							<image class="image3" src="/static/index/login.png" mode="aspectFill"></image>
 						</view>
 						<text class="title">{{defaultTitle}}</text>
 						<text class="money">
@@ -27,7 +27,7 @@
 							class="cu-btn line-red text-red">登录</button>
 					</view>
 					<view @click="hide" class="cancel-btn" v-if="showHide">
-						<image src="/static/close-icon.png" mode="aspectFit"></image>
+						<image class="image2" src="/static/close-icon.png" mode="aspectFit"></image>
 					</view>
 				</view>
 			</view>
@@ -361,7 +361,7 @@
 				border-width: 0;
 			}
 
-			image {
+			.image1 {
 				width: 100%;
 				height: 100%;
 			}
@@ -376,7 +376,7 @@
 			width: 66upx;
 			height: 66upx;
 
-			image {
+			.image2 {
 				width: 100%;
 				height: 100%;
 			}
@@ -430,7 +430,7 @@
 			height: 76upx;
 			margin-bottom: 100upx;
 
-			image {
+			.image3 {
 				width: 100%;
 				height: 100%;
 			}

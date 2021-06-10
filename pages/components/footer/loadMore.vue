@@ -2,7 +2,7 @@
 	<view class="margin-tb flex justify-center"v-show="isShow">
 		<view class="cu-load loading" v-show="isLoad"></view>
 		<view class="aimer-footer align-center" v-show="!isLoad">
-			<image src="/static/footer-aimer.png" mode="aspectFit"></image>
+			<image class="image1" src="/static/footer-aimer.png" mode="aspectFit"></image>
 		</view>
 	</view>
 </template>
@@ -20,7 +20,7 @@
 	.aimer-footer{
 		width: 500upx;
 		height: 30upx;
-		image{
+		.image1{
 			width: 100%;
 			height: 100%;
 		}

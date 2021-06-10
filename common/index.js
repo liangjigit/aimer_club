@@ -32,6 +32,9 @@ export function navigatorToPage(url, type, miniappId, displayPage, isRedirect) {
 					path: url,
 					success() {
 						resolve()
+					},
+					fail() {
+						reject()
 					}
 				})
 				break;

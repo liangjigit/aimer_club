@@ -3,17 +3,17 @@
 		<view class="item flex" v-for="(item,index) in list" :key="index" @click.stop="goDetail(item.articleCode)">
 			<image src="/static/cup/new-icon.png" class="new-icon" mode="aspectFit" v-if="index==0&&isShowNew"></image>
 			<view class="face">
-				<image :src="item.img" mode="aspectFill"></image>
+				<image class="image1" :src="item.img" mode="aspectFill"></image>
 			</view>
 			 <view class="content flex flex-direction flex-sub">
 			 	<text class="title text-cut-line2">{{item.title}}</text>
 				<view class="sign flex flex-sub" v-if="item.tags&&item.tags.length>0">
-					<text v-for="(tag, tagIndex) in item.tags" :key="tagIndex">{{tag}}</text>
+					<text class="text1" v-for="(tag, tagIndex) in item.tags" :key="tagIndex">{{tag}}</text>
 				</view>
 				<view class="tutor flex flex-direction">
 					<view class="flex align-center margin-bottom" v-if="item.expertName">
 						<view class="avatar">
-							<image :src="item.expertPhoto" mode="aspectFill"></image>
+							<image class="image2" :src="item.expertPhoto" mode="aspectFill"></image>
 						</view>
 						<view class="info">
 							<view class="name">
@@ -83,7 +83,7 @@
 			margin-right: 26upx;
 			overflow: hidden;
 			flex-shrink: 0;
-			image{
+			.image1{
 				width: 100%;
 				height: 100%;
 			}
@@ -97,7 +97,7 @@
 					border-radius:100%;
 					margin-right: 25upx;
 					overflow: hidden;
-					image{
+					.image2{
 						width:100%;
 						height: 100%;
 					}
@@ -126,7 +126,7 @@
 			.sign{
 				flex-wrap: wrap;
 				align-items: baseline;
-				text{
+				.text1{
 					font-size:24upx;
 					font-weight:400;
 					color: #BBBBBB;

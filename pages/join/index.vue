@@ -86,7 +86,7 @@
 </template>
 
 <script>
-	import cuCustom from '@/colorui/components/cu-custom.vue'
+	import cuCustom from '@/pages/join/components/cu-custom.vue'
 	import {
 		mapState,
 		mapActions,

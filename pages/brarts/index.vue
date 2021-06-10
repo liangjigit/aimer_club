@@ -74,7 +74,7 @@
 			// 跳转到详情
 			goDetail(options){
 				uni.navigateTo({
-					url:'/pages/brarts/detail?code='+ options.code
+					url:'/pages/brarts/modules/detail?code='+ options.code
 				})
 			}	
 		}

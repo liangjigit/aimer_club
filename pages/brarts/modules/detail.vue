@@ -39,8 +39,8 @@
 
 <script>
 	import {mapState,mapActions,mapMutations,mapGetters} from 'vuex'
-	import popup from '../components/popup/popup.vue'
-	import sharePupop from '../components/popup/share-pupop.vue'
+	import popup from '../../components/popup/popup.vue'
+	import sharePupop from '../../components/popup/share-pupop.vue'
 	import homeBtn from '@/pages/components/float-button/home.vue'
 	import htmlContent from '@/pages/components/html-content/htmlContent.vue'
 	import {doBrartsStatistics} from '@/common/statistics.js'

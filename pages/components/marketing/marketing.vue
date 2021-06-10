@@ -1,8 +1,8 @@
 <template>
 	<view class="marketing" @touchmove.stop.prevent="moveHandle" v-if="isShowMarketing">
-		<image :src="popData.image" @click="goPath" mode="widthFix"></image>
+		<image class="image1" :src="popData.image" @click="goPath" mode="widthFix"></image>
 		<view @click="hide" class="cancel-btn">
-			<image src="/static/close-icon.png" mode="aspectFit"></image>
+			<image class="image2" src="/static/close-icon.png" mode="aspectFit"></image>
 		</view>
 	</view>
 </template>
@@ -106,7 +106,7 @@
 		align-items: center;
 		overflow: hidden;
 
-		image {
+		.image1 {
 			width: 78.13%;
 		}
 
@@ -119,11 +119,10 @@
 			width: 66upx;
 			height: 66upx;
 
-			image {
+			.image2 {
 				width: 100%;
 				height: 100%;
 			}
-
 		}
 	}
 </style>

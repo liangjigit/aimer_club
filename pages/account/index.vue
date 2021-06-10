@@ -263,7 +263,7 @@
 					return
 				}
 				uni.navigateTo({
-					url: '/pages/account/carmi'
+					url: '/pages/account/modules/carmi'
 				})
 			},
 			goTraining() {
@@ -286,7 +286,7 @@
 					return
 				}
 				uni.navigateTo({
-					url: '/pages/account/collect'
+					url: '/pages/account/modules/collect'
 				})
 			},
 			async goBenefit() {
@@ -295,7 +295,7 @@
 					return
 				}
 				uni.navigateTo({
-					url: '/pages/account/benefit'
+					url: '/pages/account/modules/benefit'
 				})
 			},
 			async goStoreNav() {

@@ -131,13 +131,13 @@
 			// 跳转到详情
 			goDetail(options) {
 				uni.navigateTo({
-					url: '/pages/activity/detail?code=' + options.code
+					url: '/pages/activity/modules/detail?code=' + options.code
 				})
 			},
 			// 切换城市
 			goActivityCity() {
 				uni.navigateTo({
-					url: '/pages/activity/city'
+					url: '/pages/activity/modules/city'
 				})
 			}
 		}

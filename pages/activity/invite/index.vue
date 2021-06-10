@@ -713,7 +713,7 @@
 				//rewardType == 2时为积分
 				if (rewardType == 2) {
 					uni.navigateTo({
-						url: '/pages/account/benefit'
+						url: '/pages/account/modules/benefit'
 					})
 				} else {
 					uni.navigateTo({

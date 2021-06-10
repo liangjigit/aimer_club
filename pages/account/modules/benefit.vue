@@ -146,7 +146,7 @@
 			},
 			goCarmi() {
 				uni.navigateTo({
-					url: '/pages/account/carmi'
+					url: '/pages/account/modules/carmi'
 				})
 			},
 			goCoupon() {

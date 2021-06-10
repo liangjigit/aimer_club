@@ -15,62 +15,10 @@
 			}
 		},
 		{
-			"path": "pages/banner/aimerInfo",
-			"style": {
-				"navigationBarTitleText": "aimer信息",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
-			"path": "pages/integral/index",
-			"name": "integral",
-			"style": {
-				"navigationBarTitleText": "如何赚取积分"
-			}
-		},
-		{
-			"path": "pages/cup/detail",
-			"style": {
-				"navigationBarTitleText": "CUP 有料详情"
-			}
-		},
-		{
-			"path": "pages/coupon/index",
-			"style": {
-				"navigationBarTitleText": "优惠券",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/coupon/detail",
-			"style": {
-				"navigationBarTitleText": "优惠券"
-			}
-		},
-		{
-			"path": "pages/join/index",
-			"style": {
-				"navigationBarTitleText": "加入AIMER CLUB",
-				"navigationStyle": "custom"
-			}
-		},
-		{
 			"path": "pages/brarts/index",
 			"style": {
 				"navigationBarTitleText": "BRARTS",
 				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/brarts/detail",
-			"style": {
-				"navigationBarTitleText": "AIMER CLUB"
-			}
-		},
-		{
-			"path": "pages/poster/index",
-			"style": {
-				"navigationBarTitleText": "分享"
 			}
 		},
 		{
@@ -81,75 +29,9 @@
 			}
 		},
 		{
-			"path": "pages/training/detail/index",
-			"style": {
-				"navigationBarTitleText": "体态训练营"
-			}
-		},
-		{
-			"path": "pages/training/detail/punch",
-			"style": {
-				"navigationBarTitleText": "AIMER CLUB"
-			}
-		},
-		{
 			"path": "pages/account/index",
 			"style": {
 				"navigationBarTitleText": "我的 CLUB"
-			}
-		},
-		{
-			"path": "pages/account/baseInfo/index",
-			"style": {
-				"navigationBarTitleText": "个人资料"
-			}
-		},
-		{
-			"path": "pages/account/benefit",
-			"style": {
-				"navigationBarTitleText": "我的权益"
-			}
-		},
-		{
-			"path": "pages/account/collect",
-			"style": {
-				"navigationBarTitleText": "我的收藏",
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-			"path": "pages/account/carmi",
-			"style": {
-				"navigationBarTitleText": "电子券卡密"
-			}
-		},
-		{
-			"path": "pages/account/storeNav/index",
-			"style": {
-				"navigationBarTitleText": "门店导航"
-			}
-		},
-		{
-			"path": "pages/account/storeNav/detail",
-			"style": {
-				"navigationBarTitleText": "门店详情"
-			}
-		},
-		{
-			"path": "pages/webview/index",
-			"style": {
-				"navigationBarTitleText": "webview"
-			}
-		},
-		{
-			"path": "pages/activity/city",
-			"style": {
-				"navigationBarTitleText": "切换城市"
-			}
-		}, {
-			"path": "pages/activity/detail",
-			"style": {
-				"navigationBarTitleText": "AIMER CLUB"
 			}
 		}
 	],
@@ -198,6 +80,82 @@
 		]
 	},
 	"subPackages": [{
+			"root": "pages/brarts/modules",
+			"pages": [{
+				"path": "detail",
+				"style": {
+					"navigationBarTitleText": "AIMER CLUB"
+				}
+			}]
+		}, {
+			"root": "pages/activity/modules",
+			"pages": [{
+				"path": "city",
+				"style": {
+					"navigationBarTitleText": "切换城市"
+				}
+			}, {
+				"path": "detail",
+				"style": {
+					"navigationBarTitleText": "AIMER CLUB"
+				}
+			}]
+		}, {
+			"root": "pages/account/modules",
+			"pages": [{
+					"path": "benefit",
+					"style": {
+						"navigationBarTitleText": "我的权益"
+					}
+				}, {
+					"path": "carmi",
+					"style": {
+						"navigationBarTitleText": "电子券卡密"
+					}
+				},
+				{
+					"path": "collect",
+					"style": {
+						"navigationBarTitleText": "我的收藏",
+						"enablePullDownRefresh": true
+					}
+				}
+			]
+		},
+		{
+			"root": "pages/webview",
+			"pages": [{
+				"path": "index",
+				"style": {
+					"navigationBarTitleText": "webview"
+				}
+			}]
+		},
+		{
+			"root": "pages/account/storeNav",
+			"pages": [{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "门店导航"
+					}
+				},
+				{
+					"path": "detail",
+					"style": {
+						"navigationBarTitleText": "门店详情"
+					}
+				}
+			]
+		},
+		{
+			"root": "pages/account/baseInfo",
+			"pages": [{
+				"path": "index",
+				"style": {
+					"navigationBarTitleText": "个人资料"
+				}
+			}]
+		}, {
 			"root": "pages/account/shoppingGuide",
 			"pages": [{
 					"path": "index",
@@ -215,6 +173,22 @@
 					"path": "city",
 					"style": {
 						"navigationBarTitleText": "选择城市"
+					}
+				}
+			]
+		},
+		{
+			"root": "pages/training/detail",
+			"pages": [{
+					"path": "index",
+					"style": {
+						"navigationBarTitleText": "体态训练营"
+					}
+				},
+				{
+					"path": "punch",
+					"style": {
+						"navigationBarTitleText": "AIMER CLUB"
 					}
 				}
 			]
@@ -260,7 +234,69 @@
 					"navigationBarTitleText": "活动规则"
 				}
 			}]
+		},
+		{
+			"root": "pages/banner",
+			"pages": [{
+				"path": "aimerInfo",
+				"style": {
+					"navigationBarTitleText": "aimer信息",
+					"enablePullDownRefresh": false
+				}
+			}]
+		},
+		{
+			"root": "pages/integral",
+			"pages": [{
+				"path": "index",
+				"name": "integral",
+				"style": {
+					"navigationBarTitleText": "如何赚取积分"
+				}
+			}]
+		},
+		{
+			"root": "pages/cup",
+			"pages": [{
+				"path": "detail",
+				"style": {
+					"navigationBarTitleText": "CUP 有料详情"
+				}
+			}]
+		},
+		{
+			"root": "pages/coupon",
+			"pages": [{
+				"path": "index",
+				"style": {
+					"navigationBarTitleText": "优惠券",
+					"enablePullDownRefresh": true
+				}
+			}, {
+				"path": "detail",
+				"style": {
+					"navigationBarTitleText": "优惠券"
+				}
+			}]
+		},
+		{
+			"root": "pages/join",
+			"pages": [{
+				"path": "index",
+				"style": {
+					"navigationBarTitleText": "加入AIMER CLUB",
+					"navigationStyle": "custom"
+				}
+			}]
+		},
+		{
+			"root": "pages/poster",
+			"pages": [{
+				"path": "index",
+				"style": {
+					"navigationBarTitleText": "分享"
+				}
+			}]
 		}
 	]
-
 }
