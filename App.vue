@@ -52,10 +52,10 @@
 			const {
 				scene
 			} = options
-			uni.setStorageSync('globalScene', scene)
+			this.globalData.scene = scene
 			if (getCurrentPages()[0] && getCurrentPages()[0].route == 'pages/index/index') {
 				this.globalData.hotOpen = true
-			}else{
+			} else {
 				this.globalData.hotOpen = false
 			}
 			// console.log('App Show', scene)
@@ -65,7 +65,9 @@
 		},
 		globalData: {
 			level: false,
-			hotOpen: false
+			hotOpen: false,
+			//进入场景值
+			scene: 0
 		}
 	}
 </script>

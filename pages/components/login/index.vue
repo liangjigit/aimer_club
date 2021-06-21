@@ -123,9 +123,9 @@
 						if (fromWhere == 'tabBar') {
 							this.showTopLogin = true
 						} else {
+							if (fromWhere == 'FL') this.showHide = false
 							//如果未显示弹窗
 							if (!this.isShowLogin) {
-								if (fromWhere == 'FL') this.showHide = false
 								//显示弹窗
 								this.GETLOGINPOPUP()
 								uni.hideLoading()
@@ -145,13 +145,15 @@
 				const getPhone = uni.getStorageSync('getPhone');
 				//未注册
 				if (token && getPhone) {
-					if (uni.getStorageSync('invitePhone')) {
-						//被邀请进入的新会员
-						this.$emit('getNewPrize')
-					} else {
+					if (getCurrentPages()[getCurrentPages().length - 1].route == 'pages/index/index') {
 						uni.redirectTo({
 							url: '/pages/join/index'
 						})
+						return false
+					}
+					if (uni.getStorageSync('invitePhone')) {
+						//被邀请进入的新会员
+						this.$emit('getNewPrize')
 					}
 				}
 			},
@@ -215,7 +217,8 @@
 							if (!isCurrentPage) {
 								navigatorToPage(url, type, null, null, true)
 							}
-						} else if (id && !(uni.getStorageSync('fromService') || uni.getStorageSync('inviteStatus') !== '')) {
+						} else if (id && !(uni.getStorageSync('fromService') || uni.getStorageSync(
+								'inviteStatus') !== '')) {
 							const {
 								linkType,
 								linkUrl,

@@ -215,11 +215,21 @@
 			this.$refs.marketing.hasMarket = false
 		},
 		onShow() {
-			if (getApp().globalData.hotOpen && !uni.getStorageSync('joinToIndex')) {
+			const {
+				hotOpen,
+				scene
+			} = getApp().globalData
+			// console.log(scene)
+			if (hotOpen && !uni.getStorageSync('joinToIndex') && scene != '1038') {
 				this.$refs.marketing.getMarketing()
 			}
-			//删除裂变活动的缓存
-			uni.removeStorageSync('inviteStatus')
+			//如果存在则删除裂变活动的缓存
+			if (uni.getStorageSync('inviteStatus')) {
+				uni.removeStorageSync('inviteStatus')
+				uni.removeStorageSync('invitePhone')
+				uni.removeStorageSync('fromService')
+				uni.removeStorageSync('clubIn')
+			}
 			this.$refs.login.checkLogin('tabBar')
 			if (!this.onCreated) {
 				let isRefresh = true
@@ -294,6 +304,7 @@
 			...mapMutations('login', ['GETLOGINPOPUP', 'GETGUIDINFO', 'GETINVITEUSERID', 'GETREDIRECTURL']),
 			...mapMutations('cup', ['CHANGECOLLECT']),
 			...mapActions('invite', ['getActiveIndex']),
+			//从注册进入的首页不弹出营销弹窗
 			hasMarketResult() {
 				//获取营销弹窗数据
 				if (uni.getStorageSync('joinToIndex')) {

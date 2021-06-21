@@ -341,13 +341,9 @@
 		},
 		onUnload() {
 			console.log('------onUnload------')
-			uni.removeStorageSync('inviteStatus')
-			this.GETINVITEUSERID({
-				inviteUserId: null
-			})
-			uni.removeStorageSync('invitePhone')
-			uni.removeStorageSync('fromService')
-			uni.removeStorageSync('clubIn')
+			// this.GETINVITEUSERID({
+			// 	inviteUserId: null
+			// })
 		},
 		onLoad(options) {
 			console.log('------onLoad------')
@@ -404,6 +400,7 @@
 		},
 		onShow() {
 			console.log('------onShow------')
+			if(uni.getStorageSync('getPhone') !== false) uni.hideHomeButton()
 			// uni.hideLoading()
 			// uni.showLoading({
 			// 	title: '加载中',
@@ -411,6 +408,8 @@
 			// })
 			//获取两年后积分时间
 			this.getNowAndTwoYear()
+			//获取初始数据
+			this.getNewMemberPrize('INIT')
 			// //通过小程序码进入 1047 1048 1049 隐藏活动
 			// let scene = uni.getStorageSync('globalScene')
 			// if (scene == 1047 || scene == 1048 || scene == 1049) {
@@ -425,12 +424,18 @@
 			// 	uni.removeStorageSync('clubIn')
 			// }
 			//判断是否登陆
+			// console.log(this.isLogin)
+			// console.log(uni.getStorageSync('getPhone'))
 			if (this.isLogin) {
-				this.isShowInvite = true
-				this.getIndexData()
+				if (!uni.getStorageSync('getPhone')) {
+					//进判断代表注册并登录 
+					this.isShowInvite = true
+					this.getIndexData()
+				}else{
+					this.$refs.login.checkLogin('FL')
+				}
 			} else {
 				this.isShowInvite = false
-				this.getNewMemberPrize('INIT')
 				this.$refs.login.checkLogin('FL')
 			}
 		},
@@ -687,7 +692,7 @@
 			},
 			//去登录
 			toJoin() {
-				uni.navigateTo({
+				uni.reLaunch({
 					url: '/pages/join/index'
 				})
 			},

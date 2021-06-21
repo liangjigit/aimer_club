@@ -1,7 +1,7 @@
 <template>
 	<view class="marketing" @touchmove.stop.prevent="moveHandle" v-if="isShowMarketing">
 		<image class="image1" :src="popData.image" @click="goPath" mode="widthFix"></image>
-		<view @click="hide" class="cancel-btn">
+		<view @click="hide" class="cancel-btn" :style="closeP">
 			<image class="image2" src="/static/close-icon.png" mode="aspectFit"></image>
 		</view>
 	</view>
@@ -23,7 +23,7 @@
 				popData: {},
 				// 是否有弹框数据
 				hasMarket: false,
-				backMini: false
+				closeP: ''
 			}
 		},
 		created() {
@@ -42,9 +42,8 @@
 				if (code == 200) {
 					this.popData = JSON.parse(data)
 					// console.log('-----', this.popData)
-					if (this.popData == null || this.backMini) {
+					if (this.popData == null) {
 						this.hasMarket = false
-						this.backMini = false
 					} else {
 						this.hasMarket = true
 					}
@@ -70,9 +69,7 @@
 					navigatorToPage(url, linkType)
 				} else if (linkType == 3) {
 					//跳转其他小程序
-					navigatorToPage(miniappUrl, linkType, appId).then(() => {
-						_this.backMini = true
-					})
+					navigatorToPage(miniappUrl, linkType, appId)
 				}
 			},
 			//隐藏弹窗
@@ -86,6 +83,27 @@
 			...mapGetters('login', ['isLogin']),
 			isShowMarketing() {
 				return this.hasMarket && this.isLogin
+			}
+		},
+		watch: {
+			isShowMarketing: {
+				handler(val) {
+					if (val) {
+						const {
+							windowHeight: h
+						} = uni.getSystemInfoSync()
+						// console.log(h)
+						if (h < 600) {
+							this.closeP = 'height:130rpx'
+						} else if (600 <= h && h < 640) {
+							this.closeP = 'height:150rpx'
+						} else {
+							this.closeP = 'height:300rpx'
+						}
+					}
+				},
+				immediate: true,
+				deep: true
 			}
 		}
 	}
@@ -117,7 +135,6 @@
 			bottom: 50rpx;
 			font-size: 70upx;
 			width: 66upx;
-			height: 66upx;
 
 			.image2 {
 				width: 100%;
